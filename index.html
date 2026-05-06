@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="nl">
 <head>
@@ -71,19 +70,19 @@
     }
     .main {
       flex: 1;
-      padding: 32px;
+      padding: 24px;
     }
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       gap: 16px;
       flex-wrap: wrap;
     }
     .topbar h1 {
       margin: 0;
-      font-size: 30px;
+      font-size: 28px;
     }
     .actions {
       display: flex;
@@ -107,101 +106,48 @@
       color: #1f2937;
       border: 1px solid #d9e1ea;
     }
-    .grid {
+    .layout {
       display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 24px;
+      grid-template-columns: 340px 1fr 320px;
+      gap: 20px;
+      align-items: start;
     }
     .card {
       background: white;
       border-radius: 16px;
-      padding: 24px;
+      padding: 22px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-    }
-    .card h2, .card h3 {
-      margin-top: 0;
     }
     .zones {
       display: grid;
-      grid-template-columns: repeat(3, minmax(120px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
     }
     .zone {
       background: #f3f7fb;
       border: 2px solid #dbe6f0;
       border-radius: 14px;
-      padding: 18px;
-      min-height: 100px;
+      padding: 16px;
       cursor: pointer;
-      transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+      transition: 0.2s ease;
     }
     .zone:hover {
-      transform: translateY(-2px);
-      border-color: #7fb0e8;
+      border-color: #8db8eb;
     }
     .zone.active {
       border-color: #1f7ae0;
-      box-shadow: 0 0 0 3px rgba(31,122,224,0.10);
       background: #eef6ff;
     }
     .zone strong {
       display: block;
-      font-size: 20px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      font-size: 18px;
     }
     .muted {
       color: #6b7280;
       font-size: 14px;
       line-height: 1.5;
-    }
-    .ticket-box {
-      background: #f9fbfd;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 18px;
-      margin-top: 18px;
-    }
-    .phase-list {
-      display: grid;
-      gap: 12px;
-      margin-top: 16px;
-    }
-    .phase {
-      background: #f8fafc;
-      border: 1px solid #e4ebf2;
-      border-radius: 12px;
-      padding: 14px 16px;
-    }
-    .phase-title {
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-    .status-box {
-      background: #fff8dd;
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      border: 1px solid #f0e1a6;
-    }
-    .tag {
-      display: inline-block;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: #eef3f8;
-      margin: 6px 6px 0 0;
-      font-size: 14px;
-    }
-    .mini-line {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 10px 0;
-      border-bottom: 1px solid #edf2f7;
-      font-size: 15px;
-    }
-    .mini-line:last-child {
-      border-bottom: none;
     }
     .ticket-list {
       margin-top: 18px;
@@ -213,13 +159,111 @@
       border-radius: 12px;
       padding: 14px 16px;
       background: #fff;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .ticket-item:hover {
+      border-color: #8db8eb;
+      background: #f9fbff;
+    }
+    .ticket-item.active {
+      border-color: #1f7ae0;
+      box-shadow: 0 0 0 3px rgba(31,122,224,0.08);
+      background: #eef6ff;
     }
     .ticket-item strong {
       display: block;
       margin-bottom: 6px;
     }
+    .breadcrumb {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+    .attachments {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .attachment {
+      width: 130px;
+      border: 1px solid #dce6ef;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .attachment-thumb {
+      height: 86px;
+      background: linear-gradient(135deg, #e6eef7, #f8fbff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #516579;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .attachment-meta {
+      padding: 10px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .field {
+      margin-bottom: 16px;
+    }
+    .field label {
+      display: block;
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+    .field-box {
+      background: #f8fafc;
+      border: 1px solid #e4ebf2;
+      border-radius: 12px;
+      padding: 14px 16px;
+      min-height: 52px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #eef3f8;
+      margin: 6px 6px 0 0;
+      font-size: 14px;
+    }
+    .status-box {
+      background: #fff8dd;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      border: 1px solid #f0e1a6;
+      font-weight: bold;
+    }
+    .side-panel-box {
+      background: #f8fafc;
+      border: 1px solid #e4ebf2;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .phase-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .phase {
+      background: #f8fafc;
+      border: 1px solid #e4ebf2;
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .phase-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
     .contact-section {
-      margin-top: 32px;
+      margin-top: 28px;
     }
     .contact-card {
       background: white;
@@ -253,12 +297,9 @@
       padding: 14px;
       overflow: hidden;
     }
-    @media (max-width: 1024px) {
-      .grid {
+    @media (max-width: 1200px) {
+      .layout {
         grid-template-columns: 1fr;
-      }
-      .sidebar {
-        width: 280px;
       }
     }
     @media (max-width: 760px) {
@@ -269,10 +310,7 @@
         width: 100%;
       }
       .main {
-        padding: 20px;
-      }
-      .zones {
-        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        padding: 16px;
       }
       .contact-card {
         padding: 18px;
@@ -346,12 +384,10 @@
         </div>
       </div>
 
-      <div class="grid">
+      <div class="layout">
         <section class="card">
           <h2 id="zoneTitle">Zone P1</h2>
-          <p class="muted" id="zoneText">
-            Overzicht van de geselecteerde zone met registraties, foto’s en fases.
-          </p>
+          <p class="muted" id="zoneText">Overzicht van zone P1 met registraties, foto’s en fases.</p>
 
           <div class="zones">
             <div class="zone active" id="zone-P1" onclick="selectZone('P1')">
@@ -376,12 +412,35 @@
             </div>
           </div>
 
-          <div class="ticket-box">
-            <h3 id="ticketTitle">Herstelwerkzaamheden P1</h3>
-            <p class="muted" id="ticketDescription">
-              Voorbeeldticket van de geselecteerde zone. Hier komen later de echte foto’s, opmerkingen en annotaties.
-            </p>
+          <div class="ticket-list" id="ticketList"></div>
+        </section>
 
+        <section class="card">
+          <div class="breadcrumb" id="breadcrumb">Project / P1 / Ticket 001</div>
+
+          <h2>Algemene informatie</h2>
+
+          <div class="attachments" id="attachments"></div>
+
+          <div class="field">
+            <label>Titel</label>
+            <div class="field-box" id="ticketTitle">Herstelwerkzaamheden P1</div>
+          </div>
+
+          <div class="field">
+            <label>Omschrijving</label>
+            <div class="field-box" id="ticketDescription">Voorbeeldticket van de geselecteerde zone. Hier komen later de echte foto’s, opmerkingen en annotaties.</div>
+          </div>
+
+          <div class="field">
+            <label>Labels</label>
+            <div class="field-box">
+              <span class="tag" id="ticketLabel">Restauratie</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Fases</label>
             <div class="phase-list">
               <div class="phase">
                 <div class="phase-title">Startfase</div>
@@ -397,42 +456,42 @@
               </div>
             </div>
           </div>
-
-          <div class="ticket-list" id="ticketList"></div>
         </section>
 
         <aside class="card">
           <h3>Status</h3>
-          <div class="status-box" id="statusBox">
-            Actieve zone: P1
+          <div class="status-box" id="statusBox">Gecreëerd</div>
+
+          <h3>Personen</h3>
+          <div class="side-panel-box">
+            <strong>Verantwoordelijk</strong>
+            <div class="muted" id="ownerBox">Diederik Holland</div>
           </div>
 
-          <h3>Projectgegevens</h3>
-          <div class="mini-line"><span>Project</span><strong>Pilot watergang</strong></div>
-          <div class="mini-line"><span>Fase</span><strong>Voor / na</strong></div>
-          <div class="mini-line"><span>Status</span><strong>Geregistreerd</strong></div>
+          <div class="side-panel-box">
+            <strong>Geraadpleegd</strong>
+            <div class="muted">Uitvoerder team</div>
+          </div>
 
-          <h3 style="margin-top:24px;">Labels</h3>
-          <span class="tag">Restauratie</span>
-          <span class="tag">Herstel</span>
-          <span class="tag">Voor / na</span>
+          <div class="side-panel-box">
+            <strong>Geïnformeerd</strong>
+            <div class="muted" id="infoBox">Henry Hoegen, collega restauratie</div>
+          </div>
 
-          <h3 style="margin-top:24px;">Volgende stap</h3>
-          <p class="muted">
-            Hierna bouwen we foto-upload, annotaties met rode X/pijl en een detailweergave per ticket.
-          </p>
+          <h3>Opmerking</h3>
+          <div class="side-panel-box muted">
+            Hier komt later de ticketstatus, deadline, verantwoordelijke en archivering zoals in jouw referentie.
+          </div>
         </aside>
       </div>
 
       <section class="contact-section">
         <div class="contact-card">
-          <div class="contact-text">
-            <p class="contact-kicker">Contact</p>
-            <h2>Neem direct contact op</h2>
-            <p class="contact-description">
-              Gebruik het formulier hieronder om een vraag te stellen, een project te bespreken of een opmerking door te geven.
-            </p>
-          </div>
+          <p class="contact-kicker">Contact</p>
+          <h2>Neem direct contact op</h2>
+          <p class="contact-description">
+            Gebruik het formulier hieronder om een vraag te stellen, een project te bespreken of een opmerking door te geven.
+          </p>
 
           <div class="form-shell">
             <iframe
@@ -456,109 +515,175 @@
     const zoneData = {
       P1: {
         title: 'Zone P1',
-        text: 'Overzicht van zone P1 met voorbeeldregistraties en herstelpunten.',
-        ticket: 'Herstelwerkzaamheden P1',
-        description: 'In deze zone leggen we de beginsituatie, tussenstand en oplevering vast.',
-        start: 'Beginsituatie vastleggen met foto’s van scheurvorming en detailpunten.',
-        middle: 'Tussenstand met herstelwerkzaamheden en tussentijdse controle.',
-        end: 'Eindcontrole en visuele bevestiging van het resultaat.',
+        text: 'Overzicht van zone P1 met registraties, foto’s en fases.',
         tickets: [
-          'Ticket 001 – Scheurvorming in metselwerk',
-          'Ticket 002 – Controle waterlijn',
-          'Ticket 003 – Detailopname hoekverbinding'
+          {
+            id: 'Ticket 001',
+            title: 'Herstelwerkzaamheden P1',
+            description: 'Registratie van schade en herstelpunten in zone P1.',
+            label: 'Restauratie',
+            start: 'Beginsituatie vastleggen en schade documenteren.',
+            middle: 'Tussenstand van uitvoering en voortgangsfoto’s.',
+            end: 'Oplevering en eindresultaat controleren.'
+          },
+          {
+            id: 'Ticket 002',
+            title: 'Controle waterlijn P1',
+            description: 'Controle van waterlijn, metselwerk en aansluitingen.',
+            label: 'Controle',
+            start: 'Nulmeting en eerste opname waterlijn.',
+            middle: 'Voortgang van tussenliggende herstelwerkzaamheden.',
+            end: 'Eindopname en vergelijk met beginsituatie.'
+          }
         ]
       },
       P2: {
         title: 'Zone P2',
         text: 'Overzicht van zone P2 met extra focus op waterschade en herstelpunten.',
-        ticket: 'Herstelwerkzaamheden P2',
-        description: 'Deze zone bevat meerdere registraties en aandachtspunten.',
-        start: 'Vooropname maken van beschadiging, metselwerk en ondergrond.',
-        middle: 'Middenfase met voortgangsbeelden en controle op uitvoering.',
-        end: 'Eindbeeld en opleveringsfoto’s bewaren per onderdeel.',
         tickets: [
-          'Ticket 011 – Opname voegwerk',
-          'Ticket 012 – Tussencontrole restauratie',
-          'Ticket 013 – Registratie eindbeeld'
+          {
+            id: 'Ticket 011',
+            title: 'Opname voegwerk P2',
+            description: 'Inspectie van voegwerk en scheurvorming in zone P2.',
+            label: 'Herstel',
+            start: 'Vooropname van scheuren en losse delen.',
+            middle: 'Tussencontrole van herstel en stabilisatie.',
+            end: 'Definitieve opleveringsregistratie.'
+          }
         ]
       },
       P3: {
         title: 'Zone P3',
         text: 'Overzicht van zone P3, vergelijkbaar met jouw voorbeeldscherm.',
-        ticket: 'Herstelwerkzaamheden in beeld – voor en na',
-        description: 'Zone P3 bevat voorbeeldregistraties voor restauratie en herstel.',
-        start: 'Beginsituatie tonen met foto’s en hoofdplattegrond als referentie.',
-        middle: 'Tussenstand vastleggen tijdens herstelwerkzaamheden.',
-        end: 'Afronding en eindcontrole van het uitgevoerde werk.',
         tickets: [
-          'Ticket 021 – Vooropname schadebeeld',
-          'Ticket 022 – Herstel in uitvoering',
-          'Ticket 023 – Oplevercontrole en eindregistratie'
+          {
+            id: 'Ticket 021',
+            title: 'Herstelwerkzaamheden in beeld – voor en na',
+            description: 'Voorbeeldticket van restauratie en herstel in zone P3.',
+            label: 'Restauratie',
+            start: 'Beginsituatie tonen met foto’s en hoofdplattegrond als referentie.',
+            middle: 'Tussenstand vastleggen tijdens herstelwerkzaamheden.',
+            end: 'Afronding en eindcontrole van het uitgevoerde werk.'
+          },
+          {
+            id: 'Ticket 022',
+            title: 'Tussencontrole restauratie P3',
+            description: 'Controle van voortgang en detaillering in het metselwerk.',
+            label: 'Controle',
+            start: 'Startopname van risicozones.',
+            middle: 'Middenfase met tussentijdse inspectie.',
+            end: 'Eindbeoordeling na herstel.'
+          }
         ]
       },
       P4: {
         title: 'Zone P4',
         text: 'Overzicht van zone P4 met minder registraties maar wel aparte controles.',
-        ticket: 'Controle en herstel P4',
-        description: 'Deze zone wordt gebruikt voor gerichte opname en controle.',
-        start: 'Startopname met locatie en schadebeeld.',
-        middle: 'Voortgang en controle van tussenliggende werkzaamheden.',
-        end: 'Eindstatus en afrondingsbeeld per ticket.',
         tickets: [
-          'Ticket 031 – Inspectie fundering',
-          'Ticket 032 – Voortgangsfoto opname'
+          {
+            id: 'Ticket 031',
+            title: 'Inspectie fundering P4',
+            description: 'Technische controle van fundering en aansluitend metselwerk.',
+            label: 'Inspectie',
+            start: 'Startopname fundering en situatie.',
+            middle: 'Controle tijdens werkzaamheden.',
+            end: 'Eindstatus na stabilisatie.'
+          }
         ]
       },
       P5: {
         title: 'Zone P5',
         text: 'Overzicht van zone P5 met voorbeeldgegevens voor het laatste deelgebied.',
-        ticket: 'Herstel en oplevering P5',
-        description: 'Laatste zone van dit project met eigen registraties en status.',
-        start: 'Beginsituatie van metselwerk en details vastleggen.',
-        middle: 'Werk in uitvoering tonen met voortgangsfoto’s.',
-        end: 'Definitieve opleverfoto’s en afsluitende controle.',
         tickets: [
-          'Ticket 041 – Vooropname laatste deel',
-          'Ticket 042 – Middencontrole werkzaamheden',
-          'Ticket 043 – Eindoplevering P5'
+          {
+            id: 'Ticket 041',
+            title: 'Herstel en oplevering P5',
+            description: 'Laatste zone van dit project met eigen registraties en status.',
+            label: 'Oplevering',
+            start: 'Beginsituatie van metselwerk en details vastleggen.',
+            middle: 'Werk in uitvoering tonen met voortgangsfoto’s.',
+            end: 'Definitieve opleverfoto’s en afsluitende controle.'
+          }
         ]
       }
     };
 
-    function renderTickets(items) {
+    let currentZone = 'P1';
+    let currentTicketIndex = 0;
+
+    function renderTickets(zone) {
       const list = document.getElementById('ticketList');
-      list.innerHTML = items.map(item => `
-        <div class="ticket-item">
-          <strong>${item}</strong>
-          <span class="muted">Voorbeeldticket gekoppeld aan de geselecteerde zone.</span>
+      const tickets = zoneData[zone].tickets;
+
+      list.innerHTML = tickets.map((ticket, index) => `
+        <div class="ticket-item ${index === currentTicketIndex ? 'active' : ''}" onclick="selectTicket(${index})">
+          <strong>${ticket.id} – ${ticket.title}</strong>
+          <span class="muted">${ticket.description}</span>
         </div>
       `).join('');
     }
 
+    function renderAttachments(zone, ticket) {
+      const box = document.getElementById('attachments');
+      box.innerHTML = `
+        <div class="attachment">
+          <div class="attachment-thumb">Tekening</div>
+          <div class="attachment-meta">${zone} • hoofdplattegrond</div>
+        </div>
+        <div class="attachment">
+          <div class="attachment-thumb">Start</div>
+          <div class="attachment-meta">09 apr. 2026</div>
+        </div>
+        <div class="attachment">
+          <div class="attachment-thumb">Midden</div>
+          <div class="attachment-meta">09 apr. 2026</div>
+        </div>
+        <div class="attachment">
+          <div class="attachment-thumb">Eind</div>
+          <div class="attachment-meta">09 apr. 2026</div>
+        </div>
+      `;
+    }
+
+    function renderTicketDetails() {
+      const ticket = zoneData[currentZone].tickets[currentTicketIndex];
+
+      document.getElementById('zoneTitle').textContent = zoneData[currentZone].title;
+      document.getElementById('zoneText').textContent = zoneData[currentZone].text;
+      document.getElementById('breadcrumb').textContent = `Project / ${currentZone} / ${ticket.id}`;
+      document.getElementById('ticketTitle').textContent = ticket.title;
+      document.getElementById('ticketDescription').textContent = ticket.description;
+      document.getElementById('ticketLabel').textContent = ticket.label;
+      document.getElementById('startText').textContent = ticket.start;
+      document.getElementById('middleText').textContent = ticket.middle;
+      document.getElementById('endText').textContent = ticket.end;
+      document.getElementById('statusBox').textContent = `Gecreëerd – ${currentZone}`;
+      document.getElementById('ownerBox').textContent = currentZone === 'P3' ? 'Diederik Holland' : 'Projectteam';
+      document.getElementById('infoBox').textContent = currentZone === 'P3' ? 'Henry Hoegen, collega restauratie' : 'Collega uitvoerder';
+
+      renderAttachments(currentZone, ticket);
+      renderTickets(currentZone);
+    }
+
     function selectZone(zone) {
+      currentZone = zone;
+      currentTicketIndex = 0;
+
       document.querySelectorAll('.zone').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('[data-nav]').forEach(el => el.classList.remove('active'));
 
-      const zoneCard = document.getElementById('zone-' + zone);
-      if (zoneCard) zoneCard.classList.add('active');
+      document.getElementById('zone-' + zone).classList.add('active');
+      document.querySelector('[data-nav="' + zone + '"]').classList.add('active');
 
-      const navItem = document.querySelector('[data-nav="' + zone + '"]');
-      if (navItem) navItem.classList.add('active');
-
-      const data = zoneData[zone];
-      document.getElementById('zoneTitle').textContent = data.title;
-      document.getElementById('zoneText').textContent = data.text;
-      document.getElementById('ticketTitle').textContent = data.ticket;
-      document.getElementById('ticketDescription').textContent = data.description;
-      document.getElementById('startText').textContent = data.start;
-      document.getElementById('middleText').textContent = data.middle;
-      document.getElementById('endText').textContent = data.end;
-      document.getElementById('statusBox').textContent = 'Actieve zone: ' + zone;
-
-      renderTickets(data.tickets);
+      renderTicketDetails();
     }
 
-    renderTickets(zoneData.P1.tickets);
+    function selectTicket(index) {
+      currentTicketIndex = index;
+      renderTicketDetails();
+    }
+
+    renderTicketDetails();
   </script>
 </body>
 </html>
