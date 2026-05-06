@@ -3,322 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bouw Herstel Tool</title>
+  <title>Bouw Tool Simpel</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #edf2f7;
+      background: #eef3f8;
       color: #1f2937;
     }
-    .app {
-      display: flex;
-      min-height: 100vh;
-    }
-    .sidebar {
-      width: 320px;
-      background: #18344f;
-      color: #fff;
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-    }
-    .logo {
-      font-size: 34px;
-      font-weight: bold;
-      margin-bottom: 28px;
-    }
-    .project-label {
-      font-size: 13px;
-      opacity: 0.8;
-      margin-bottom: 4px;
-    }
-    .project-name {
-      font-size: 19px;
-      font-weight: bold;
-      line-height: 1.4;
-      margin-bottom: 28px;
-    }
-    .section-title {
-      font-size: 13px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      opacity: 0.8;
-      margin: 18px 0 8px;
-    }
-    .nav-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 10px;
-      border-radius: 10px;
-      margin-bottom: 4px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .nav-item:hover,
-    .nav-item.active {
-      background: rgba(255,255,255,0.10);
-    }
-    .nav-left {
-      font-size: 18px;
-    }
-    .count {
-      font-size: 15px;
-      color: #b7c6d4;
-    }
-    .main {
-      flex: 1;
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
       padding: 24px;
     }
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .topbar h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    button, .upload-btn {
-      border: none;
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      display: inline-block;
-      text-align: center;
-    }
-    .btn-primary {
-      background: #1f7ae0;
+    .header {
+      background: #18344f;
       color: white;
+      padding: 22px 24px;
+      border-radius: 18px;
+      margin-bottom: 22px;
     }
-    .btn-secondary {
-      background: white;
-      color: #1f2937;
-      border: 1px solid #d9e1ea;
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
     }
-    .layout {
-      display: grid;
-      grid-template-columns: 340px 1fr 320px;
-      gap: 20px;
-      align-items: start;
+    .header p {
+      margin: 0;
+      color: #d0dbe6;
     }
     .card {
       background: white;
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 22px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-    }
-    .zones {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(120px, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-    .zone {
-      background: #f3f7fb;
-      border: 2px solid #dbe6f0;
-      border-radius: 14px;
-      padding: 16px;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-    .zone:hover { border-color: #8db8eb; }
-    .zone.active {
-      border-color: #1f7ae0;
-      background: #eef6ff;
-    }
-    .zone strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 18px;
-    }
-    .muted {
-      color: #6b7280;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .ticket-list {
-      margin-top: 18px;
-      display: grid;
-      gap: 12px;
-    }
-    .ticket-item {
-      border: 1px solid #dbe6f0;
-      border-radius: 12px;
-      padding: 14px 16px;
-      background: #fff;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-    .ticket-item:hover {
-      border-color: #8db8eb;
-      background: #f9fbff;
-    }
-    .ticket-item.active {
-      border-color: #1f7ae0;
-      box-shadow: 0 0 0 3px rgba(31,122,224,0.08);
-      background: #eef6ff;
-    }
-    .ticket-item strong {
-      display: block;
-      margin-bottom: 6px;
-    }
-    .breadcrumb {
-      color: #64748b;
-      font-size: 14px;
-      margin-bottom: 14px;
-    }
-    .attachments {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-    }
-    .attachment {
-      width: 130px;
-      border: 1px solid #dce6ef;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #fff;
-    }
-    .attachment-thumb {
-      height: 86px;
-      background: linear-gradient(135deg, #e6eef7, #f8fbff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #516579;
-      font-size: 13px;
-      font-weight: bold;
-    }
-    .attachment-meta {
-      padding: 10px;
-      font-size: 12px;
-      color: #6b7280;
+      margin-bottom: 22px;
     }
     .field {
       margin-bottom: 16px;
     }
     .field label {
       display: block;
-      font-size: 14px;
-      color: #6b7280;
-      margin-bottom: 6px;
-    }
-    .field-box {
-      background: #f8fafc;
-      border: 1px solid #e4ebf2;
-      border-radius: 12px;
-      padding: 14px 16px;
-      min-height: 52px;
-    }
-    .tag {
-      display: inline-block;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: #eef3f8;
-      margin: 6px 6px 0 0;
-      font-size: 14px;
-    }
-    .status-box {
-      background: #fff8dd;
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      border: 1px solid #f0e1a6;
-      font-weight: bold;
-    }
-    .side-panel-box {
-      background: #f8fafc;
-      border: 1px solid #e4ebf2;
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-    }
-    .phase-list {
-      display: grid;
-      gap: 14px;
-      margin-top: 14px;
-    }
-    .phase {
-      background: #f8fafc;
-      border: 1px solid #e4ebf2;
-      border-radius: 12px;
-      padding: 14px 16px;
-    }
-    .phase-title {
       font-weight: bold;
       margin-bottom: 8px;
     }
-    .upload-wrap {
-      margin-top: 10px;
+    .field input[type="text"] {
+      width: 100%;
+      border: 1px solid #d5e0ea;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
     }
     .upload-btn {
+      display: inline-block;
       background: #1f7ae0;
       color: white;
-      margin-bottom: 10px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
     }
     .file-input {
       display: none;
     }
-    .preview-box {
+    .plan-preview {
+      margin-top: 18px;
+      border: 1px solid #d8e2eb;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+    .plan-preview img {
       width: 100%;
-      min-height: 180px;
-      border-radius: 12px;
-      border: 1px dashed #bdd0e2;
-      background: #fff;
+      max-height: 420px;
+      object-fit: contain;
+      display: none;
+      background: white;
+    }
+    .placeholder {
+      padding: 40px 20px;
+      text-align: center;
+      color: #6b7280;
+    }
+    .split-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+      margin-top: 22px;
+    }
+    .split-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+      overflow: hidden;
+      border: 1px solid #dbe6ef;
+    }
+    .split-head {
+      padding: 14px 16px;
+      background: #f7fafc;
+      border-bottom: 1px solid #e5edf4;
+      font-weight: bold;
+    }
+    .split-canvas {
+      position: relative;
+      height: 240px;
+      background: #f0f4f8;
+      overflow: hidden;
+      cursor: crosshair;
+      border-bottom: 1px solid #e5edf4;
+    }
+    .split-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+      user-select: none;
+      pointer-events: none;
+    }
+    .split-empty {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
-    .preview-box img {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      display: none;
-      cursor: pointer;
-    }
-    .preview-placeholder {
-      padding: 20px;
       text-align: center;
-      color: #718096;
+      padding: 14px;
+      color: #6b7280;
       font-size: 14px;
-    }
-    .drawing-preview {
-      margin-top: 14px;
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #dce6ef;
-      background: #fff;
-      cursor: pointer;
-    }
-    .drawing-preview img {
-      width: 100%;
-      display: block;
     }
     .marker {
       position: absolute;
-      width: 52px;
-      height: 52px;
-      border: 4px solid red;
-      border-radius: 50%;
-      right: 14%;
-      bottom: 18%;
+      width: 24px;
+      height: 24px;
+      transform: translate(-50%, -50%);
       pointer-events: none;
     }
     .marker::before,
@@ -329,549 +146,293 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
+      border-radius: 2px;
     }
     .marker::before {
       width: 4px;
-      height: 72px;
+      height: 24px;
     }
     .marker::after {
-      width: 72px;
+      width: 24px;
       height: 4px;
     }
-    .contact-section {
-      margin-top: 28px;
-    }
-    .contact-card {
-      background: white;
-      border-radius: 18px;
-      padding: 28px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-      border: 1px solid #e5edf5;
-    }
-    .contact-kicker {
-      margin: 0 0 8px;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #5b7288;
-    }
-    .contact-card h2 {
-      margin: 0 0 10px;
-      font-size: 30px;
-      color: #17324d;
-    }
-    .contact-description {
-      margin: 0 0 20px;
-      color: #667085;
-      max-width: 700px;
-      line-height: 1.6;
-    }
-    .form-shell {
-      background: #f7fafc;
-      border: 1px solid #dbe6f0;
-      border-radius: 16px;
-      padding: 14px;
-      overflow: hidden;
-    }
-    .modal {
+    .point-form {
       display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.88);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal.open {
-      display: flex;
-    }
-    .modal-inner {
-      max-width: 92vw;
-      max-height: 92vh;
-      position: relative;
-    }
-    .modal-inner img {
-      max-width: 92vw;
-      max-height: 92vh;
-      display: block;
-      border-radius: 10px;
+      padding: 14px 16px 18px;
       background: #fff;
     }
-    .modal-close {
-      position: absolute;
-      top: -14px;
-      right: -14px;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: white;
-      color: #111827;
-      font-size: 22px;
+    .point-form.active {
+      display: block;
+    }
+    .point-box {
+      background: #f8fafc;
+      border: 1px solid #dbe6ef;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #475569;
+    }
+    .photo-upload {
+      margin-bottom: 12px;
+    }
+    .photo-btn {
+      display: inline-block;
+      background: #18344f;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
       font-weight: bold;
-      border: none;
       cursor: pointer;
     }
-    @media (max-width: 1200px) {
-      .layout {
-        grid-template-columns: 1fr;
+    .photo-preview {
+      margin-top: 10px;
+      width: 100%;
+      height: 140px;
+      border: 1px dashed #c8d5e3;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      color: #6b7280;
+      font-size: 14px;
+      text-align: center;
+      padding: 10px;
+    }
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .hint {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 12px;
+    }
+    @media (max-width: 1300px) {
+      .split-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
     @media (max-width: 760px) {
-      .app {
-        flex-direction: column;
+      .split-grid {
+        grid-template-columns: 1fr;
       }
-      .sidebar {
-        width: 100%;
+      .container {
+        padding: 14px;
       }
-      .main {
-        padding: 16px;
-      }
-      .contact-card {
-        padding: 18px;
-      }
-      .contact-card h2 {
-        font-size: 24px;
-      }
-      .form-shell iframe {
-        height: 1100px;
+      .split-canvas {
+        height: 260px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="logo">GoControl</div>
+  <div class="container">
+    <div class="header">
+      <h1>Bouw Tool</h1>
+      <p>Simpel werken: nieuw project, hoofdplattegrond uploaden, in 5 delen werken, klikken en direct foto's toevoegen.</p>
+    </div>
 
-      <div class="project-label">Project</div>
-      <div class="project-name">Pilot watergang Kromme Nieuwegracht</div>
-
-      <div class="section-title">Tekeningen</div>
-
-      <div class="nav-item">
-        <div class="nav-left">Favoriete tekening</div>
-        <div class="count">(0)</div>
+    <div class="card">
+      <div class="field">
+        <label for="projectName">Nieuw project</label>
+        <input type="text" id="projectName" placeholder="Bijvoorbeeld: Pilot watergang Kromme Nieuwegracht">
       </div>
 
-      <div class="nav-item">
-        <div class="nav-left">GPS-kaart</div>
-        <div class="count">(2)</div>
+      <div class="field">
+        <label>Hoofdplattegrond</label>
+        <label class="upload-btn" for="mainPlanUpload">Upload hoofdplattegrond</label>
+        <input class="file-input" type="file" id="mainPlanUpload" accept="image/*">
       </div>
 
-      <div class="nav-item active" data-nav="P1" onclick="selectZone('P1')">
-        <div class="nav-left">P1</div>
-        <div class="count">(25)</div>
+      <div class="plan-preview">
+        <div class="placeholder" id="mainPlanPlaceholder">Nog geen hoofdplattegrond toegevoegd</div>
+        <img id="mainPlanImage" alt="Hoofdplattegrond preview">
       </div>
 
-      <div class="nav-item" data-nav="P2" onclick="selectZone('P2')">
-        <div class="nav-left">P2</div>
-        <div class="count">(50)</div>
+      <div class="hint">
+        Na upload wordt de hoofdplattegrond hieronder automatisch in 5 delen getoond. Klik daarna in een deel op het exacte punt waar het mankement zit.
       </div>
+    </div>
 
-      <div class="nav-item" data-nav="P3" onclick="selectZone('P3')">
-        <div class="nav-left">P3</div>
-        <div class="count">(51)</div>
-      </div>
-
-      <div class="nav-item" data-nav="P4" onclick="selectZone('P4')">
-        <div class="nav-left">P4</div>
-        <div class="count">(10)</div>
-      </div>
-
-      <div class="nav-item" data-nav="P5" onclick="selectZone('P5')">
-        <div class="nav-left">P5</div>
-        <div class="count">(15)</div>
-      </div>
-
-      <div class="nav-item">
-        <div class="nav-left">Tekeningen t.b.v. opname</div>
-        <div class="count">(21)</div>
-      </div>
-    </aside>
-
-    <main class="main">
-      <div class="topbar">
-        <h1>Bouw Herstel Tool</h1>
-        <div class="actions">
-          <button class="btn-secondary">Nieuw project</button>
-          <button class="btn-primary">Nieuw mankement</button>
+    <div class="split-grid" id="splitGrid">
+      <div class="split-card">
+        <div class="split-head">Deel 1</div>
+        <div class="split-canvas" data-part="1">
+          <div class="split-empty">Upload eerst een hoofdplattegrond</div>
+          <img class="split-image" id="splitImage1" alt="Deel 1">
+        </div>
+        <div class="point-form" id="pointForm1">
+          <div class="point-box" id="pointInfo1">Nog geen punt gekozen</div>
+          <div class="photo-upload">
+            <label class="photo-btn" for="photoUpload1">Foto toevoegen</label>
+            <input class="file-input" type="file" id="photoUpload1" accept="image/*" onchange="previewPointPhoto(event, 1)">
+            <div class="photo-preview" id="photoPreview1">
+              <span id="photoText1">Nog geen foto toegevoegd</span>
+              <img id="photoImg1" alt="Foto deel 1">
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="layout">
-        <section class="card">
-          <h2 id="zoneTitle">Zone P1</h2>
-          <p class="muted" id="zoneText">Overzicht van zone P1 met registraties, foto’s en fases.</p>
-
-          <div class="zones">
-            <div class="zone active" id="zone-P1" onclick="selectZone('P1')">
-              <strong>P1</strong>
-              <span class="muted">25 beelden of registraties</span>
+      <div class="split-card">
+        <div class="split-head">Deel 2</div>
+        <div class="split-canvas" data-part="2">
+          <div class="split-empty">Upload eerst een hoofdplattegrond</div>
+          <img class="split-image" id="splitImage2" alt="Deel 2">
+        </div>
+        <div class="point-form" id="pointForm2">
+          <div class="point-box" id="pointInfo2">Nog geen punt gekozen</div>
+          <div class="photo-upload">
+            <label class="photo-btn" for="photoUpload2">Foto toevoegen</label>
+            <input class="file-input" type="file" id="photoUpload2" accept="image/*" onchange="previewPointPhoto(event, 2)">
+            <div class="photo-preview" id="photoPreview2">
+              <span id="photoText2">Nog geen foto toegevoegd</span>
+              <img id="photoImg2" alt="Foto deel 2">
             </div>
-            <div class="zone" id="zone-P2" onclick="selectZone('P2')">
-              <strong>P2</strong>
-              <span class="muted">50 beelden of registraties</span>
-            </div>
-            <div class="zone" id="zone-P3" onclick="selectZone('P3')">
-              <strong>P3</strong>
-              <span class="muted">51 beelden of registraties</span>
-            </div>
-            <div class="zone" id="zone-P4" onclick="selectZone('P4')">
-              <strong>P4</strong>
-              <span class="muted">10 beelden of registraties</span>
-            </div>
-            <div class="zone" id="zone-P5" onclick="selectZone('P5')">
-              <strong>P5</strong>
-              <span class="muted">15 beelden of registraties</span>
-            </div>
-          </div>
-
-          <div class="ticket-list" id="ticketList"></div>
-        </section>
-
-        <section class="card">
-          <div class="breadcrumb" id="breadcrumb">Project / P1 / Ticket 001</div>
-
-          <h2>Algemene informatie</h2>
-
-          <div class="attachments" id="attachments"></div>
-
-          <div class="field">
-            <label>Titel</label>
-            <div class="field-box" id="ticketTitle">Herstelwerkzaamheden P1</div>
-          </div>
-
-          <div class="field">
-            <label>Omschrijving</label>
-            <div class="field-box" id="ticketDescription">Voorbeeldticket van de geselecteerde zone.</div>
-          </div>
-
-          <div class="field">
-            <label>Labels</label>
-            <div class="field-box">
-              <span class="tag" id="ticketLabel">Restauratie</span>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Referentie tekening</label>
-            <div class="drawing-preview" onclick="openModal(document.getElementById('drawingImage').src)">
-              <img id="drawingImage" src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80" alt="Referentie tekening">
-              <div class="marker"></div>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Fases met beeld</label>
-            <div class="phase-list">
-              <div class="phase">
-                <div class="phase-title">Startfase</div>
-                <div class="muted" id="startText">Beginsituatie vastleggen en schade documenteren.</div>
-                <div class="upload-wrap">
-                  <label class="upload-btn" for="startUpload">Upload startfoto</label>
-                  <input class="file-input" type="file" id="startUpload" accept="image/*" onchange="previewImage(event, 'startPreview', 'startPlaceholder')">
-                  <div class="preview-box">
-                    <div class="preview-placeholder" id="startPlaceholder">Nog geen startfoto toegevoegd</div>
-                    <img id="startPreview" alt="Start preview" onclick="openModal(this.src)">
-                  </div>
-                </div>
-              </div>
-
-              <div class="phase">
-                <div class="phase-title">Middenfase</div>
-                <div class="muted" id="middleText">Tussenstand van uitvoering en voortgangsfoto’s.</div>
-                <div class="upload-wrap">
-                  <label class="upload-btn" for="middleUpload">Upload middenfoto</label>
-                  <input class="file-input" type="file" id="middleUpload" accept="image/*" onchange="previewImage(event, 'middlePreview', 'middlePlaceholder')">
-                  <div class="preview-box">
-                    <div class="preview-placeholder" id="middlePlaceholder">Nog geen middenfoto toegevoegd</div>
-                    <img id="middlePreview" alt="Midden preview" onclick="openModal(this.src)">
-                  </div>
-                </div>
-              </div>
-
-              <div class="phase">
-                <div class="phase-title">Eindfase</div>
-                <div class="muted" id="endText">Oplevering en eindresultaat controleren.</div>
-                <div class="upload-wrap">
-                  <label class="upload-btn" for="endUpload">Upload eindfoto</label>
-                  <input class="file-input" type="file" id="endUpload" accept="image/*" onchange="previewImage(event, 'endPreview', 'endPlaceholder')">
-                  <div class="preview-box">
-                    <div class="preview-placeholder" id="endPlaceholder">Nog geen eindfoto toegevoegd</div>
-                    <img id="endPreview" alt="Eind preview" onclick="openModal(this.src)">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <aside class="card">
-          <h3>Status</h3>
-          <div class="status-box" id="statusBox">Gecreëerd</div>
-
-          <h3>Personen</h3>
-          <div class="side-panel-box">
-            <strong>Verantwoordelijk</strong>
-            <div class="muted" id="ownerBox">Diederik Holland</div>
-          </div>
-
-          <div class="side-panel-box">
-            <strong>Geraadpleegd</strong>
-            <div class="muted">Uitvoerder team</div>
-          </div>
-
-          <div class="side-panel-box">
-            <strong>Geïnformeerd</strong>
-            <div class="muted" id="infoBox">Henry Hoegen, collega restauratie</div>
-          </div>
-
-          <h3>Opmerking</h3>
-          <div class="side-panel-box muted">
-            Volgende stap: echte annotaties met rode X, pijl of doelwit direct op de geüploade foto of plattegrond.
-          </div>
-        </aside>
-      </div>
-
-      <section class="contact-section">
-        <div class="contact-card">
-          <p class="contact-kicker">Contact</p>
-          <h2>Neem direct contact op</h2>
-          <p class="contact-description">
-            Gebruik het formulier hieronder om een vraag te stellen, een project te bespreken of een opmerking door te geven.
-          </p>
-
-          <div class="form-shell">
-            <iframe
-              src="https://docs.google.com/forms/d/e/1FAIpQLSfqgHMrpra3GMfYD97j91u2mT8eD5NGVPl1wdWvit-eioVAZA/viewform?embedded=true"
-              width="100%"
-              height="980"
-              frameborder="0"
-              marginheight="0"
-              marginwidth="0"
-              style="border:0; display:block; width:100%; background:#fff;"
-            >
-              Laden…
-            </iframe>
           </div>
         </div>
-      </section>
-    </main>
-  </div>
+      </div>
 
-  <div class="modal" id="imageModal" onclick="closeModal(event)">
-    <div class="modal-inner">
-      <button class="modal-close" onclick="forceCloseModal()">×</button>
-      <img id="modalImage" src="" alt="Vergrote afbeelding">
+      <div class="split-card">
+        <div class="split-head">Deel 3</div>
+        <div class="split-canvas" data-part="3">
+          <div class="split-empty">Upload eerst een hoofdplattegrond</div>
+          <img class="split-image" id="splitImage3" alt="Deel 3">
+        </div>
+        <div class="point-form" id="pointForm3">
+          <div class="point-box" id="pointInfo3">Nog geen punt gekozen</div>
+          <div class="photo-upload">
+            <label class="photo-btn" for="photoUpload3">Foto toevoegen</label>
+            <input class="file-input" type="file" id="photoUpload3" accept="image/*" onchange="previewPointPhoto(event, 3)">
+            <div class="photo-preview" id="photoPreview3">
+              <span id="photoText3">Nog geen foto toegevoegd</span>
+              <img id="photoImg3" alt="Foto deel 3">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="split-card">
+        <div class="split-head">Deel 4</div>
+        <div class="split-canvas" data-part="4">
+          <div class="split-empty">Upload eerst een hoofdplattegrond</div>
+          <img class="split-image" id="splitImage4" alt="Deel 4">
+        </div>
+        <div class="point-form" id="pointForm4">
+          <div class="point-box" id="pointInfo4">Nog geen punt gekozen</div>
+          <div class="photo-upload">
+            <label class="photo-btn" for="photoUpload4">Foto toevoegen</label>
+            <input class="file-input" type="file" id="photoUpload4" accept="image/*" onchange="previewPointPhoto(event, 4)">
+            <div class="photo-preview" id="photoPreview4">
+              <span id="photoText4">Nog geen foto toegevoegd</span>
+              <img id="photoImg4" alt="Foto deel 4">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="split-card">
+        <div class="split-head">Deel 5</div>
+        <div class="split-canvas" data-part="5">
+          <div class="split-empty">Upload eerst een hoofdplattegrond</div>
+          <img class="split-image" id="splitImage5" alt="Deel 5">
+        </div>
+        <div class="point-form" id="pointForm5">
+          <div class="point-box" id="pointInfo5">Nog geen punt gekozen</div>
+          <div class="photo-upload">
+            <label class="photo-btn" for="photoUpload5">Foto toevoegen</label>
+            <input class="file-input" type="file" id="photoUpload5" accept="image/*" onchange="previewPointPhoto(event, 5)">
+            <div class="photo-preview" id="photoPreview5">
+              <span id="photoText5">Nog geen foto toegevoegd</span>
+              <img id="photoImg5" alt="Foto deel 5">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    const zoneData = {
-      P1: {
-        title: 'Zone P1',
-        text: 'Overzicht van zone P1 met registraties, foto’s en fases.',
-        tickets: [
-          {
-            id: 'Ticket 001',
-            title: 'Herstelwerkzaamheden P1',
-            description: 'Registratie van schade en herstelpunten in zone P1.',
-            label: 'Restauratie',
-            start: 'Beginsituatie vastleggen en schade documenteren.',
-            middle: 'Tussenstand van uitvoering en voortgangsfoto’s.',
-            end: 'Oplevering en eindresultaat controleren.'
-          },
-          {
-            id: 'Ticket 002',
-            title: 'Controle waterlijn P1',
-            description: 'Controle van waterlijn, metselwerk en aansluitingen.',
-            label: 'Controle',
-            start: 'Nulmeting en eerste opname waterlijn.',
-            middle: 'Voortgang van tussenliggende herstelwerkzaamheden.',
-            end: 'Eindopname en vergelijk met beginsituatie.'
-          }
-        ]
-      },
-      P2: {
-        title: 'Zone P2',
-        text: 'Overzicht van zone P2 met extra focus op waterschade en herstelpunten.',
-        tickets: [
-          {
-            id: 'Ticket 011',
-            title: 'Opname voegwerk P2',
-            description: 'Inspectie van voegwerk en scheurvorming in zone P2.',
-            label: 'Herstel',
-            start: 'Vooropname van scheuren en losse delen.',
-            middle: 'Tussencontrole van herstel en stabilisatie.',
-            end: 'Definitieve opleveringsregistratie.'
-          }
-        ]
-      },
-      P3: {
-        title: 'Zone P3',
-        text: 'Overzicht van zone P3, vergelijkbaar met jouw voorbeeldscherm.',
-        tickets: [
-          {
-            id: 'Ticket 021',
-            title: 'Herstelwerkzaamheden in beeld – voor en na',
-            description: 'Voorbeeldticket van restauratie en herstel in zone P3.',
-            label: 'Restauratie',
-            start: 'Beginsituatie tonen met foto’s en hoofdplattegrond als referentie.',
-            middle: 'Tussenstand vastleggen tijdens herstelwerkzaamheden.',
-            end: 'Afronding en eindcontrole van het uitgevoerde werk.'
-          },
-          {
-            id: 'Ticket 022',
-            title: 'Tussencontrole restauratie P3',
-            description: 'Controle van voortgang en detaillering in het metselwerk.',
-            label: 'Controle',
-            start: 'Startopname van risicozones.',
-            middle: 'Middenfase met tussentijdse inspectie.',
-            end: 'Eindbeoordeling na herstel.'
-          }
-        ]
-      },
-      P4: {
-        title: 'Zone P4',
-        text: 'Overzicht van zone P4 met minder registraties maar wel aparte controles.',
-        tickets: [
-          {
-            id: 'Ticket 031',
-            title: 'Inspectie fundering P4',
-            description: 'Technische controle van fundering en aansluitend metselwerk.',
-            label: 'Inspectie',
-            start: 'Startopname fundering en situatie.',
-            middle: 'Controle tijdens werkzaamheden.',
-            end: 'Eindstatus na stabilisatie.'
-          }
-        ]
-      },
-      P5: {
-        title: 'Zone P5',
-        text: 'Overzicht van zone P5 met voorbeeldgegevens voor het laatste deelgebied.',
-        tickets: [
-          {
-            id: 'Ticket 041',
-            title: 'Herstel en oplevering P5',
-            description: 'Laatste zone van dit project met eigen registraties en status.',
-            label: 'Oplevering',
-            start: 'Beginsituatie van metselwerk en details vastleggen.',
-            middle: 'Werk in uitvoering tonen met voortgangsfoto’s.',
-            end: 'Definitieve opleverfoto’s en afsluitende controle.'
-          }
-        ]
-      }
-    };
+    const mainPlanUpload = document.getElementById('mainPlanUpload');
+    const mainPlanImage = document.getElementById('mainPlanImage');
+    const mainPlanPlaceholder = document.getElementById('mainPlanPlaceholder');
 
-    let currentZone = 'P1';
-    let currentTicketIndex = 0;
-
-    function renderTickets(zone) {
-      const list = document.getElementById('ticketList');
-      const tickets = zoneData[zone].tickets;
-
-      list.innerHTML = tickets.map((ticket, index) => `
-        <div class="ticket-item ${index === currentTicketIndex ? 'active' : ''}" onclick="selectTicket(${index})">
-          <strong>${ticket.id} – ${ticket.title}</strong>
-          <span class="muted">${ticket.description}</span>
-        </div>
-      `).join('');
-    }
-
-    function renderAttachments(zone, ticket) {
-      const box = document.getElementById('attachments');
-      box.innerHTML = `
-        <div class="attachment">
-          <div class="attachment-thumb">Tekening</div>
-          <div class="attachment-meta">${zone} • hoofdplattegrond</div>
-        </div>
-        <div class="attachment">
-          <div class="attachment-thumb">Start</div>
-          <div class="attachment-meta">Foto registratie</div>
-        </div>
-        <div class="attachment">
-          <div class="attachment-thumb">Midden</div>
-          <div class="attachment-meta">Foto registratie</div>
-        </div>
-        <div class="attachment">
-          <div class="attachment-thumb">Eind</div>
-          <div class="attachment-meta">Foto registratie</div>
-        </div>
-      `;
-    }
-
-    function renderTicketDetails() {
-      const ticket = zoneData[currentZone].tickets[currentTicketIndex];
-
-      document.getElementById('zoneTitle').textContent = zoneData[currentZone].title;
-      document.getElementById('zoneText').textContent = zoneData[currentZone].text;
-      document.getElementById('breadcrumb').textContent = `Project / ${currentZone} / ${ticket.id}`;
-      document.getElementById('ticketTitle').textContent = ticket.title;
-      document.getElementById('ticketDescription').textContent = ticket.description;
-      document.getElementById('ticketLabel').textContent = ticket.label;
-      document.getElementById('startText').textContent = ticket.start;
-      document.getElementById('middleText').textContent = ticket.middle;
-      document.getElementById('endText').textContent = ticket.end;
-      document.getElementById('statusBox').textContent = `Gecreëerd – ${currentZone}`;
-      document.getElementById('ownerBox').textContent = currentZone === 'P3' ? 'Diederik Holland' : 'Projectteam';
-      document.getElementById('infoBox').textContent = currentZone === 'P3' ? 'Henry Hoegen, collega restauratie' : 'Collega uitvoerder';
-
-      renderAttachments(currentZone, ticket);
-      renderTickets(currentZone);
-    }
-
-    function selectZone(zone) {
-      currentZone = zone;
-      currentTicketIndex = 0;
-
-      document.querySelectorAll('.zone').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('[data-nav]').forEach(el => el.classList.remove('active'));
-
-      document.getElementById('zone-' + zone).classList.add('active');
-      document.querySelector('[data-nav="' + zone + '"]').classList.add('active');
-
-      renderTicketDetails();
-    }
-
-    function selectTicket(index) {
-      currentTicketIndex = index;
-      renderTicketDetails();
-    }
-
-    function previewImage(event, imgId, placeholderId) {
+    mainPlanUpload.addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (!file || !file.type.startsWith('image/')) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const img = document.getElementById(imgId);
-        const placeholder = document.getElementById(placeholderId);
+        const imageSrc = e.target.result;
+        mainPlanImage.src = imageSrc;
+        mainPlanImage.style.display = 'block';
+        mainPlanPlaceholder.style.display = 'none';
+
+        for (let i = 1; i <= 5; i++) {
+          const splitImage = document.getElementById('splitImage' + i);
+          const splitCanvas = document.querySelector('.split-canvas[data-part="' + i + '"]');
+          const splitEmpty = splitCanvas.querySelector('.split-empty');
+
+          splitImage.src = imageSrc;
+          splitImage.style.display = 'block';
+          splitEmpty.style.display = 'none';
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.querySelectorAll('.split-canvas').forEach(canvas => {
+      canvas.addEventListener('click', function(e) {
+        const part = this.dataset.part;
+        const image = this.querySelector('.split-image');
+
+        if (!image.src) return;
+
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const xPercent = ((x / rect.width) * 100).toFixed(1);
+        const yPercent = ((y / rect.height) * 100).toFixed(1);
+
+        const oldMarker = this.querySelector('.marker');
+        if (oldMarker) oldMarker.remove();
+
+        const marker = document.createElement('div');
+        marker.className = 'marker';
+        marker.style.left = x + 'px';
+        marker.style.top = y + 'px';
+        this.appendChild(marker);
+
+        const form = document.getElementById('pointForm' + part);
+        const info = document.getElementById('pointInfo' + part);
+
+        form.classList.add('active');
+        info.textContent = `Punt gekozen in deel ${part} op X: ${xPercent}% en Y: ${yPercent}%`;
+      });
+    });
+
+    function previewPointPhoto(event, part) {
+      const file = event.target.files[0];
+      if (!file || !file.type.startsWith('image/')) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('photoImg' + part);
+        const text = document.getElementById('photoText' + part);
+
         img.src = e.target.result;
         img.style.display = 'block';
-        placeholder.style.display = 'none';
+        text.style.display = 'none';
       };
       reader.readAsDataURL(file);
     }
-
-    function openModal(src) {
-      if (!src) return;
-      document.getElementById('modalImage').src = src;
-      document.getElementById('imageModal').classList.add('open');
-    }
-
-    function closeModal(event) {
-      if (event.target.id === 'imageModal') {
-        forceCloseModal();
-      }
-    }
-
-    function forceCloseModal() {
-      document.getElementById('imageModal').classList.remove('open');
-      document.getElementById('modalImage').src = '';
-    }
-
-    renderTicketDetails();
   </script>
 </body>
 </html>
