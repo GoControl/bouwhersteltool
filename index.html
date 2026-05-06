@@ -12,16 +12,12 @@
       background: #eef3f8;
       color: #1f2937;
     }
-
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     .projects-page {
       min-height: 100vh;
       background: #f5f7fa;
     }
-
     .projects-topbar {
       background: white;
       border-bottom: 1px solid #dce5ee;
@@ -30,11 +26,9 @@
       font-weight: bold;
       color: #16324c;
     }
-
     .projects-wrap {
       padding: 24px 28px 40px;
     }
-
     .projects-toolbar {
       display: flex;
       justify-content: space-between;
@@ -43,7 +37,6 @@
       flex-wrap: wrap;
       margin-bottom: 24px;
     }
-
     .search-box input {
       width: 280px;
       max-width: 100%;
@@ -53,7 +46,6 @@
       font-size: 15px;
       background: white;
     }
-
     .btn {
       border: none;
       border-radius: 10px;
@@ -62,18 +54,15 @@
       font-weight: bold;
       cursor: pointer;
     }
-
     .btn-primary {
       background: #1f7ae0;
       color: white;
     }
-
     .project-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 22px;
     }
-
     .project-card {
       background: white;
       border-radius: 18px;
@@ -83,12 +72,10 @@
       cursor: pointer;
       transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
-
     .project-card:hover {
       transform: translateY(-3px);
       box-shadow: 0 16px 32px rgba(0,0,0,0.10);
     }
-
     .project-image {
       width: 100%;
       height: 190px;
@@ -96,11 +83,9 @@
       display: block;
       background: #dce6ef;
     }
-
     .project-info {
       padding: 18px;
     }
-
     .project-title {
       font-size: 18px;
       font-weight: bold;
@@ -108,14 +93,12 @@
       color: #17324d;
       line-height: 1.35;
     }
-
     .project-subtitle {
       color: #6b7280;
       font-size: 15px;
       margin-bottom: 8px;
       line-height: 1.4;
     }
-
     .project-role {
       color: #7a8796;
       font-size: 14px;
@@ -125,34 +108,29 @@
       display: flex;
       min-height: 100vh;
     }
-
     .sidebar {
       width: 320px;
       background: #213d57;
       color: #fff;
       padding: 18px 18px 24px;
     }
-
     .logo {
       font-size: 30px;
       font-weight: bold;
       margin-bottom: 24px;
       letter-spacing: 0.02em;
     }
-
     .sidebar-label {
       font-size: 13px;
       color: #d3dde8;
       margin-bottom: 6px;
     }
-
     .sidebar-project {
       font-size: 17px;
       font-weight: bold;
       line-height: 1.4;
       margin-bottom: 20px;
     }
-
     .menu-title {
       font-size: 13px;
       text-transform: uppercase;
@@ -160,7 +138,6 @@
       margin: 18px 0 8px;
       color: #d8e1ea;
     }
-
     .menu-item {
       display: flex;
       justify-content: space-between;
@@ -172,12 +149,10 @@
       transition: background 0.18s ease;
       font-size: 17px;
     }
-
     .menu-item:hover,
     .menu-item.active {
       background: rgba(255,255,255,0.10);
     }
-
     .menu-count {
       color: #b8c7d5;
       font-size: 14px;
@@ -188,7 +163,6 @@
       padding: 24px;
       background: #eef3f8;
     }
-
     .project-main-top {
       display: flex;
       justify-content: space-between;
@@ -197,84 +171,200 @@
       flex-wrap: wrap;
       margin-bottom: 18px;
     }
-
     .back-btn {
       background: white;
       border: 1px solid #d4dee8;
       color: #17324d;
     }
-
     .content-card {
       background: white;
       border-radius: 18px;
       padding: 22px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.06);
     }
-
     .content-card h2 {
       margin-top: 0;
       margin-bottom: 10px;
       font-size: 28px;
       color: #17324d;
     }
-
     .content-card p {
       color: #5f6b78;
       line-height: 1.6;
       margin-bottom: 18px;
     }
 
-    .simple-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-      margin-top: 20px;
+    .field {
+      margin-bottom: 16px;
+    }
+    .field label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .field input[type="text"] {
+      width: 100%;
+      border: 1px solid #d5e0ea;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
     }
 
-    .simple-part {
+    .upload-btn {
+      display: inline-block;
+      background: #1f7ae0;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .file-input {
+      display: none;
+    }
+
+    .plan-preview {
+      margin-top: 18px;
+      border: 1px solid #d8e2eb;
+      border-radius: 16px;
+      overflow: hidden;
       background: #f8fafc;
-      border: 1px solid #dbe6ef;
-      border-radius: 14px;
-      padding: 18px;
+    }
+    .plan-preview img {
+      width: 100%;
+      max-height: 340px;
+      object-fit: contain;
+      display: none;
+      background: white;
+    }
+    .placeholder {
+      padding: 40px 20px;
       text-align: center;
+      color: #6b7280;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .split-card {
+      background: #fff;
+      border: 1px solid #dbe6ef;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    }
+    .split-head {
+      padding: 14px 16px;
+      background: #f7fafc;
+      border-bottom: 1px solid #e5edf4;
       font-weight: bold;
       color: #17324d;
-      min-height: 110px;
+    }
+    .split-canvas-wrap {
+      position: relative;
+      background: #f2f6fa;
+      border-bottom: 1px solid #e5edf4;
+    }
+    canvas.split-canvas {
+      width: 100%;
+      height: 220px;
+      display: block;
+      cursor: crosshair;
+      background: #f8fafc;
+    }
+    .point-form {
+      display: none;
+      padding: 14px 16px 18px;
+      background: #fff;
+    }
+    .point-form.active {
+      display: block;
+    }
+    .point-box {
+      background: #f8fafc;
+      border: 1px solid #dbe6ef;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #475569;
+    }
+    .photo-upload {
+      margin-bottom: 12px;
+    }
+    .photo-btn {
+      display: inline-block;
+      background: #18344f;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .photo-preview {
+      margin-top: 10px;
+      width: 100%;
+      height: 140px;
+      border: 1px dashed #c8d5e3;
+      border-radius: 12px;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: #f8fafc;
+      color: #6b7280;
+      font-size: 14px;
+      text-align: center;
+      padding: 10px;
+    }
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .hint {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 12px;
     }
 
-    @media (max-width: 1200px) {
-      .simple-grid {
+    @media (max-width: 1400px) {
+      .split-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 1100px) {
+      .split-grid {
         grid-template-columns: repeat(2, 1fr);
       }
     }
-
     @media (max-width: 820px) {
       .project-app {
         flex-direction: column;
       }
-
       .sidebar {
         width: 100%;
       }
-
       .project-main {
         padding: 16px;
       }
-
       .projects-topbar {
         padding: 18px 16px;
         font-size: 24px;
       }
-
       .projects-wrap {
         padding: 16px;
       }
-
-      .simple-grid {
+      .split-grid {
         grid-template-columns: 1fr;
+      }
+      canvas.split-canvas {
+        height: 250px;
       }
     }
   </style>
@@ -381,21 +471,134 @@
       <div class="content-card">
         <h2 id="contentProjectTitle">Pilot watergang Kromme Nieuwegracht</h2>
         <p id="contentProjectSubtitle">
-          Hier kom je in het project nadat je op de projectkaart hebt geklikt. Dit is de pagina waar we daarna jouw simpele workflow verder op bouwen met hoofdplattegrond en 5 delen.
+          Upload hieronder de hoofdplattegrond. Daarna wordt deze automatisch opgesplitst in 5 delen. Klik in een deel op het exacte punt en voeg direct de foto toe.
         </p>
 
-        <div class="simple-grid">
-          <div class="simple-part">P1</div>
-          <div class="simple-part">P2</div>
-          <div class="simple-part">P3</div>
-          <div class="simple-part">P4</div>
-          <div class="simple-part">P5</div>
+        <div class="field">
+          <label for="projectNameInput">Projectnaam</label>
+          <input type="text" id="projectNameInput" placeholder="Projectnaam">
+        </div>
+
+        <div class="field">
+          <label>Hoofdplattegrond</label>
+          <label class="upload-btn" for="mainPlanUpload">Upload hoofdplattegrond</label>
+          <input class="file-input" type="file" id="mainPlanUpload" accept="image/*">
+        </div>
+
+        <div class="plan-preview">
+          <div class="placeholder" id="mainPlanPlaceholder">Nog geen hoofdplattegrond toegevoegd</div>
+          <img id="mainPlanImage" alt="Hoofdplattegrond preview">
+        </div>
+
+        <div class="hint">
+          Klik na upload in één van de 5 delen op het juiste punt. Dan verschijnt direct een rood kruis en het fotoveld van dat deel.
+        </div>
+
+        <div class="split-grid">
+          <div class="split-card">
+            <div class="split-head">Deel 1</div>
+            <div class="split-canvas-wrap">
+              <canvas class="split-canvas" id="canvas1" width="300" height="220"></canvas>
+            </div>
+            <div class="point-form" id="pointForm1">
+              <div class="point-box" id="pointInfo1">Nog geen punt gekozen</div>
+              <div class="photo-upload">
+                <label class="photo-btn" for="photoUpload1">Foto toevoegen</label>
+                <input class="file-input" type="file" id="photoUpload1" accept="image/*" onchange="previewPointPhoto(event, 1)">
+                <div class="photo-preview" id="photoPreview1">
+                  <span id="photoText1">Nog geen foto toegevoegd</span>
+                  <img id="photoImg1" alt="Foto deel 1">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="split-card">
+            <div class="split-head">Deel 2</div>
+            <div class="split-canvas-wrap">
+              <canvas class="split-canvas" id="canvas2" width="300" height="220"></canvas>
+            </div>
+            <div class="point-form" id="pointForm2">
+              <div class="point-box" id="pointInfo2">Nog geen punt gekozen</div>
+              <div class="photo-upload">
+                <label class="photo-btn" for="photoUpload2">Foto toevoegen</label>
+                <input class="file-input" type="file" id="photoUpload2" accept="image/*" onchange="previewPointPhoto(event, 2)">
+                <div class="photo-preview" id="photoPreview2">
+                  <span id="photoText2">Nog geen foto toegevoegd</span>
+                  <img id="photoImg2" alt="Foto deel 2">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="split-card">
+            <div class="split-head">Deel 3</div>
+            <div class="split-canvas-wrap">
+              <canvas class="split-canvas" id="canvas3" width="300" height="220"></canvas>
+            </div>
+            <div class="point-form" id="pointForm3">
+              <div class="point-box" id="pointInfo3">Nog geen punt gekozen</div>
+              <div class="photo-upload">
+                <label class="photo-btn" for="photoUpload3">Foto toevoegen</label>
+                <input class="file-input" type="file" id="photoUpload3" accept="image/*" onchange="previewPointPhoto(event, 3)">
+                <div class="photo-preview" id="photoPreview3">
+                  <span id="photoText3">Nog geen foto toegevoegd</span>
+                  <img id="photoImg3" alt="Foto deel 3">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="split-card">
+            <div class="split-head">Deel 4</div>
+            <div class="split-canvas-wrap">
+              <canvas class="split-canvas" id="canvas4" width="300" height="220"></canvas>
+            </div>
+            <div class="point-form" id="pointForm4">
+              <div class="point-box" id="pointInfo4">Nog geen punt gekozen</div>
+              <div class="photo-upload">
+                <label class="photo-btn" for="photoUpload4">Foto toevoegen</label>
+                <input class="file-input" type="file" id="photoUpload4" accept="image/*" onchange="previewPointPhoto(event, 4)">
+                <div class="photo-preview" id="photoPreview4">
+                  <span id="photoText4">Nog geen foto toegevoegd</span>
+                  <img id="photoImg4" alt="Foto deel 4">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="split-card">
+            <div class="split-head">Deel 5</div>
+            <div class="split-canvas-wrap">
+              <canvas class="split-canvas" id="canvas5" width="300" height="220"></canvas>
+            </div>
+            <div class="point-form" id="pointForm5">
+              <div class="point-box" id="pointInfo5">Nog geen punt gekozen</div>
+              <div class="photo-upload">
+                <label class="photo-btn" for="photoUpload5">Foto toevoegen</label>
+                <input class="file-input" type="file" id="photoUpload5" accept="image/*" onchange="previewPointPhoto(event, 5)">
+                <div class="photo-preview" id="photoPreview5">
+                  <span id="photoText5">Nog geen foto toegevoegd</span>
+                  <img id="photoImg5" alt="Foto deel 5">
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
   </div>
 
   <script>
+    let sourceImage = null;
+    const markers = {
+      1: null,
+      2: null,
+      3: null,
+      4: null,
+      5: null
+    };
+
     function openProject(name, subtitle, role) {
       document.getElementById('projectsPage').classList.add('hidden');
       document.getElementById('projectPage').classList.remove('hidden');
@@ -403,12 +606,131 @@
       document.getElementById('sidebarProjectName').textContent = name;
       document.getElementById('contentProjectTitle').textContent = name;
       document.getElementById('contentProjectSubtitle').textContent =
-        subtitle + ' • ' + role + '. Hier bouwen we daarna de hoofdplattegrond en 5 delen in.';
+        subtitle + ' • ' + role + '. Upload hieronder de hoofdplattegrond en werk daarna per deel.';
+      document.getElementById('projectNameInput').value = name;
     }
 
     function goBackToProjects() {
       document.getElementById('projectPage').classList.add('hidden');
       document.getElementById('projectsPage').classList.remove('hidden');
+    }
+
+    document.getElementById('mainPlanUpload').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file || !file.type.startsWith('image/')) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        sourceImage = new Image();
+        sourceImage.onload = function() {
+          document.getElementById('mainPlanImage').src = e.target.result;
+          document.getElementById('mainPlanImage').style.display = 'block';
+          document.getElementById('mainPlanPlaceholder').style.display = 'none';
+
+          for (let i = 1; i <= 5; i++) {
+            markers[i] = null;
+            document.getElementById('pointForm' + i).classList.remove('active');
+            document.getElementById('pointInfo' + i).textContent = 'Nog geen punt gekozen';
+            drawPart(i);
+          }
+        };
+        sourceImage.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function drawPart(partIndex) {
+      const canvas = document.getElementById('canvas' + partIndex);
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = '#f2f6fa';
+      ctx.fillRect(0, 0, width, height);
+
+      if (!sourceImage) {
+        ctx.fillStyle = '#738295';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Upload eerst een hoofdplattegrond', width / 2, height / 2);
+        return;
+      }
+
+      const sliceWidth = sourceImage.width / 5;
+      const sx = sliceWidth * (partIndex - 1);
+      const sy = 0;
+      const sWidth = sliceWidth;
+      const sHeight = sourceImage.height;
+
+      ctx.drawImage(sourceImage, sx, sy, sWidth, sHeight, 0, 0, width, height);
+
+      const marker = markers[partIndex];
+      if (marker) {
+        drawCross(ctx, marker.x, marker.y);
+      }
+    }
+
+    function drawCross(ctx, x, y) {
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 3;
+
+      ctx.beginPath();
+      ctx.moveTo(x - 10, y);
+      ctx.lineTo(x + 10, y);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(x, y - 10);
+      ctx.lineTo(x, y + 10);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    for (let i = 1; i <= 5; i++) {
+      const canvas = document.getElementById('canvas' + i);
+
+      canvas.addEventListener('click', function(event) {
+        if (!sourceImage) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        const x = (event.clientX - rect.left) * scaleX;
+        const y = (event.clientY - rect.top) * scaleY;
+
+        markers[i] = { x, y };
+        drawPart(i);
+
+        const xPercent = ((x / canvas.width) * 100).toFixed(1);
+        const yPercent = ((y / canvas.height) * 100).toFixed(1);
+
+        document.getElementById('pointForm' + i).classList.add('active');
+        document.getElementById('pointInfo' + i).textContent =
+          'Punt gekozen in deel ' + i + ' op X: ' + xPercent + '% en Y: ' + yPercent + '%';
+      });
+
+      drawPart(i);
+    }
+
+    function previewPointPhoto(event, part) {
+      const file = event.target.files[0];
+      if (!file || !file.type.startsWith('image/')) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('photoImg' + part);
+        const text = document.getElementById('photoText' + part);
+
+        img.src = e.target.result;
+        img.style.display = 'block';
+        text.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
     }
   </script>
 </body>
