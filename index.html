@@ -883,3 +883,56 @@
 
   
 </html>
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.save-message {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #e8f7ec;
+  border: 1px solid #bfe3c8;
+  color: #22663a;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
+function savePartData() {
+  if (!partData[activePart].marker) {
+    alert('Zet eerst een kruis op de tekening.');
+    return;
+  }
+
+  const payload = {
+    project: document.getElementById('projectNameInput').value,
+    part: activePart,
+    savedAt: new Date().toISOString(),
+    data: partData[activePart]
+  };
+
+  const fileName = `deel-${activePart}-opslag.json`;
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+
+  URL.revokeObjectURL(url);
+
+  const saveMessage = document.getElementById('saveMessage');
+  saveMessage.classList.remove('hidden');
+  saveMessage.textContent = `Deel ${activePart} opgeslagen`;
+}
+
+function saveAndClosePartData() {
+  savePartData();
+  setTimeout(() => {
+    closePartModal();
+  }, 300);
+}
+Belangrijke verbetering
