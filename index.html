@@ -4,9 +4,111 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bouw Herstel Tool</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f7;
+      color: #1f2937;
+    }
+    .wrap {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 300px;
+      background: #17324d;
+      color: white;
+      padding: 24px 18px;
+    }
+    .sidebar h1 {
+      font-size: 24px;
+      margin: 0 0 24px;
+    }
+    .project {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 6px;
+    }
+    .project-name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 24px;
+    }
+    .menu-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin: 24px 0 12px;
+    }
+    .menu-item {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 20px;
+    }
+    .main {
+      flex: 1;
+      padding: 40px;
+    }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+      max-width: 900px;
+    }
+    .zones {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .zone {
+      background: #eef3f8;
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .small {
+      display: block;
+      font-size: 14px;
+      font-weight: normal;
+      margin-top: 6px;
+      color: #4b5563;
+    }
+  </style>
 </head>
 <body>
-  <h1>Bouw Herstel Tool</h1>
-  <p>De gratis online basis werkt.</p>
+  <div class="wrap">
+    <aside class="sidebar">
+      <h1>GoControl</h1>
+      <div class="project">Project</div>
+      <div class="project-name">Pilot watergang</div>
+
+      <div class="menu-title">Tekeningen</div>
+      <div class="menu-item">GPS-kaart (2)</div>
+      <div class="menu-item">P1 (25)</div>
+      <div class="menu-item">P2 (50)</div>
+      <div class="menu-item">P3 (51)</div>
+      <div class="menu-item">P4 (10)</div>
+      <div class="menu-item">P5 (15)</div>
+    </aside>
+
+    <main class="main">
+      <div class="card">
+        <h2>Bouw Herstel Tool</h2>
+        <p>De gratis online basis werkt. Hier bouwen we stap voor stap jullie projecten, zones, foto-fases en annotaties in.</p>
+
+        <div class="zones">
+          <div class="zone">P1 <span class="small">25 beelden</span></div>
+          <div class="zone">P2 <span class="small">50 beelden</span></div>
+          <div class="zone">P3 <span class="small">51 beelden</span></div>
+          <div class="zone">P4 <span class="small">10 beelden</span></div>
+          <div class="zone">P5 <span class="small">15 beelden</span></div>
+        </div>
+      </div>
+    </main>
+  </div>
 </body>
 </html>
