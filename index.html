@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="nl">
 <head>
@@ -108,7 +109,7 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
+      grid-template-columns: 1.5fr 1fr;
       gap: 24px;
     }
     .card {
@@ -202,6 +203,56 @@
     .mini-line:last-child {
       border-bottom: none;
     }
+    .ticket-list {
+      margin-top: 18px;
+      display: grid;
+      gap: 12px;
+    }
+    .ticket-item {
+      border: 1px solid #dbe6f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      background: #fff;
+    }
+    .ticket-item strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .contact-section {
+      margin-top: 32px;
+    }
+    .contact-card {
+      background: white;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      border: 1px solid #e5edf5;
+    }
+    .contact-kicker {
+      margin: 0 0 8px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #5b7288;
+    }
+    .contact-card h2 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      color: #17324d;
+    }
+    .contact-description {
+      margin: 0 0 20px;
+      color: #667085;
+      max-width: 700px;
+      line-height: 1.6;
+    }
+    .form-shell {
+      background: #f7fafc;
+      border: 1px solid #dbe6f0;
+      border-radius: 16px;
+      padding: 14px;
+      overflow: hidden;
+    }
     @media (max-width: 1024px) {
       .grid {
         grid-template-columns: 1fr;
@@ -223,6 +274,15 @@
       .zones {
         grid-template-columns: repeat(2, minmax(120px, 1fr));
       }
+      .contact-card {
+        padding: 18px;
+      }
+      .contact-card h2 {
+        font-size: 24px;
+      }
+      .form-shell iframe {
+        height: 1100px;
+      }
     }
   </style>
 </head>
@@ -236,16 +296,45 @@
 
       <div class="section-title">Tekeningen</div>
 
-      <div class="nav-item"><div class="nav-left">Favoriete tekening</div><div class="count">(0)</div></div>
-      <div class="nav-item"><div class="nav-left">GPS-kaart</div><div class="count">(2)</div></div>
+      <div class="nav-item">
+        <div class="nav-left">Favoriete tekening</div>
+        <div class="count">(0)</div>
+      </div>
 
-      <div class="nav-item active" onclick="selectZone('P1')"><div class="nav-left">P1</div><div class="count">(25)</div></div>
-      <div class="nav-item" onclick="selectZone('P2')"><div class="nav-left">P2</div><div class="count">(50)</div></div>
-      <div class="nav-item" onclick="selectZone('P3')"><div class="nav-left">P3</div><div class="count">(51)</div></div>
-      <div class="nav-item" onclick="selectZone('P4')"><div class="nav-left">P4</div><div class="count">(10)</div></div>
-      <div class="nav-item" onclick="selectZone('P5')"><div class="nav-left">P5</div><div class="count">(15)</div></div>
+      <div class="nav-item">
+        <div class="nav-left">GPS-kaart</div>
+        <div class="count">(2)</div>
+      </div>
 
-      <div class="nav-item"><div class="nav-left">Tekeningen t.b.v. opname</div><div class="count">(21)</div></div>
+      <div class="nav-item active" data-nav="P1" onclick="selectZone('P1')">
+        <div class="nav-left">P1</div>
+        <div class="count">(25)</div>
+      </div>
+
+      <div class="nav-item" data-nav="P2" onclick="selectZone('P2')">
+        <div class="nav-left">P2</div>
+        <div class="count">(50)</div>
+      </div>
+
+      <div class="nav-item" data-nav="P3" onclick="selectZone('P3')">
+        <div class="nav-left">P3</div>
+        <div class="count">(51)</div>
+      </div>
+
+      <div class="nav-item" data-nav="P4" onclick="selectZone('P4')">
+        <div class="nav-left">P4</div>
+        <div class="count">(10)</div>
+      </div>
+
+      <div class="nav-item" data-nav="P5" onclick="selectZone('P5')">
+        <div class="nav-left">P5</div>
+        <div class="count">(15)</div>
+      </div>
+
+      <div class="nav-item">
+        <div class="nav-left">Tekeningen t.b.v. opname</div>
+        <div class="count">(21)</div>
+      </div>
     </aside>
 
     <main class="main">
@@ -261,27 +350,27 @@
         <section class="card">
           <h2 id="zoneTitle">Zone P1</h2>
           <p class="muted" id="zoneText">
-            Overzicht van de geselecteerde zone met tickets, beelden en fases.
+            Overzicht van de geselecteerde zone met registraties, foto’s en fases.
           </p>
 
           <div class="zones">
-            <div class="zone active" onclick="selectZone('P1')" id="zone-P1">
+            <div class="zone active" id="zone-P1" onclick="selectZone('P1')">
               <strong>P1</strong>
               <span class="muted">25 beelden of registraties</span>
             </div>
-            <div class="zone" onclick="selectZone('P2')" id="zone-P2">
+            <div class="zone" id="zone-P2" onclick="selectZone('P2')">
               <strong>P2</strong>
               <span class="muted">50 beelden of registraties</span>
             </div>
-            <div class="zone" onclick="selectZone('P3')" id="zone-P3">
+            <div class="zone" id="zone-P3" onclick="selectZone('P3')">
               <strong>P3</strong>
               <span class="muted">51 beelden of registraties</span>
             </div>
-            <div class="zone" onclick="selectZone('P4')" id="zone-P4">
+            <div class="zone" id="zone-P4" onclick="selectZone('P4')">
               <strong>P4</strong>
               <span class="muted">10 beelden of registraties</span>
             </div>
-            <div class="zone" onclick="selectZone('P5')" id="zone-P5">
+            <div class="zone" id="zone-P5" onclick="selectZone('P5')">
               <strong>P5</strong>
               <span class="muted">15 beelden of registraties</span>
             </div>
@@ -308,6 +397,8 @@
               </div>
             </div>
           </div>
+
+          <div class="ticket-list" id="ticketList"></div>
         </section>
 
         <aside class="card">
@@ -332,6 +423,32 @@
           </p>
         </aside>
       </div>
+
+      <section class="contact-section">
+        <div class="contact-card">
+          <div class="contact-text">
+            <p class="contact-kicker">Contact</p>
+            <h2>Neem direct contact op</h2>
+            <p class="contact-description">
+              Gebruik het formulier hieronder om een vraag te stellen, een project te bespreken of een opmerking door te geven.
+            </p>
+          </div>
+
+          <div class="form-shell">
+            <iframe
+              src="https://docs.google.com/forms/d/e/1FAIpQLSfqgHMrpra3GMfYD97j91u2mT8eD5NGVPl1wdWvit-eioVAZA/viewform?embedded=true"
+              width="100%"
+              height="980"
+              frameborder="0"
+              marginheight="0"
+              marginwidth="0"
+              style="border:0; display:block; width:100%; background:#fff;"
+            >
+              Laden…
+            </iframe>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -344,7 +461,12 @@
         description: 'In deze zone leggen we de beginsituatie, tussenstand en oplevering vast.',
         start: 'Beginsituatie vastleggen met foto’s van scheurvorming en detailpunten.',
         middle: 'Tussenstand met herstelwerkzaamheden en tussentijdse controle.',
-        end: 'Eindcontrole en visuele bevestiging van het resultaat.'
+        end: 'Eindcontrole en visuele bevestiging van het resultaat.',
+        tickets: [
+          'Ticket 001 – Scheurvorming in metselwerk',
+          'Ticket 002 – Controle waterlijn',
+          'Ticket 003 – Detailopname hoekverbinding'
+        ]
       },
       P2: {
         title: 'Zone P2',
@@ -353,7 +475,12 @@
         description: 'Deze zone bevat meerdere registraties en aandachtspunten.',
         start: 'Vooropname maken van beschadiging, metselwerk en ondergrond.',
         middle: 'Middenfase met voortgangsbeelden en controle op uitvoering.',
-        end: 'Eindbeeld en opleveringsfoto’s bewaren per onderdeel.'
+        end: 'Eindbeeld en opleveringsfoto’s bewaren per onderdeel.',
+        tickets: [
+          'Ticket 011 – Opname voegwerk',
+          'Ticket 012 – Tussencontrole restauratie',
+          'Ticket 013 – Registratie eindbeeld'
+        ]
       },
       P3: {
         title: 'Zone P3',
@@ -362,7 +489,12 @@
         description: 'Zone P3 bevat voorbeeldregistraties voor restauratie en herstel.',
         start: 'Beginsituatie tonen met foto’s en hoofdplattegrond als referentie.',
         middle: 'Tussenstand vastleggen tijdens herstelwerkzaamheden.',
-        end: 'Afronding en eindcontrole van het uitgevoerde werk.'
+        end: 'Afronding en eindcontrole van het uitgevoerde werk.',
+        tickets: [
+          'Ticket 021 – Vooropname schadebeeld',
+          'Ticket 022 – Herstel in uitvoering',
+          'Ticket 023 – Oplevercontrole en eindregistratie'
+        ]
       },
       P4: {
         title: 'Zone P4',
@@ -371,7 +503,11 @@
         description: 'Deze zone wordt gebruikt voor gerichte opname en controle.',
         start: 'Startopname met locatie en schadebeeld.',
         middle: 'Voortgang en controle van tussenliggende werkzaamheden.',
-        end: 'Eindstatus en afrondingsbeeld per ticket.'
+        end: 'Eindstatus en afrondingsbeeld per ticket.',
+        tickets: [
+          'Ticket 031 – Inspectie fundering',
+          'Ticket 032 – Voortgangsfoto opname'
+        ]
       },
       P5: {
         title: 'Zone P5',
@@ -380,24 +516,34 @@
         description: 'Laatste zone van dit project met eigen registraties en status.',
         start: 'Beginsituatie van metselwerk en details vastleggen.',
         middle: 'Werk in uitvoering tonen met voortgangsfoto’s.',
-        end: 'Definitieve opleverfoto’s en afsluitende controle.'
+        end: 'Definitieve opleverfoto’s en afsluitende controle.',
+        tickets: [
+          'Ticket 041 – Vooropname laatste deel',
+          'Ticket 042 – Middencontrole werkzaamheden',
+          'Ticket 043 – Eindoplevering P5'
+        ]
       }
     };
 
+    function renderTickets(items) {
+      const list = document.getElementById('ticketList');
+      list.innerHTML = items.map(item => `
+        <div class="ticket-item">
+          <strong>${item}</strong>
+          <span class="muted">Voorbeeldticket gekoppeld aan de geselecteerde zone.</span>
+        </div>
+      `).join('');
+    }
+
     function selectZone(zone) {
       document.querySelectorAll('.zone').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('[data-nav]').forEach(el => el.classList.remove('active'));
 
       const zoneCard = document.getElementById('zone-' + zone);
       if (zoneCard) zoneCard.classList.add('active');
 
-      const navItems = document.querySelectorAll('.sidebar .nav-item');
-      navItems.forEach(item => {
-        const left = item.querySelector('.nav-left');
-        if (left && left.textContent.trim() === zone) {
-          item.classList.add('active');
-        }
-      });
+      const navItem = document.querySelector('[data-nav="' + zone + '"]');
+      if (navItem) navItem.classList.add('active');
 
       const data = zoneData[zone];
       document.getElementById('zoneTitle').textContent = data.title;
@@ -408,107 +554,11 @@
       document.getElementById('middleText').textContent = data.middle;
       document.getElementById('endText').textContent = data.end;
       document.getElementById('statusBox').textContent = 'Actieve zone: ' + zone;
+
+      renderTickets(data.tickets);
     }
+
+    renderTickets(zoneData.P1.tickets);
   </script>
 </body>
 </html>
-<section class="card" style="margin-top: 24px;">
-  <h2>Contact</h2>
-  <p class="muted">Neem contact op via het formulier hieronder.</p>
-
-  <div style="position: relative; width: 100%; overflow: hidden; border-radius: 14px; background: #fff;">
-    <iframe
-      src="https://docs.google.com/forms/d/e/1FAIpQLSfqgHMrpra3GMfYD97j91u2mT8eD5NGVPl1wdWvit-eioVAZA/viewform?embedded=true"
-      width="100%"
-      height="900"
-      frameborder="0"
-      marginheight="0"
-      marginwidth="0"
-      style="border: 0; display: block; width: 100%;"
-    >
-      Laden…
-    </iframe>
-  </div>
-</section>
-<section class="contact-section">
-  <div class="contact-card">
-    <div class="contact-text">
-      <p class="contact-kicker">Contact</p>
-      <h2>Neem direct contact op</h2>
-      <p class="contact-description">
-        Gebruik het formulier hieronder om een vraag te stellen, een project te bespreken of een opmerking door te geven.
-      </p>
-    </div>
-
-    <div class="form-shell">
-      <iframe
-        src="https://docs.google.com/forms/d/e/1FAIpQLSfqgHMrpra3GMfYD97j91u2mT8eD5NGVPl1wdWvit-eioVAZA/viewform?embedded=true"
-        width="100%"
-        height="980"
-        frameborder="0"
-        marginheight="0"
-        marginwidth="0"
-        style="border:0; display:block; width:100%; background:#fff;"
-      >
-        Laden…
-      </iframe>
-    </div>
-  </div>
-</section>
-En voeg deze CSS toe in je <style>:
-
-css
-.contact-section {
-  margin-top: 32px;
-}
-
-.contact-card {
-  background: white;
-  border-radius: 18px;
-  padding: 28px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-  border: 1px solid #e5edf5;
-}
-
-.contact-kicker {
-  margin: 0 0 8px;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #5b7288;
-}
-
-.contact-card h2 {
-  margin: 0 0 10px;
-  font-size: 30px;
-  color: #17324d;
-}
-
-.contact-description {
-  margin: 0 0 20px;
-  color: #667085;
-  max-width: 700px;
-  line-height: 1.6;
-}
-
-.form-shell {
-  background: #f7fafc;
-  border: 1px solid #dbe6f0;
-  border-radius: 16px;
-  padding: 14px;
-  overflow: hidden;
-}
-
-@media (max-width: 760px) {
-  .contact-card {
-    padding: 18px;
-  }
-
-  .contact-card h2 {
-    font-size: 24px;
-  }
-
-  .form-shell iframe {
-    height: 1100px;
-  }
-}
