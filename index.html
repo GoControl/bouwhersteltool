@@ -936,3 +936,7 @@ function saveAndClosePartData() {
   }, 300);
 }
 Belangrijke verbetering
+function closePartModal() {
+  document.getElementById('partModal').classList.remove('open');
+  document.getElementById('saveMessage').classList.add('hidden');
+}
