@@ -305,7 +305,7 @@
       display: flex;
     }
     .modal-panel {
-      width: min(1100px, 100%);
+      width: min(1180px, 100%);
       max-height: 94vh;
       overflow: auto;
       background: white;
@@ -346,7 +346,7 @@
     }
     canvas.zoom-canvas {
       width: 100%;
-      height: 520px;
+      height: 560px;
       display: block;
       cursor: crosshair;
       background: #fff;
@@ -381,26 +381,41 @@
       cursor: pointer;
       margin-bottom: 10px;
     }
-    .photo-preview {
-      width: 100%;
-      height: 200px;
-      border: 1px dashed #c8d5e3;
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .gallery-item {
+      border: 1px solid #dbe6ef;
       border-radius: 12px;
       overflow: hidden;
+      background: white;
+      min-height: 170px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #fff;
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      display: block;
+    }
+    .empty-gallery {
+      width: 100%;
+      min-height: 170px;
+      border: 1px dashed #c8d5e3;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
       color: #6b7280;
       font-size: 14px;
       text-align: center;
-      padding: 10px;
-    }
-    .photo-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: none;
+      padding: 18px;
     }
 
     @media (max-width: 1400px) {
@@ -437,7 +452,7 @@
         height: 240px;
       }
       canvas.zoom-canvas {
-        height: 360px;
+        height: 380px;
       }
     }
   </style>
@@ -525,13 +540,13 @@
         </p>
 
         <div class="field">
-          <label for="projectNameInput">Projectnaam</label>
+          abel for="projectNameInput">Projectnaam</label>
           <input type="text" id="projectNameInput" placeholder="Projectnaam">
         </div>
 
         <div class="field">
-          <label>Hoofdplattegrond</label>
-          <label class="upload-btn" for="mainPlanUpload">Upload hoofdplattegrond</label>
+          abel>Hoofdplattegrond</label>
+          abel class="upload-btn" for="mainPlanUpload">Upload hoofdplattegrond</label>
           <input class="file-input" type="file" id="mainPlanUpload" accept="image/*">
         </div>
 
@@ -548,35 +563,31 @@
           <div class="split-card" onclick="openPartModal(1)">
             <div class="split-head">Deel 1</div>
             <div class="split-thumb-wrap">
-              <canvas class="split-thumb" id="thumb1" width="300" height="220"></canvas>
+              anvas class="split-thumb" id="thumb1"></canvas>
             </div>
           </div>
-
           <div class="split-card" onclick="openPartModal(2)">
             <div class="split-head">Deel 2</div>
             <div class="split-thumb-wrap">
-              <canvas class="split-thumb" id="thumb2" width="300" height="220"></canvas>
+              anvas class="split-thumb" id="thumb2"></canvas>
             </div>
           </div>
-
           <div class="split-card" onclick="openPartModal(3)">
             <div class="split-head">Deel 3</div>
             <div class="split-thumb-wrap">
-              <canvas class="split-thumb" id="thumb3" width="300" height="220"></canvas>
+              anvas class="split-thumb" id="thumb3"></canvas>
             </div>
           </div>
-
           <div class="split-card" onclick="openPartModal(4)">
             <div class="split-head">Deel 4</div>
             <div class="split-thumb-wrap">
-              <canvas class="split-thumb" id="thumb4" width="300" height="220"></canvas>
+              anvas class="split-thumb" id="thumb4"></canvas>
             </div>
           </div>
-
           <div class="split-card" onclick="openPartModal(5)">
             <div class="split-head">Deel 5</div>
             <div class="split-thumb-wrap">
-              <canvas class="split-thumb" id="thumb5" width="300" height="220"></canvas>
+              anvas class="split-thumb" id="thumb5"></canvas>
             </div>
           </div>
         </div>
@@ -589,28 +600,28 @@
       <button class="modal-close" onclick="closePartModal()">×</button>
       <div class="modal-title" id="modalTitle">Deel 1</div>
       <div class="modal-subtitle">
-        Klik hieronder op het exacte punt waar je het kruis wilt zetten. Pas daarna verschijnt het veld voor foto en opmerkingen.
+        Klik hieronder op het exacte punt waar je het kruis wilt zetten. Daarna kun je meerdere foto's toevoegen en een opmerking invullen.
       </div>
 
       <div class="zoom-wrap">
-        <canvas class="zoom-canvas" id="zoomCanvas" width="1000" height="520"></canvas>
+        anvas class="zoom-canvas" id="zoomCanvas"></canvas>
       </div>
 
       <div class="point-form" id="modalPointForm">
         <div class="point-box" id="modalPointInfo">Nog geen punt gekozen</div>
 
         <div class="field">
-          <label>Foto toevoegen</label>
-          <label class="photo-btn" for="modalPhotoUpload">Foto uploaden</label>
-          <input class="file-input" type="file" id="modalPhotoUpload" accept="image/*" onchange="previewModalPhoto(event)">
-          <div class="photo-preview" id="modalPhotoPreview">
-            <span id="modalPhotoText">Nog geen foto toegevoegd</span>
-            <img id="modalPhotoImg" alt="Foto preview">
+          abel>Foto's toevoegen</label>
+          abel class="photo-btn" for="modalPhotoUpload">Meerdere foto's uploaden</label>
+          <input class="file-input" type="file" id="modalPhotoUpload" accept="image/*" multiple onchange="previewModalPhotos(event)">
+          <div id="modalGalleryContainer">
+            <div class="empty-gallery" id="emptyGallery">Nog geen foto's toegevoegd</div>
+            <div class="gallery-grid hidden" id="modalGallery"></div>
           </div>
         </div>
 
         <div class="field">
-          <label for="modalRemark">Opmerking</label>
+          abel for="modalRemark">Opmerking</label>
           <textarea id="modalRemark" placeholder="Typ hier je opmerking over dit punt"></textarea>
         </div>
       </div>
@@ -622,11 +633,11 @@
     let activePart = 1;
 
     const partData = {
-      1: { marker: null, photo: '', remark: '' },
-      2: { marker: null, photo: '', remark: '' },
-      3: { marker: null, photo: '', remark: '' },
-      4: { marker: null, photo: '', remark: '' },
-      5: { marker: null, photo: '', remark: '' }
+      1: { marker: null, photos: [], remark: '' },
+      2: { marker: null, photos: [], remark: '' },
+      3: { marker: null, photos: [], remark: '' },
+      4: { marker: null, photos: [], remark: '' },
+      5: { marker: null, photos: [], remark: '' }
     };
 
     function openProject(name, subtitle, role) {
@@ -643,6 +654,18 @@
     function goBackToProjects() {
       document.getElementById('projectPage').classList.add('hidden');
       document.getElementById('projectsPage').classList.remove('hidden');
+    }
+
+    function setupHiDPICanvas(canvas, cssWidth, cssHeight) {
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.round(cssWidth * ratio);
+      canvas.height = Math.round(cssHeight * ratio);
+      canvas.style.width = cssWidth + 'px';
+      canvas.style.height = cssHeight + 'px';
+
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      return { ctx, width: cssWidth, height: cssHeight };
     }
 
     document.getElementById('mainPlanUpload').addEventListener('change', function(event) {
@@ -666,16 +689,24 @@
       reader.readAsDataURL(file);
     });
 
-    function drawPartSlice(ctx, canvasWidth, canvasHeight, partIndex) {
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    function drawPartSliceOnCanvas(canvas, partIndex, isZoom = false) {
+      const rect = canvas.getBoundingClientRect();
+      const cssWidth = Math.max(Math.round(rect.width || (isZoom ? 1000 : 300)), 1);
+      const cssHeight = Math.max(Math.round(rect.height || (isZoom ? 560 : 220)), 1);
+      const setup = setupHiDPICanvas(canvas, cssWidth, cssHeight);
+      const ctx = setup.ctx;
+      const width = setup.width;
+      const height = setup.height;
+
+      ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = '#f2f6fa';
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.fillRect(0, 0, width, height);
 
       if (!sourceImage) {
         ctx.fillStyle = '#738295';
         ctx.font = '14px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('Upload eerst een hoofdplattegrond', canvasWidth / 2, canvasHeight / 2);
+        ctx.fillText('Upload eerst een hoofdplattegrond', width / 2, height / 2);
         return;
       }
 
@@ -685,7 +716,9 @@
       const sWidth = sliceWidth;
       const sHeight = sourceImage.height;
 
-      ctx.drawImage(sourceImage, sx, sy, sWidth, sHeight, 0, 0, canvasWidth, canvasHeight);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(sourceImage, sx, sy, sWidth, sHeight, 0, 0, width, height);
 
       if (partData[partIndex].marker) {
         const marker = partData[partIndex].marker;
@@ -714,8 +747,7 @@
 
     function drawThumb(partIndex) {
       const canvas = document.getElementById('thumb' + partIndex);
-      const ctx = canvas.getContext('2d');
-      drawPartSlice(ctx, canvas.width, canvas.height, partIndex);
+      drawPartSliceOnCanvas(canvas, partIndex, false);
     }
 
     function openPartModal(partIndex) {
@@ -725,8 +757,10 @@
       document.getElementById('modalTitle').textContent = 'Deel ' + partIndex;
       document.getElementById('partModal').classList.add('open');
 
-      drawZoomCanvas();
-      loadModalForm();
+      setTimeout(() => {
+        drawZoomCanvas();
+        loadModalForm();
+      }, 10);
     }
 
     function closePartModal() {
@@ -735,40 +769,29 @@
 
     function drawZoomCanvas() {
       const canvas = document.getElementById('zoomCanvas');
-      const ctx = canvas.getContext('2d');
-      drawPartSlice(ctx, canvas.width, canvas.height, activePart);
+      drawPartSliceOnCanvas(canvas, activePart, true);
     }
 
     function loadModalForm() {
       const form = document.getElementById('modalPointForm');
       const info = document.getElementById('modalPointInfo');
-      const photoImg = document.getElementById('modalPhotoImg');
-      const photoText = document.getElementById('modalPhotoText');
       const remark = document.getElementById('modalRemark');
-
       const data = partData[activePart];
 
       if (data.marker) {
         form.classList.add('active');
-        const xPercent = ((data.marker.x / 1000) * 100).toFixed(1);
-        const yPercent = ((data.marker.y / 520) * 100).toFixed(1);
+        const canvas = document.getElementById('zoomCanvas');
+        const rect = canvas.getBoundingClientRect();
+        const xPercent = ((data.marker.x / rect.width) * 100).toFixed(1);
+        const yPercent = ((data.marker.y / rect.height) * 100).toFixed(1);
         info.textContent = `Punt gekozen in deel ${activePart} op X: ${xPercent}% en Y: ${yPercent}%`;
       } else {
         form.classList.remove('active');
         info.textContent = 'Nog geen punt gekozen';
       }
 
-      if (data.photo) {
-        photoImg.src = data.photo;
-        photoImg.style.display = 'block';
-        photoText.style.display = 'none';
-      } else {
-        photoImg.src = '';
-        photoImg.style.display = 'none';
-        photoText.style.display = 'block';
-      }
-
       remark.value = data.remark || '';
+      renderGallery();
     }
 
     document.getElementById('zoomCanvas').addEventListener('click', function(event) {
@@ -776,45 +799,72 @@
 
       const canvas = this;
       const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-
-      const x = (event.clientX - rect.left) * scaleX;
-      const y = (event.clientY - rect.top) * scaleY;
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
 
       partData[activePart].marker = { x, y };
 
       drawZoomCanvas();
       drawThumb(activePart);
 
-      const xPercent = ((x / canvas.width) * 100).toFixed(1);
-      const yPercent = ((y / canvas.height) * 100).toFixed(1);
+      const xPercent = ((x / rect.width) * 100).toFixed(1);
+      const yPercent = ((y / rect.height) * 100).toFixed(1);
 
       document.getElementById('modalPointForm').classList.add('active');
       document.getElementById('modalPointInfo').textContent =
         `Punt gekozen in deel ${activePart} op X: ${xPercent}% en Y: ${yPercent}%`;
     });
 
-    function previewModalPhoto(event) {
-      const file = event.target.files[0];
-      if (!file || !file.type.startsWith('image/')) return;
+    function previewModalPhotos(event) {
+      const files = Array.from(event.target.files || []);
+      if (!files.length) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        partData[activePart].photo = e.target.result;
+      files.forEach(file => {
+        if (!file.type.startsWith('image/')) return;
 
-        const img = document.getElementById('modalPhotoImg');
-        const text = document.getElementById('modalPhotoText');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          partData[activePart].photos.push(e.target.result);
+          renderGallery();
+        };
+        reader.readAsDataURL(file);
+      });
 
-        img.src = e.target.result;
-        img.style.display = 'block';
-        text.style.display = 'none';
-      };
-      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    function renderGallery() {
+      const gallery = document.getElementById('modalGallery');
+      const empty = document.getElementById('emptyGallery');
+      const photos = partData[activePart].photos;
+
+      if (!photos.length) {
+        empty.classList.remove('hidden');
+        gallery.classList.add('hidden');
+        gallery.innerHTML = '';
+        return;
+      }
+
+      empty.classList.add('hidden');
+      gallery.classList.remove('hidden');
+      gallery.innerHTML = photos.map(src => `
+        <div class="gallery-item">
+          <img src="${src}" alt="Projectfoto preview">
+        </div>
+      `).join('');
     }
 
     document.getElementById('modalRemark').addEventListener('input', function() {
       partData[activePart].remark = this.value;
+    });
+
+    window.addEventListener('resize', function() {
+      for (let i = 1; i <= 5; i++) {
+        drawThumb(i);
+      }
+      if (document.getElementById('partModal').classList.contains('open')) {
+        drawZoomCanvas();
+      }
     });
 
     for (let i = 1; i <= 5; i++) {
