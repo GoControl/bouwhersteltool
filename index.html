@@ -89,13 +89,15 @@
       gap: 12px;
       flex-wrap: wrap;
     }
-    button {
+    button, .upload-btn {
       border: none;
       border-radius: 10px;
       padding: 12px 18px;
       font-size: 15px;
       font-weight: bold;
       cursor: pointer;
+      display: inline-block;
+      text-align: center;
     }
     .btn-primary {
       background: #1f7ae0;
@@ -132,9 +134,7 @@
       cursor: pointer;
       transition: 0.2s ease;
     }
-    .zone:hover {
-      border-color: #8db8eb;
-    }
+    .zone:hover { border-color: #8db8eb; }
     .zone.active {
       border-color: #1f7ae0;
       background: #eef6ff;
@@ -249,7 +249,7 @@
     }
     .phase-list {
       display: grid;
-      gap: 10px;
+      gap: 14px;
       margin-top: 14px;
     }
     .phase {
@@ -260,7 +260,83 @@
     }
     .phase-title {
       font-weight: bold;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
+    }
+    .upload-wrap {
+      margin-top: 10px;
+    }
+    .upload-btn {
+      background: #1f7ae0;
+      color: white;
+      margin-bottom: 10px;
+    }
+    .file-input {
+      display: none;
+    }
+    .preview-box {
+      width: 100%;
+      min-height: 180px;
+      border-radius: 12px;
+      border: 1px dashed #bdd0e2;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .preview-box img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: none;
+      cursor: pointer;
+    }
+    .preview-placeholder {
+      padding: 20px;
+      text-align: center;
+      color: #718096;
+      font-size: 14px;
+    }
+    .drawing-preview {
+      margin-top: 14px;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #dce6ef;
+      background: #fff;
+      cursor: pointer;
+    }
+    .drawing-preview img {
+      width: 100%;
+      display: block;
+    }
+    .marker {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      border: 4px solid red;
+      border-radius: 50%;
+      right: 14%;
+      bottom: 18%;
+      pointer-events: none;
+    }
+    .marker::before,
+    .marker::after {
+      content: "";
+      position: absolute;
+      background: red;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .marker::before {
+      width: 4px;
+      height: 72px;
+    }
+    .marker::after {
+      width: 72px;
+      height: 4px;
     }
     .contact-section {
       margin-top: 28px;
@@ -296,6 +372,45 @@
       border-radius: 16px;
       padding: 14px;
       overflow: hidden;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal.open {
+      display: flex;
+    }
+    .modal-inner {
+      max-width: 92vw;
+      max-height: 92vh;
+      position: relative;
+    }
+    .modal-inner img {
+      max-width: 92vw;
+      max-height: 92vh;
+      display: block;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .modal-close {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: white;
+      color: #111827;
+      font-size: 22px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
     }
     @media (max-width: 1200px) {
       .layout {
@@ -429,7 +544,7 @@
 
           <div class="field">
             <label>Omschrijving</label>
-            <div class="field-box" id="ticketDescription">Voorbeeldticket van de geselecteerde zone. Hier komen later de echte foto’s, opmerkingen en annotaties.</div>
+            <div class="field-box" id="ticketDescription">Voorbeeldticket van de geselecteerde zone.</div>
           </div>
 
           <div class="field">
@@ -440,19 +555,53 @@
           </div>
 
           <div class="field">
-            <label>Fases</label>
+            <label>Referentie tekening</label>
+            <div class="drawing-preview" onclick="openModal(document.getElementById('drawingImage').src)">
+              <img id="drawingImage" src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80" alt="Referentie tekening">
+              <div class="marker"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Fases met beeld</label>
             <div class="phase-list">
               <div class="phase">
                 <div class="phase-title">Startfase</div>
                 <div class="muted" id="startText">Beginsituatie vastleggen en schade documenteren.</div>
+                <div class="upload-wrap">
+                  <label class="upload-btn" for="startUpload">Upload startfoto</label>
+                  <input class="file-input" type="file" id="startUpload" accept="image/*" onchange="previewImage(event, 'startPreview', 'startPlaceholder')">
+                  <div class="preview-box">
+                    <div class="preview-placeholder" id="startPlaceholder">Nog geen startfoto toegevoegd</div>
+                    <img id="startPreview" alt="Start preview" onclick="openModal(this.src)">
+                  </div>
+                </div>
               </div>
+
               <div class="phase">
                 <div class="phase-title">Middenfase</div>
                 <div class="muted" id="middleText">Tussenstand van uitvoering en voortgangsfoto’s.</div>
+                <div class="upload-wrap">
+                  <label class="upload-btn" for="middleUpload">Upload middenfoto</label>
+                  <input class="file-input" type="file" id="middleUpload" accept="image/*" onchange="previewImage(event, 'middlePreview', 'middlePlaceholder')">
+                  <div class="preview-box">
+                    <div class="preview-placeholder" id="middlePlaceholder">Nog geen middenfoto toegevoegd</div>
+                    <img id="middlePreview" alt="Midden preview" onclick="openModal(this.src)">
+                  </div>
+                </div>
               </div>
+
               <div class="phase">
                 <div class="phase-title">Eindfase</div>
                 <div class="muted" id="endText">Oplevering en eindresultaat controleren.</div>
+                <div class="upload-wrap">
+                  <label class="upload-btn" for="endUpload">Upload eindfoto</label>
+                  <input class="file-input" type="file" id="endUpload" accept="image/*" onchange="previewImage(event, 'endPreview', 'endPlaceholder')">
+                  <div class="preview-box">
+                    <div class="preview-placeholder" id="endPlaceholder">Nog geen eindfoto toegevoegd</div>
+                    <img id="endPreview" alt="Eind preview" onclick="openModal(this.src)">
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -480,7 +629,7 @@
 
           <h3>Opmerking</h3>
           <div class="side-panel-box muted">
-            Hier komt later de ticketstatus, deadline, verantwoordelijke en archivering zoals in jouw referentie.
+            Volgende stap: echte annotaties met rode X, pijl of doelwit direct op de geüploade foto of plattegrond.
           </div>
         </aside>
       </div>
@@ -509,6 +658,13 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div class="modal" id="imageModal" onclick="closeModal(event)">
+    <div class="modal-inner">
+      <button class="modal-close" onclick="forceCloseModal()">×</button>
+      <img id="modalImage" src="" alt="Vergrote afbeelding">
+    </div>
   </div>
 
   <script>
@@ -632,15 +788,15 @@
         </div>
         <div class="attachment">
           <div class="attachment-thumb">Start</div>
-          <div class="attachment-meta">09 apr. 2026</div>
+          <div class="attachment-meta">Foto registratie</div>
         </div>
         <div class="attachment">
           <div class="attachment-thumb">Midden</div>
-          <div class="attachment-meta">09 apr. 2026</div>
+          <div class="attachment-meta">Foto registratie</div>
         </div>
         <div class="attachment">
           <div class="attachment-thumb">Eind</div>
-          <div class="attachment-meta">09 apr. 2026</div>
+          <div class="attachment-meta">Foto registratie</div>
         </div>
       `;
     }
@@ -681,6 +837,38 @@
     function selectTicket(index) {
       currentTicketIndex = index;
       renderTicketDetails();
+    }
+
+    function previewImage(event, imgId, placeholderId) {
+      const file = event.target.files[0];
+      if (!file || !file.type.startsWith('image/')) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById(imgId);
+        const placeholder = document.getElementById(placeholderId);
+        img.src = e.target.result;
+        img.style.display = 'block';
+        placeholder.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function openModal(src) {
+      if (!src) return;
+      document.getElementById('modalImage').src = src;
+      document.getElementById('imageModal').classList.add('open');
+    }
+
+    function closeModal(event) {
+      if (event.target.id === 'imageModal') {
+        forceCloseModal();
+      }
+    }
+
+    function forceCloseModal() {
+      document.getElementById('imageModal').classList.remove('open');
+      document.getElementById('modalImage').src = '';
     }
 
     renderTicketDetails();
