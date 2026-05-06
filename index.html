@@ -540,13 +540,13 @@
         </p>
 
         <div class="field">
-          abel for="projectNameInput">Projectnaam</label>
+          <label for="projectNameInput">Projectnaam</label>
           <input type="text" id="projectNameInput" placeholder="Projectnaam">
         </div>
 
         <div class="field">
-          abel>Hoofdplattegrond</label>
-          abel class="upload-btn" for="mainPlanUpload">Upload hoofdplattegrond</label>
+          <label>Hoofdplattegrond</label>
+          <label class="upload-btn" for="mainPlanUpload">Upload hoofdplattegrond</label>
           <input class="file-input" type="file" id="mainPlanUpload" accept="image/*">
         </div>
 
@@ -563,31 +563,31 @@
           <div class="split-card" onclick="openPartModal(1)">
             <div class="split-head">Deel 1</div>
             <div class="split-thumb-wrap">
-              anvas class="split-thumb" id="thumb1"></canvas>
+              <canvas class="split-thumb" id="thumb1"></canvas>
             </div>
           </div>
           <div class="split-card" onclick="openPartModal(2)">
             <div class="split-head">Deel 2</div>
             <div class="split-thumb-wrap">
-              anvas class="split-thumb" id="thumb2"></canvas>
+              <canvas class="split-thumb" id="thumb2"></canvas>
             </div>
           </div>
           <div class="split-card" onclick="openPartModal(3)">
             <div class="split-head">Deel 3</div>
             <div class="split-thumb-wrap">
-              anvas class="split-thumb" id="thumb3"></canvas>
+              <canvas class="split-thumb" id="thumb3"></canvas>
             </div>
           </div>
           <div class="split-card" onclick="openPartModal(4)">
             <div class="split-head">Deel 4</div>
             <div class="split-thumb-wrap">
-              anvas class="split-thumb" id="thumb4"></canvas>
+              <canvas class="split-thumb" id="thumb4"></canvas>
             </div>
           </div>
           <div class="split-card" onclick="openPartModal(5)">
             <div class="split-head">Deel 5</div>
             <div class="split-thumb-wrap">
-              anvas class="split-thumb" id="thumb5"></canvas>
+              <canvas class="split-thumb" id="thumb5"></canvas>
             </div>
           </div>
         </div>
@@ -604,15 +604,15 @@
       </div>
 
       <div class="zoom-wrap">
-        anvas class="zoom-canvas" id="zoomCanvas"></canvas>
+        <canvas class="zoom-canvas" id="zoomCanvas"></canvas>
       </div>
 
       <div class="point-form" id="modalPointForm">
         <div class="point-box" id="modalPointInfo">Nog geen punt gekozen</div>
 
         <div class="field">
-          abel>Foto's toevoegen</label>
-          abel class="photo-btn" for="modalPhotoUpload">Meerdere foto's uploaden</label>
+          <label>Foto's toevoegen</label>
+          <label class="photo-btn" for="modalPhotoUpload">Meerdere foto's uploaden</label>
           <input class="file-input" type="file" id="modalPhotoUpload" accept="image/*" multiple onchange="previewModalPhotos(event)">
           <div id="modalGalleryContainer">
             <div class="empty-gallery" id="emptyGallery">Nog geen foto's toegevoegd</div>
@@ -621,7 +621,7 @@
         </div>
 
         <div class="field">
-          abel for="modalRemark">Opmerking</label>
+          <label for="modalRemark">Opmerking</label>
           <textarea id="modalRemark" placeholder="Typ hier je opmerking over dit punt"></textarea>
         </div>
       </div>
@@ -643,7 +643,6 @@
     function openProject(name, subtitle, role) {
       document.getElementById('projectsPage').classList.add('hidden');
       document.getElementById('projectPage').classList.remove('hidden');
-
       document.getElementById('sidebarProjectName').textContent = name;
       document.getElementById('contentProjectTitle').textContent = name;
       document.getElementById('contentProjectSubtitle').textContent =
@@ -662,7 +661,6 @@
       canvas.height = Math.round(cssHeight * ratio);
       canvas.style.width = cssWidth + 'px';
       canvas.style.height = cssHeight + 'px';
-
       const ctx = canvas.getContext('2d');
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       return { ctx, width: cssWidth, height: cssHeight };
@@ -747,7 +745,7 @@
 
     function drawThumb(partIndex) {
       const canvas = document.getElementById('thumb' + partIndex);
-      drawPartSliceOnCanvas(canvas, partIndex, false);
+      if (canvas) drawPartSliceOnCanvas(canvas, partIndex, false);
     }
 
     function openPartModal(partIndex) {
@@ -769,7 +767,7 @@
 
     function drawZoomCanvas() {
       const canvas = document.getElementById('zoomCanvas');
-      drawPartSliceOnCanvas(canvas, activePart, true);
+      if (canvas) drawPartSliceOnCanvas(canvas, activePart, true);
     }
 
     function loadModalForm() {
@@ -794,26 +792,29 @@
       renderGallery();
     }
 
-    document.getElementById('zoomCanvas').addEventListener('click', function(event) {
-      if (!sourceImage) return;
+    const zoomCanvasEl = document.getElementById('zoomCanvas');
+    if (zoomCanvasEl) {
+      zoomCanvasEl.addEventListener('click', function(event) {
+        if (!sourceImage) return;
 
-      const canvas = this;
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+        const canvas = this;
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
 
-      partData[activePart].marker = { x, y };
+        partData[activePart].marker = { x, y };
 
-      drawZoomCanvas();
-      drawThumb(activePart);
+        drawZoomCanvas();
+        drawThumb(activePart);
 
-      const xPercent = ((x / rect.width) * 100).toFixed(1);
-      const yPercent = ((y / rect.height) * 100).toFixed(1);
+        const xPercent = ((x / rect.width) * 100).toFixed(1);
+        const yPercent = ((y / rect.height) * 100).toFixed(1);
 
-      document.getElementById('modalPointForm').classList.add('active');
-      document.getElementById('modalPointInfo').textContent =
-        `Punt gekozen in deel ${activePart} op X: ${xPercent}% en Y: ${yPercent}%`;
-    });
+        document.getElementById('modalPointForm').classList.add('active');
+        document.getElementById('modalPointInfo').textContent =
+          `Punt gekozen in deel ${activePart} op X: ${xPercent}% en Y: ${yPercent}%`;
+      });
+    }
 
     function previewModalPhotos(event) {
       const files = Array.from(event.target.files || []);
