@@ -417,6 +417,22 @@
       text-align: center;
       padding: 18px;
     }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .save-message {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #e8f7ec;
+      border: 1px solid #bfe3c8;
+      color: #22663a;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+    }
 
     @media (max-width: 1400px) {
       .split-grid {
@@ -530,7 +546,7 @@
     <main class="project-main">
       <div class="project-main-top">
         <button class="btn back-btn" onclick="goBackToProjects()">← Terug naar projecten</button>
-        <button class="btn btn-primary">Opslaan</button>
+        <button class="btn btn-primary" type="button">Opslaan</button>
       </div>
 
       <div class="content-card">
@@ -624,6 +640,14 @@
           <label for="modalRemark">Opmerking</label>
           <textarea id="modalRemark" placeholder="Typ hier je opmerking over dit punt"></textarea>
         </div>
+
+        <div class="modal-actions">
+          <button class="btn back-btn" type="button" onclick="closePartModal()">Annuleren</button>
+          <button class="btn btn-primary" type="button" onclick="savePartData()">Opslaan</button>
+          <button class="btn btn-primary" type="button" onclick="saveAndClosePartData()">Opslaan en sluiten</button>
+        </div>
+
+        <div id="saveMessage" class="save-message hidden">Opgeslagen</div>
       </div>
     </div>
   </div>
@@ -763,6 +787,7 @@
 
     function closePartModal() {
       document.getElementById('partModal').classList.remove('open');
+      document.getElementById('saveMessage').classList.add('hidden');
     }
 
     function drawZoomCanvas() {
@@ -855,6 +880,46 @@
       `).join('');
     }
 
+    function savePartData(showAlert = true) {
+      if (!partData[activePart].marker) {
+        alert('Zet eerst een kruis op de tekening.');
+        return false;
+      }
+
+      const payload = {
+        project: document.getElementById('projectNameInput').value,
+        part: activePart,
+        savedAt: new Date().toISOString(),
+        data: partData[activePart]
+      };
+
+      const fileName = `deel-${activePart}-opslag.json`;
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+
+      const saveMessage = document.getElementById('saveMessage');
+      saveMessage.classList.remove('hidden');
+      saveMessage.textContent = `Deel ${activePart} opgeslagen`;
+
+      return true;
+    }
+
+    function saveAndClosePartData() {
+      const saved = savePartData(false);
+      if (saved) {
+        setTimeout(() => {
+          closePartModal();
+        }, 300);
+      }
+    }
+
     document.getElementById('modalRemark').addEventListener('input', function() {
       partData[activePart].remark = this.value;
     });
@@ -873,70 +938,4 @@
     }
   </script>
 </body>
-<div class="modal-actions">
-  <button class="btn back-btn" type="button" onclick="closePartModal()">Annuleren</button>
-  <button class="btn btn-primary" type="button" onclick="savePartData()">Opslaan</button>
-  <button class="btn btn-primary" type="button" onclick="saveAndClosePartData()">Opslaan en sluiten</button>
-</div>
-
-<div id="saveMessage" class="save-message hidden">Opgeslagen</div>
-
-  
 </html>
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 18px;
-}
-
-.save-message {
-  margin-top: 14px;
-  padding: 12px 14px;
-  background: #e8f7ec;
-  border: 1px solid #bfe3c8;
-  color: #22663a;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: bold;
-}
-function savePartData() {
-  if (!partData[activePart].marker) {
-    alert('Zet eerst een kruis op de tekening.');
-    return;
-  }
-
-  const payload = {
-    project: document.getElementById('projectNameInput').value,
-    part: activePart,
-    savedAt: new Date().toISOString(),
-    data: partData[activePart]
-  };
-
-  const fileName = `deel-${activePart}-opslag.json`;
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  a.click();
-
-  URL.revokeObjectURL(url);
-
-  const saveMessage = document.getElementById('saveMessage');
-  saveMessage.classList.remove('hidden');
-  saveMessage.textContent = `Deel ${activePart} opgeslagen`;
-}
-
-function saveAndClosePartData() {
-  savePartData();
-  setTimeout(() => {
-    closePartModal();
-  }, 300);
-}
-Belangrijke verbetering
-function closePartModal() {
-  document.getElementById('partModal').classList.remove('open');
-  document.getElementById('saveMessage').classList.add('hidden');
-}
