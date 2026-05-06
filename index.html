@@ -430,3 +430,85 @@
     </iframe>
   </div>
 </section>
+<section class="contact-section">
+  <div class="contact-card">
+    <div class="contact-text">
+      <p class="contact-kicker">Contact</p>
+      <h2>Neem direct contact op</h2>
+      <p class="contact-description">
+        Gebruik het formulier hieronder om een vraag te stellen, een project te bespreken of een opmerking door te geven.
+      </p>
+    </div>
+
+    <div class="form-shell">
+      <iframe
+        src="https://docs.google.com/forms/d/e/1FAIpQLSfqgHMrpra3GMfYD97j91u2mT8eD5NGVPl1wdWvit-eioVAZA/viewform?embedded=true"
+        width="100%"
+        height="980"
+        frameborder="0"
+        marginheight="0"
+        marginwidth="0"
+        style="border:0; display:block; width:100%; background:#fff;"
+      >
+        Laden…
+      </iframe>
+    </div>
+  </div>
+</section>
+En voeg deze CSS toe in je <style>:
+
+css
+.contact-section {
+  margin-top: 32px;
+}
+
+.contact-card {
+  background: white;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  border: 1px solid #e5edf5;
+}
+
+.contact-kicker {
+  margin: 0 0 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #5b7288;
+}
+
+.contact-card h2 {
+  margin: 0 0 10px;
+  font-size: 30px;
+  color: #17324d;
+}
+
+.contact-description {
+  margin: 0 0 20px;
+  color: #667085;
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+.form-shell {
+  background: #f7fafc;
+  border: 1px solid #dbe6f0;
+  border-radius: 16px;
+  padding: 14px;
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  .contact-card {
+    padding: 18px;
+  }
+
+  .contact-card h2 {
+    font-size: 24px;
+  }
+
+  .form-shell iframe {
+    height: 1100px;
+  }
+}
