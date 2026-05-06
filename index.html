@@ -1,114 +1,169 @@
-<!doctype html>
+ <!doctype html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bouw Herstel Tool</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f3f5f7;
+      background: #edf2f7;
       color: #1f2937;
     }
-    .wrap {
+    .app {
       display: flex;
       min-height: 100vh;
     }
     .sidebar {
-      width: 300px;
-      background: #17324d;
-      color: white;
-      padding: 24px 18px;
+      width: 320px;
+      background: #18344f;
+      color: #fff;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
     }
-    .sidebar h1 {
-      font-size: 24px;
-      margin: 0 0 24px;
+    .logo {
+      font-size: 34px;
+      font-weight: bold;
+      margin-bottom: 28px;
     }
-    .project {
-      font-size: 14px;
+    .project-label {
+      font-size: 13px;
       opacity: 0.8;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .project-name {
-      font-size: 24px;
+      font-size: 19px;
       font-weight: bold;
-      margin-bottom: 24px;
+      line-height: 1.4;
+      margin-bottom: 28px;
     }
-    .menu-title {
+    .section-title {
       font-size: 13px;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      opacity: 0.7;
-      margin: 24px 0 12px;
+      opacity: 0.8;
+      margin: 18px 0 8px;
     }
-    .menu-item {
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      font-size: 20px;
+    .nav-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 10px;
+      border-radius: 10px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(255,255,255,0.08);
+    }
+    .nav-left {
+      font-size: 18px;
+    }
+    .count {
+      font-size: 15px;
+      color: #b7c6d4;
     }
     .main {
       flex: 1;
-      padding: 40px;
+      padding: 32px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .topbar h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #1f7ae0;
+      color: white;
+    }
+    .btn-secondary {
+      background: white;
+      color: #1f2937;
+      border: 1px solid #d9e1ea;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
     }
     .card {
       background: white;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 24px;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.08);
-      max-width: 900px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    }
+    .card h2, .card h3 {
+      margin-top: 0;
     }
     .zones {
       display: grid;
       grid-template-columns: repeat(3, minmax(120px, 1fr));
       gap: 16px;
-      margin-top: 24px;
+      margin-top: 20px;
     }
     .zone {
-      background: #eef3f8;
-      border-radius: 12px;
+      background: #f3f7fb;
+      border: 1px solid #dbe6f0;
+      border-radius: 14px;
       padding: 18px;
-      font-size: 20px;
-      font-weight: bold;
+      min-height: 100px;
     }
-    .small {
+    .zone strong {
       display: block;
-      font-size: 14px;
-      font-weight: normal;
-      margin-top: 6px;
-      color: #4b5563;
+      font-size: 20px;
+      margin-bottom: 8px;
     }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <aside class="sidebar">
-      <h1>GoControl</h1>
-      <div class="project">Project</div>
-      <div class="project-name">Pilot watergang</div>
-
-      <div class="menu-title">Tekeningen</div>
-      <div class="menu-item">GPS-kaart (2)</div>
-      <div class="menu-item">P1 (25)</div>
-      <div class="menu-item">P2 (50)</div>
-      <div class="menu-item">P3 (51)</div>
-      <div class="menu-item">P4 (10)</div>
-      <div class="menu-item">P5 (15)</div>
-    </aside>
-
-    <main class="main">
-      <div class="card">
-        <h2>Bouw Herstel Tool</h2>
-        <p>De gratis online basis werkt. Hier bouwen we stap voor stap jullie projecten, zones, foto-fases en annotaties in.</p>
-
-        <div class="zones">
-          <div class="zone">P1 <span class="small">25 beelden</span></div>
-          <div class="zone">P2 <span class="small">50 beelden</span></div>
-          <div class="zone">P3 <span class="small">51 beelden</span></div>
-          <div class="zone">P4 <span class="small">10 beelden</span></div>
-          <div class="zone">P5 <span class="small">15 beelden</span></div>
-        </div>
-      </div>
-    </main>
-  </div>
-</body>
-</html>
+    .phase-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .phase {
+      background: #f8fafc;
+      border: 1px solid #e4ebf2;
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .phase-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .muted {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .status-box {
+      background: #fff8dd;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      border: 1px solid #f0e1a6;
+    }
+    .tag {
+      dis
