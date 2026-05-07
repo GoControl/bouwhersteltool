@@ -3,363 +3,324 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bouw Tool Projecten</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <title>ed controls</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; background: #e8eef5; color: #1f2937; min-height: 100vh; }
     .hidden { display: none !important; }
 
     /* ===== DASHBOARD ===== */
-    .dashboard {
-      min-height: 100vh;
-      background: linear-gradient(160deg, #1a3a5c 0%, #2d6a9f 40%, #1e4d78 100%);
-    }
+    .dashboard { min-height: 100vh; background: linear-gradient(160deg, #1a3a5c 0%, #2d6a9f 40%, #1e4d78 100%); }
 
     .dash-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 36px;
-      background: rgba(255,255,255,0.12);
-      border-bottom: 1px solid rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 32px;
+      background: rgba(255,255,255,0.10);
+      border-bottom: 1px solid rgba(255,255,255,0.15);
     }
-    .dash-logo { font-size: 24px; font-weight: 900; color: white; letter-spacing: 0.04em; }
+    .dash-logo { font-size: 26px; font-weight: 900; color: white; }
     .dash-logo span { color: #7dd3fc; }
-    .dash-topbar-right { display: flex; gap: 12px; align-items: center; }
-    .dash-search {
-      background: rgba(255,255,255,0.20);
-      border: 1px solid rgba(255,255,255,0.35);
-      border-radius: 12px;
-      padding: 10px 16px;
-      color: white;
-      font-size: 14px;
-      width: 220px;
-      outline: none;
-    }
-    .dash-search::placeholder { color: rgba(255,255,255,0.65); }
-    .dash-search:focus { background: rgba(255,255,255,0.28); border-color: #7dd3fc; }
 
-    .dash-body { padding: 36px; }
+    .dash-body { padding: 32px; }
 
-    .dash-hero { text-align: center; padding: 36px 20px 44px; }
-    .dash-hero h1 { font-size: 42px; font-weight: 900; color: white; line-height: 1.2; margin-bottom: 12px; text-shadow: 0 2px 12px rgba(0,0,0,0.2); }
+    .dash-hero { text-align: center; padding: 32px 20px 40px; }
+    .dash-hero h1 { font-size: 38px; font-weight: 900; color: white; margin-bottom: 10px; }
     .dash-hero h1 span { color: #7dd3fc; }
-    .dash-hero p { color: rgba(255,255,255,0.75); font-size: 16px; max-width: 500px; margin: 0 auto 28px; line-height: 1.6; }
+    .dash-hero p { color: rgba(255,255,255,0.70); font-size: 16px; margin: 0 auto 28px; max-width: 460px; line-height: 1.6; }
 
-    .dash-stats { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 44px; }
+    .dash-stats { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 40px; }
     .stat-pill {
-      background: rgba(255,255,255,0.18);
-      border: 1px solid rgba(255,255,255,0.30);
-      border-radius: 999px;
-      padding: 11px 20px;
-      color: white;
-      font-size: 14px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 999px; padding: 12px 22px; color: white;
+      font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 9px;
     }
-    .stat-dot { width: 10px; height: 10px; border-radius: 50%; background: #7dd3fc; display: inline-block; }
+    .stat-dot { width: 11px; height: 11px; border-radius: 50%; background: #7dd3fc; display: inline-block; }
     .stat-dot.green { background: #4ade80; }
     .stat-dot.orange { background: #fbbf24; }
 
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
     .section-title { font-size: 20px; font-weight: bold; color: white; }
 
-    .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; }
+    .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 22px; }
 
     .project-card {
-      background: rgba(255,255,255,0.95);
-      border: 1px solid rgba(255,255,255,0.7);
-      border-radius: 18px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      position: relative;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      background: white; border-radius: 18px; overflow: hidden;
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative;
     }
     .project-card:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(0,0,0,0.22); }
     .project-card-img { width: 100%; height: 190px; object-fit: cover; display: block; }
     .project-card-img-placeholder {
       width: 100%; height: 190px;
-      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 52px; color: #93c5fd;
+      background: linear-gradient(135deg,#dbeafe,#bfdbfe);
+      display: flex; align-items: center; justify-content: center; font-size: 52px; color: #93c5fd;
     }
-    .project-card-body { padding: 16px 18px 18px; background: white; }
-    .project-card-title { font-size: 17px; font-weight: bold; color: #1e3a5f; margin-bottom: 5px; line-height: 1.3; }
+    .project-card-body { padding: 16px 18px 18px; }
+    .project-card-title { font-size: 17px; font-weight: bold; color: #1e3a5f; margin-bottom: 5px; }
     .project-card-sub { color: #64748b; font-size: 13px; margin-bottom: 12px; }
     .project-card-footer { display: flex; align-items: center; justify-content: space-between; }
     .project-card-points { background: #eff6ff; color: #1d4ed8; border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: bold; border: 1px solid #bfdbfe; }
-    .project-card-role { color: #94a3b8; font-size: 12px; }
 
-    /* Drie-punten menu */
     .card-menu-btn {
       position: absolute; top: 10px; right: 10px;
-      width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(15,23,42,0.55);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: white; font-size: 17px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 10; backdrop-filter: blur(4px);
-      transition: background 0.15s;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(15,23,42,0.55); border: 1px solid rgba(255,255,255,0.3);
+      color: white; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; z-index: 10;
     }
-    .card-menu-btn:hover { background: rgba(30,58,92,0.85); }
-
     .card-dropdown {
-      position: absolute; top: 48px; right: 10px;
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px; padding: 7px;
-      z-index: 100; min-width: 170px;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.18);
-      display: none;
+      position: absolute; top: 50px; right: 10px;
+      background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 7px;
+      z-index: 100; min-width: 170px; box-shadow: 0 10px 28px rgba(0,0,0,0.18); display: none;
     }
     .card-dropdown.open { display: block; }
-    .card-dropdown-item {
-      padding: 10px 13px; color: #1e293b; font-size: 14px;
-      border-radius: 9px; cursor: pointer;
-      display: flex; align-items: center; gap: 9px;
-      transition: background 0.13s;
-    }
+    .card-dropdown-item { padding: 11px 14px; color: #1e293b; font-size: 15px; border-radius: 9px; cursor: pointer; display: flex; align-items: center; gap: 9px; }
     .card-dropdown-item:hover { background: #f1f5f9; }
     .card-dropdown-item.danger { color: #dc2626; }
     .card-dropdown-item.danger:hover { background: #fef2f2; }
 
     .btn-new-project {
-      background: white;
-      color: #1e3a5f;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex; align-items: center; gap: 8px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.15);
-      transition: transform 0.15s, box-shadow 0.15s;
+      background: white; color: #1e3a5f; border: none; border-radius: 14px;
+      padding: 14px 24px; font-size: 16px; font-weight: bold; cursor: pointer;
+      display: flex; align-items: center; gap: 9px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.15); transition: transform 0.15s;
     }
-    .btn-new-project:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    .btn-new-project:hover { transform: translateY(-1px); }
 
     /* ===== MODALS ===== */
     .modal {
-      position: fixed; inset: 0;
-      background: rgba(15,23,42,0.70);
+      position: fixed; inset: 0; background: rgba(15,23,42,0.72);
       display: none; align-items: center; justify-content: center;
-      padding: 22px; z-index: 9000;
-      backdrop-filter: blur(3px);
+      padding: 22px; z-index: 9000; backdrop-filter: blur(3px);
     }
     .modal.open { display: flex; }
 
-    /* Project form modal — lichte stijl */
-    .modal-panel-light {
-      width: min(520px, 100%);
-      background: white;
-      border-radius: 20px;
-      padding: 28px;
-      position: relative;
-      box-shadow: 0 24px 50px rgba(0,0,0,0.25);
+    /* Licht formulier modal */
+    .mpanel {
+      width: min(520px,100%); background: white; border-radius: 20px;
+      padding: 30px; position: relative; box-shadow: 0 24px 50px rgba(0,0,0,0.25);
     }
-    .modal-close-light {
+    .mpanel-close {
       position: absolute; top: 14px; right: 14px;
-      background: #f1f5f9; border: none;
-      width: 36px; height: 36px; border-radius: 50%;
-      color: #475569; font-size: 19px; cursor: pointer;
+      background: #f1f5f9; border: none; width: 38px; height: 38px;
+      border-radius: 50%; color: #475569; font-size: 20px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
     }
-    .modal-close-light:hover { background: #e2e8f0; }
-    .form-title { font-size: 21px; font-weight: bold; color: #1e3a5f; margin-bottom: 5px; }
-    .form-sub { color: #64748b; font-size: 14px; margin-bottom: 20px; }
+    .mpanel-title { font-size: 22px; font-weight: bold; color: #1e3a5f; margin-bottom: 5px; }
+    .mpanel-sub { color: #64748b; font-size: 14px; margin-bottom: 22px; }
 
-    .field { margin-bottom: 16px; }
-    .field label { display: block; font-weight: 600; font-size: 13px; color: #374151; margin-bottom: 7px; }
-    .field input[type="text"], .field select, .field textarea {
-      width: 100%; background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 11px;
-      padding: 12px 14px;
-      color: #1f2937;
-      font-size: 15px;
-      font-family: Arial, sans-serif;
-      outline: none;
-      transition: border-color 0.15s, background 0.15s;
+    .fld { margin-bottom: 18px; }
+    .fld label { display: block; font-weight: 700; font-size: 14px; color: #374151; margin-bottom: 8px; }
+    .fld input[type="text"], .fld select, .fld textarea {
+      width: 100%; background: #f8fafc; border: 1.5px solid #e2e8f0;
+      border-radius: 12px; padding: 14px 15px; color: #1f2937;
+      font-size: 16px; font-family: Arial, sans-serif; outline: none;
+      transition: border-color 0.15s;
     }
-    .field input:focus, .field select:focus, .field textarea:focus {
-      border-color: #3b82f6; background: white;
-    }
-    .field textarea { min-height: 100px; resize: vertical; }
+    .fld input:focus, .fld select:focus, .fld textarea:focus { border-color: #3b82f6; background: white; }
+    .fld textarea { min-height: 90px; resize: vertical; }
 
     .photo-upload-area {
-      border: 2px dashed #cbd5e1;
-      border-radius: 14px;
-      padding: 28px 20px;
-      text-align: center;
-      cursor: pointer;
-      background: #f8fafc;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 16px;
+      border: 2px dashed #cbd5e1; border-radius: 14px; padding: 30px 20px;
+      text-align: center; cursor: pointer; background: #f8fafc;
+      transition: border-color 0.2s, background 0.2s; margin-bottom: 18px;
     }
     .photo-upload-area:hover { border-color: #3b82f6; background: #eff6ff; }
-    .photo-upload-area .upload-icon { font-size: 34px; margin-bottom: 9px; }
-    .photo-upload-area p { color: #64748b; font-size: 13px; }
-
+    .pua-icon { font-size: 36px; margin-bottom: 9px; }
+    .pua-text { color: #64748b; font-size: 14px; }
     .photo-preview-wrap {
-      width: 100%; height: 170px;
-      border-radius: 12px; overflow: hidden;
-      margin-bottom: 16px; display: none; position: relative;
-      border: 1px solid #e2e8f0;
+      width: 100%; height: 175px; border-radius: 12px; overflow: hidden;
+      margin-bottom: 18px; display: none; position: relative; border: 1px solid #e2e8f0;
     }
     .photo-preview-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .photo-preview-change {
-      position: absolute; bottom: 9px; right: 9px;
-      background: rgba(15,23,42,0.75); color: white;
-      border: none; border-radius: 9px; padding: 7px 12px;
-      font-size: 12px; font-weight: bold; cursor: pointer;
+    .photo-change-btn {
+      position: absolute; bottom: 10px; right: 10px;
+      background: rgba(15,23,42,0.75); color: white; border: none;
+      border-radius: 9px; padding: 8px 13px; font-size: 13px; font-weight: bold; cursor: pointer;
     }
 
-    .form-btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
-
-    /* Deel modal — ook licht */
-    .modal-panel-wide {
-      width: min(1480px, 100%); max-height: 94vh; overflow: auto;
-      background: white; border-radius: 20px; padding: 24px; position: relative;
-      box-shadow: 0 24px 50px rgba(0,0,0,0.25);
-    }
-    .modal-close-dark {
-      position: absolute; top: 14px; right: 14px;
-      background: #f1f5f9; border: none;
-      width: 38px; height: 38px; border-radius: 50%;
-      color: #475569; font-size: 20px; cursor: pointer;
-    }
-
-    /* Help modal — donker */
-    .modal-panel-dark {
-      width: min(620px, 100%);
-      background: #1e293b;
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 20px; padding: 26px; position: relative;
-      box-shadow: 0 24px 50px rgba(0,0,0,0.4);
-    }
-    .modal-close-white {
-      position: absolute; top: 14px; right: 14px;
-      background: rgba(255,255,255,0.1); border: none;
-      width: 36px; height: 36px; border-radius: 50%;
-      color: white; font-size: 19px; cursor: pointer;
-    }
-
-    /* ===== KNOPPEN ===== */
-    .btn { border: none; border-radius: 11px; padding: 12px 20px; font-size: 14px; font-weight: bold; cursor: pointer; transition: opacity 0.15s, transform 0.12s; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+    .btn { border: none; border-radius: 12px; padding: 14px 22px; font-size: 15px; font-weight: bold; cursor: pointer; transition: opacity 0.15s, transform 0.12s; }
     .btn:hover { opacity: 0.88; transform: translateY(-1px); }
     .btn-blue { background: #2563eb; color: white; }
     .btn-gray { background: #475569; color: white; }
-    .btn-red { background: #dc2626; color: white; }
-    .btn-light { background: white; border: 1px solid #d1d5db; color: #374151; }
-    .btn-primary { background: #1d4ed8; color: white; }
-    .btn-secondary { background: #334155; color: white; }
-    .mini-btn { border: 1px solid #d1d5db; background: white; color: #374151; border-radius: 9px; padding: 7px 11px; cursor: pointer; font-size: 12px; font-weight: bold; }
-    .upload-btn { display: inline-block; background: #2563eb; color: white; padding: 11px 17px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
-    .photo-btn { display: inline-block; background: #1e3a5f; color: white; padding: 9px 13px; border-radius: 9px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+    .btn-red  { background: #dc2626; color: white; }
+    .btn-white { background: white; border: 1.5px solid #d1d5db; color: #374151; }
+    .btn-green { background: #16a34a; color: white; }
     .file-input { display: none; }
+    .upload-lbl { display: inline-block; background: #2563eb; color: white; padding: 13px 20px; border-radius: 12px; font-weight: bold; font-size: 15px; cursor: pointer; }
+    .upload-lbl-sm { display: inline-block; background: #1e3a5f; color: white; padding: 10px 15px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
 
-    /* ===== PROJECT APP ===== */
+    /* ===== PROJECT PAGINA ===== */
     .project-app { display: flex; min-height: 100vh; }
-    .sidebar { width: 290px; background: #1e3a5f; color: #fff; padding: 20px 15px 28px; border-right: 1px solid rgba(255,255,255,0.08); }
-    .sidebar-logo { font-size: 21px; font-weight: 900; color: white; margin-bottom: 4px; }
-    .sidebar-logo span { color: #7dd3fc; }
-    .sidebar-label { font-size: 11px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; margin-top: 18px; }
-    .sidebar-project-name { font-size: 15px; font-weight: bold; color: white; line-height: 1.4; margin-bottom: 6px; }
-    .menu-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.35); margin: 18px 0 7px; }
-    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 11px; border-radius: 10px; margin-bottom: 3px; cursor: pointer; font-size: 14px; color: rgba(255,255,255,0.75); transition: background 0.14s, color 0.14s; }
-    .menu-item:hover, .menu-item.active { background: rgba(125,211,252,0.15); color: white; }
-    .menu-count { color: rgba(255,255,255,0.35); font-size: 12px; }
 
-    .project-main { flex: 1; padding: 24px; background: #eef3f8; overflow: auto; }
-    .project-main-top { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
-    .content-card { background: white; border-radius: 16px; padding: 22px; box-shadow: 0 6px 24px rgba(0,0,0,0.06); }
-    .content-card h2 { margin-top: 0; margin-bottom: 10px; font-size: 24px; color: #1e3a5f; }
-    .content-card p { color: #64748b; line-height: 1.6; margin-bottom: 16px; font-size: 14px; }
+    .sidebar {
+      width: 260px; background: #1e3a5f; color: white;
+      padding: 22px 16px 28px; border-right: 1px solid rgba(255,255,255,0.08);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .sb-logo { font-size: 22px; font-weight: 900; color: white; margin-bottom: 4px; }
+    .sb-logo span { color: #7dd3fc; }
+    .sb-proj { font-size: 15px; font-weight: bold; color: white; margin: 14px 0 6px; line-height: 1.4; }
+    .sb-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.4); margin-top: 16px; margin-bottom: 6px; }
+    .sb-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 13px; border-radius: 11px; cursor: pointer;
+      font-size: 15px; color: rgba(255,255,255,0.75);
+      transition: background 0.14s, color 0.14s;
+    }
+    .sb-item:hover, .sb-item.active { background: rgba(125,211,252,0.15); color: white; }
+    .sb-count { color: rgba(255,255,255,0.35); font-size: 13px; }
+
+    .project-main { flex: 1; padding: 28px; background: #eef3f8; overflow: auto; }
+
+    .top-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 14px; flex-wrap: wrap; margin-bottom: 22px;
+    }
+
+    .content-card {
+      background: white; border-radius: 18px; padding: 26px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.06); margin-bottom: 22px;
+    }
+    .content-card h2 { font-size: 24px; font-weight: bold; color: #1e3a5f; margin-bottom: 8px; }
+    .content-card p { color: #64748b; font-size: 15px; line-height: 1.6; margin-bottom: 18px; }
 
     .plan-preview { margin-top: 14px; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; background: #f8fafc; }
-    .plan-preview-canvas { width: 100%; max-height: 320px; height: 320px; display: none; background: white; }
-    .placeholder { padding: 34px 20px; text-align: center; color: #94a3b8; font-size: 14px; }
+    .plan-canvas { width: 100%; max-height: 320px; height: 320px; display: none; background: white; }
+    .plan-placeholder { padding: 40px 20px; text-align: center; color: #94a3b8; font-size: 15px; }
 
-    .split-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 22px; }
-    .split-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.16s, box-shadow 0.16s; }
-    .split-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.1); }
-    .split-head { padding: 11px 14px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #1e3a5f; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-    canvas.split-thumb { width: 100%; height: 190px; display: block; background: #f8fafc; }
-    .badge-count { background: #eff6ff; color: #2563eb; border-radius: 999px; padding: 4px 9px; font-size: 11px; font-weight: bold; border: 1px solid #bfdbfe; }
-    .autosave-indicator { display: inline-flex; align-items: center; gap: 7px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 999px; padding: 8px 13px; font-size: 12px; font-weight: bold; }
+    /* Split grid */
+    .split-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 16px; margin-top: 24px; }
+    .split-card {
+      background: white; border: 2px solid #e2e8f0; border-radius: 16px;
+      overflow: hidden; cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.06);
+    }
+    .split-card:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.12); border-color: #3b82f6; }
+    .split-head {
+      padding: 13px 15px; background: #f0f7ff; border-bottom: 2px solid #e2e8f0;
+      font-weight: bold; color: #1e3a5f; font-size: 15px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    canvas.split-thumb { width: 100%; height: 200px; display: block; background: #f8fafc; }
+    .badge { background: #eff6ff; color: #1d4ed8; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: bold; border: 1px solid #bfdbfe; }
 
-    /* Deel modal inhoud */
-    .zoom-toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
-    .zoom-pill { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: bold; }
-    .toggle-chip { display: inline-flex; align-items: center; gap: 7px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: bold; color: #374151; cursor: pointer; }
-    .zoom-wrap { border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; background: #f8fafc; margin-bottom: 16px; touch-action: none; }
-    canvas.zoom-canvas { width: 100%; height: 430px; display: block; cursor: crosshair; background: #fff; touch-action: none; }
+    /* ===== DEEL MODAL (groot, simpel) ===== */
+    .deel-modal {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.75);
+      display: none; align-items: flex-start; justify-content: center;
+      padding: 16px; z-index: 9000; overflow-y: auto; backdrop-filter: blur(3px);
+    }
+    .deel-modal.open { display: flex; }
+    .deel-panel {
+      width: min(1300px,100%); background: white; border-radius: 20px;
+      padding: 28px; margin: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .deel-close {
+      position: absolute; top: 16px; right: 16px;
+      background: #f1f5f9; border: none; width: 44px; height: 44px;
+      border-radius: 50%; font-size: 22px; color: #475569; cursor: pointer;
+    }
+    .deel-title { font-size: 26px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px; }
+    .deel-hint { color: #64748b; font-size: 14px; margin-bottom: 18px; }
 
-    .point-form { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; background: #f8fafc; margin-bottom: 16px; }
-    .point-box { background: white; border: 1px solid #e2e8f0; border-radius: 11px; padding: 12px; margin-bottom: 12px; font-size: 14px; color: #475569; line-height: 1.5; }
-    .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-    .save-message { margin-top: 12px; padding: 11px 14px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; border-radius: 10px; font-size: 14px; font-weight: bold; }
+    /* Canvas met zoom */
+    .canvas-toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;
+    }
+    .ctool {
+      background: #f0f7ff; border: 1.5px solid #bfdbfe; border-radius: 10px;
+      padding: 10px 16px; font-size: 15px; font-weight: bold; color: #1e3a5f; cursor: pointer;
+      transition: background 0.13s;
+    }
+    .ctool:hover { background: #dbeafe; }
+    .zoom-lbl { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: bold; color: #1d4ed8; }
 
-    .tabs-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 13px; }
-    .tab-btn { padding: 10px 15px; border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #374151; font-weight: bold; cursor: pointer; font-size: 13px; }
-    .tab-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
-    .phase-panel { display: none; border: 1px solid #e2e8f0; border-radius: 13px; padding: 15px; background: white; margin-top: 6px; }
-    .phase-panel.active { display: block; }
-    .phase-date { display: inline-block; background: #f8fafc; border: 1px solid #e2e8f0; color: #64748b; border-radius: 999px; padding: 7px 12px; font-size: 12px; margin-bottom: 12px; }
+    .canvas-wrap { border: 2px solid #e2e8f0; border-radius: 16px; overflow: hidden; background: #f8fafc; margin-bottom: 20px; touch-action: none; }
+    canvas.main-canvas { width: 100%; height: 460px; display: block; cursor: crosshair; background: white; touch-action: none; }
 
-    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 10px; margin-top: 10px; }
-    .gallery-item { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: white; min-height: 145px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
-    .gallery-item img { width: 100%; height: 145px; object-fit: cover; display: block; }
-    .gallery-remove { position: absolute; top: 7px; right: 7px; width: 25px; height: 25px; border-radius: 50%; border: none; background: rgba(15,23,42,0.8); color: white; font-weight: bold; cursor: pointer; z-index: 2; font-size: 12px; }
-    .empty-gallery { width: 100%; min-height: 110px; border: 1px dashed #cbd5e1; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: white; color: #94a3b8; font-size: 13px; text-align: center; padding: 14px; margin-top: 10px; }
+    /* Punt formulier — groot en duidelijk */
+    .punt-kaart {
+      background: #f0f7ff; border: 2px solid #bfdbfe; border-radius: 18px;
+      padding: 22px; margin-bottom: 20px;
+    }
+    .punt-info {
+      background: white; border: 1.5px solid #e2e8f0; border-radius: 12px;
+      padding: 14px; font-size: 15px; color: #475569; margin-bottom: 18px; line-height: 1.5;
+    }
+    .punt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .punt-fld label { display: block; font-weight: 700; font-size: 14px; color: #374151; margin-bottom: 7px; }
+    .punt-fld input, .punt-fld select, .punt-fld textarea {
+      width: 100%; background: white; border: 1.5px solid #e2e8f0;
+      border-radius: 11px; padding: 13px 15px; font-size: 15px;
+      font-family: Arial, sans-serif; color: #1f2937; outline: none;
+    }
+    .punt-fld input:focus, .punt-fld select:focus { border-color: #3b82f6; }
+    .punt-fld.full { grid-column: 1/-1; }
+    .punt-fld textarea { min-height: 80px; resize: vertical; }
 
-    .saved-list { border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; overflow: hidden; }
-    .saved-list-head { padding: 13px 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #1e3a5f; font-size: 15px; }
-    .saved-list-body { padding: 13px; }
-    .saved-empty { color: #94a3b8; font-size: 14px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 11px; }
-    .saved-item { border: 1px solid #e2e8f0; border-radius: 13px; padding: 13px; background: #fbfdff; margin-bottom: 10px; cursor: pointer; transition: border-color 0.14s; }
-    .saved-item:last-child { margin-bottom: 0; }
-    .saved-item:hover { border-color: #2563eb; }
-    .saved-item-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 5px; }
-    .saved-item-title { font-weight: bold; color: #1e3a5f; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 14px; }
-    .saved-item-meta { color: #64748b; font-size: 12px; margin-top: 4px; }
-    .saved-item-text { color: #475569; font-size: 13px; margin-top: 5px; white-space: pre-wrap; }
-    .saved-photo-count { color: #2563eb; font-size: 12px; font-weight: bold; }
-    .status-badge { display: inline-block; padding: 4px 9px; border-radius: 999px; font-size: 11px; font-weight: bold; }
-    .status-open { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
-    .status-done { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    /* Foto upload per punt */
+    .foto-sectie { margin-top: 16px; }
+    .foto-sectie-title { font-size: 16px; font-weight: bold; color: #1e3a5f; margin-bottom: 10px; }
+    .foto-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); gap: 10px; margin-top: 10px; }
+    .foto-item { border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; position: relative; cursor: pointer; height: 130px; background: white; }
+    .foto-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .foto-del { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; background: rgba(15,23,42,0.8); color: white; border: none; font-size: 13px; font-weight: bold; cursor: pointer; z-index: 2; display: flex; align-items: center; justify-content: center; }
+    .foto-leeg { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; color: #94a3b8; font-size: 13px; background: white; margin-top: 10px; }
 
-    .comment-list { margin-top: 10px; display: grid; gap: 8px; }
-    .comment-item { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 10px 12px; color: #475569; font-size: 13px; line-height: 1.5; }
+    .acties { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+    .opgeslagen-msg { margin-top: 12px; padding: 12px 16px; background: #f0fdf4; border: 1.5px solid #86efac; color: #15803d; border-radius: 10px; font-size: 15px; font-weight: bold; }
 
+    /* Lijst opgeslagen punten */
+    .punten-lijst { border: 1.5px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
+    .punten-lijst-header { padding: 15px 18px; background: #f0f7ff; border-bottom: 1.5px solid #e2e8f0; font-size: 16px; font-weight: bold; color: #1e3a5f; }
+    .punten-lijst-body { padding: 14px; }
+    .punt-leeg { color: #94a3b8; font-size: 14px; padding: 14px; border: 1.5px dashed #e2e8f0; border-radius: 11px; text-align: center; }
+    .punt-rij {
+      display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+      border: 1.5px solid #e2e8f0; border-radius: 13px; background: #fbfdff;
+      margin-bottom: 10px; cursor: pointer; transition: border-color 0.14s;
+    }
+    .punt-rij:hover { border-color: #3b82f6; background: #f0f7ff; }
+    .punt-rij:last-child { margin-bottom: 0; }
+    .punt-num {
+      width: 40px; height: 40px; border-radius: 50%; background: #ef4444;
+      color: white; font-weight: bold; font-size: 14px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .punt-num.done { background: #22c55e; }
+    .punt-naam { font-weight: bold; color: #1e3a5f; font-size: 15px; }
+    .punt-meta { color: #64748b; font-size: 13px; margin-top: 2px; }
+    .status-badge { display: inline-block; padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: bold; margin-left: 8px; }
+    .s-open { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .s-done { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .punt-fotos { color: #2563eb; font-size: 12px; font-weight: bold; margin-left: auto; flex-shrink: 0; }
+
+    /* Autosave */
+    .autosave { display: inline-flex; align-items: center; gap: 7px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 999px; padding: 9px 14px; font-size: 13px; font-weight: bold; }
+
+    /* Lightbox */
     .lightbox { position: fixed; inset: 0; background: rgba(8,15,30,0.94); display: none; align-items: center; justify-content: center; z-index: 12000; padding: 22px; }
     .lightbox.open { display: flex; }
-    .lightbox-inner { width: min(1100px,100%); position: relative; display: flex; align-items: center; justify-content: center; }
-    .lightbox-image { max-width: 100%; max-height: 84vh; border-radius: 13px; object-fit: contain; }
-    .lightbox-close, .lightbox-arrow { position: absolute; border: none; border-radius: 50%; width: 44px; height: 44px; background: rgba(255,255,255,0.9); color: #1e3a5f; font-size: 22px; font-weight: bold; cursor: pointer; }
-    .lightbox-close { top: -10px; right: -10px; }
-    .lightbox-arrow.left { left: 8px; top: 50%; transform: translateY(-50%); }
-    .lightbox-arrow.right { right: 8px; top: 50%; transform: translateY(-50%); }
-    .lightbox-counter { position: absolute; left: 50%; bottom: -32px; transform: translateX(-50%); color: white; font-size: 13px; background: rgba(0,0,0,0.4); padding: 6px 12px; border-radius: 999px; }
+    .lb-inner { width: min(1000px,100%); position: relative; display: flex; align-items: center; justify-content: center; }
+    .lb-img { max-width: 100%; max-height: 84vh; border-radius: 13px; object-fit: contain; }
+    .lb-close, .lb-arrow { position: absolute; border: none; border-radius: 50%; width: 48px; height: 48px; background: rgba(255,255,255,0.9); color: #1e3a5f; font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .lb-close { top: -12px; right: -12px; }
+    .lb-arrow.left { left: 10px; top: 50%; transform: translateY(-50%); }
+    .lb-arrow.right { right: 10px; top: 50%; transform: translateY(-50%); }
 
-    .help-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 9px; margin-top: 12px; }
-    .help-item { border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.07); border-radius: 11px; padding: 11px; font-size: 13px; color: rgba(255,255,255,0.8); }
-    .help-item strong { display: inline-block; min-width: 78px; color: white; }
-
-    @media (max-width: 1400px) { .split-grid { grid-template-columns: repeat(3,1fr); } }
-    @media (max-width: 1100px) { .split-grid { grid-template-columns: repeat(2,1fr); } }
-    @media (max-width: 820px) {
+    @media (max-width:1200px) { .split-grid { grid-template-columns: repeat(3,1fr); } }
+    @media (max-width:900px) { .split-grid { grid-template-columns: repeat(2,1fr); } canvas.split-thumb { height: 160px; } }
+    @media (max-width:760px) {
       .project-app { flex-direction: column; }
       .sidebar { width: 100%; }
-      .project-main { padding: 14px; }
+      .project-main { padding: 16px; }
       .split-grid { grid-template-columns: 1fr; }
-      canvas.split-thumb { height: 200px; }
-      canvas.zoom-canvas { height: 300px; }
+      .punt-grid { grid-template-columns: 1fr; }
+      canvas.main-canvas { height: 300px; }
       .dash-hero h1 { font-size: 28px; }
       .dash-body { padding: 18px; }
     }
@@ -368,13 +329,15 @@
 <body>
 
 <!-- ===== DASHBOARD ===== -->
-<div id="dashboardPage" class="dashboard">
+<div id="dashPage" class="dashboard">
   <div class="dash-topbar">
     <div class="dash-logo">ed <span>controls</span></div>
-    <div class="dash-topbar-right">
-      <input type="text" class="dash-search" id="searchInput" placeholder="🔍  Zoek project..." oninput="filterProjects()">
-      <button class="btn-new-project" onclick="openNewProjectModal()">
-        <span style="font-size:17px;">+</span> Nieuw project
+    <div style="display:flex;gap:12px;align-items:center;">
+      <input type="text" id="searchInput" placeholder="🔍 Zoeken..."
+        style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:12px;padding:11px 16px;color:white;font-size:14px;width:200px;outline:none;"
+        oninput="filterProjects()">
+      <button class="btn-new-project" onclick="openProjectModal()">
+        <span style="font-size:20px;">+</span> Nieuw project
       </button>
     </div>
   </div>
@@ -382,10 +345,9 @@
   <div class="dash-body">
     <div class="dash-hero">
       <h1>Bouw <span>projecten</span><br>overzicht</h1>
-      <p>Beheer al je bouwprojecten, herstelwerkzaamheden en inspecties op één plek.</p>
+      <p>Selecteer een project of maak een nieuw project aan.</p>
       <div class="dash-stats" id="dashStats"></div>
     </div>
-
     <div class="section-header">
       <div class="section-title">Mijn projecten</div>
     </div>
@@ -393,243 +355,170 @@
   </div>
 </div>
 
-<!-- ===== PROJECT FORM MODAL (licht) ===== -->
-<div class="modal" id="projectFormModal">
-  <div class="modal-panel-light">
-    <button class="modal-close-light" onclick="closeProjectFormModal()">×</button>
-    <div class="form-title" id="projectFormTitle">Nieuw project</div>
-    <div class="form-sub" id="projectFormSub">Vul de gegevens in en upload een projectfoto.</div>
+<!-- ===== PROJECT MODAL ===== -->
+<div class="modal" id="projectModal">
+  <div class="mpanel">
+    <button class="mpanel-close" onclick="closeProjectModal()">×</button>
+    <div class="mpanel-title" id="pModalTitle">Nieuw project</div>
+    <div class="mpanel-sub">Vul naam in en upload een foto van het project.</div>
 
-    <div class="photo-upload-area" id="photoUploadArea" onclick="document.getElementById('projectPhotoInput').click()">
-      <div class="upload-icon">📷</div>
-      <p>Klik om een projectfoto te uploaden</p>
-      <p style="font-size:11px;margin-top:4px;color:#94a3b8;">JPG of PNG</p>
+    <div class="photo-upload-area" id="puArea" onclick="document.getElementById('projFotoInput').click()">
+      <div class="pua-icon">📷</div>
+      <div class="pua-text">Tik hier om een foto te kiezen</div>
     </div>
-    <input type="file" id="projectPhotoInput" class="file-input" accept="image/*">
-    <div class="photo-preview-wrap" id="photoPreviewWrap">
-      <img id="photoPreviewImg" src="" alt="">
-      <button class="photo-preview-change" onclick="document.getElementById('projectPhotoInput').click()">Foto wijzigen</button>
-    </div>
-
-    <div class="field">
-      <label>Projectnaam *</label>
-      <input type="text" id="newProjectName" placeholder="Bijv. Restauratie Brugdeel West">
-    </div>
-    <div class="field">
-      <label>Locatie</label>
-      <input type="text" id="newProjectLocation" placeholder="Bijv. Utrecht centrum">
-    </div>
-    <div class="field">
-      <label>Rol / team</label>
-      <input type="text" id="newProjectRole" placeholder="Bijv. Uitvoerder">
+    <input type="file" id="projFotoInput" class="file-input" accept="image/*">
+    <div class="photo-preview-wrap" id="puPreview">
+      <img id="puPreviewImg" src="" alt="">
+      <button class="photo-change-btn" onclick="document.getElementById('projFotoInput').click()">Foto wijzigen</button>
     </div>
 
-    <div class="form-btn-row">
-      <button class="btn btn-blue" onclick="saveProjectForm()">Project opslaan</button>
-      <button class="btn btn-gray" onclick="closeProjectFormModal()">Annuleren</button>
+    <div class="fld"><label>Projectnaam *</label><input type="text" id="projNaam" placeholder="Bijv. KNG50 Utrecht"></div>
+    <div class="fld"><label>Locatie</label><input type="text" id="projLocatie" placeholder="Bijv. Utrecht centrum"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-blue" onclick="saveProject()">✓ Opslaan</button>
+      <button class="btn btn-gray" onclick="closeProjectModal()">Annuleren</button>
     </div>
   </div>
 </div>
 
-<!-- ===== PROJECT APP ===== -->
-<div id="projectPage" class="project-app hidden">
+<!-- ===== PROJECT PAGINA ===== -->
+<div id="projPage" class="project-app hidden">
   <aside class="sidebar">
-    <div class="sidebar-logo">ed <span>controls</span></div>
-    <div class="sidebar-label">Project</div>
-    <div class="sidebar-project-name" id="sidebarProjectName"></div>
-    <div class="menu-section-title">Delen</div>
-    <div id="sidebarMenu"></div>
+    <div class="sb-logo">ed <span>controls</span></div>
+    <div class="sb-label">Project</div>
+    <div class="sb-proj" id="sbProjNaam"></div>
+    <div class="sb-label">Delen</div>
+    <div id="sbMenu"></div>
   </aside>
 
   <main class="project-main">
-    <div class="project-main-top">
-      <button class="btn btn-light" onclick="goBackToProjects()">← Terug</button>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <span class="autosave-indicator">✓ Autosave actief</span>
-        <button class="btn btn-light" onclick="openHelpModal()">Sneltoetsen</button>
-        <label class="btn btn-light" for="importProjectInput" style="cursor:pointer;">Importeren</label>
-        <input class="file-input" type="file" id="importProjectInput" accept=".json">
-        <button class="btn btn-light" onclick="exportPdfReport()">PDF rapport</button>
-        <button class="btn btn-primary" onclick="exportProjectData()">Exporteren</button>
+    <div class="top-bar">
+      <button class="btn btn-white" onclick="goBack()">← Terug</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <span class="autosave">✓ Automatisch opgeslagen</span>
+        <button class="btn btn-white" onclick="exportPdf()">📄 PDF rapport</button>
       </div>
     </div>
 
     <div class="content-card">
-      <h2 id="contentProjectTitle"></h2>
-      <p>Upload de hoofdplattegrond. De tekening wordt automatisch in 5 gelijke delen gesplitst.</p>
-
-      <div class="field">
-        <label>Hoofdplattegrond</label>
-        <label class="upload-btn" for="mainPlanUpload">Upload hoofdplattegrond</label>
-        <input class="file-input" type="file" id="mainPlanUpload" accept="image/*">
-      </div>
-
+      <h2 id="projPageTitle"></h2>
+      <p>Upload de plattegrond. Deze wordt daarna in 5 delen gesplitst.</p>
+      <label class="upload-lbl" for="planUpload">📂 Upload plattegrond</label>
+      <input class="file-input" type="file" id="planUpload" accept="image/*">
       <div class="plan-preview">
-        <div class="placeholder" id="mainPlanPlaceholder">Nog geen hoofdplattegrond</div>
-        <canvas id="mainPlanCanvas" class="plan-preview-canvas"></canvas>
+        <div class="plan-placeholder" id="planPlaceholder">📋 Nog geen plattegrond geüpload</div>
+        <canvas id="planCanvas" class="plan-canvas"></canvas>
       </div>
-
       <div class="split-grid" id="splitGrid"></div>
     </div>
   </main>
 </div>
 
 <!-- ===== DEEL MODAL ===== -->
-<div class="modal" id="partModal">
-  <div class="modal-panel-wide">
-    <button class="modal-close-dark" onclick="closePartModal()">×</button>
-    <div style="font-size:24px;font-weight:bold;color:#1e3a5f;margin-bottom:5px;" id="modalTitle">Deel 1</div>
-    <div style="color:#64748b;margin-bottom:16px;font-size:14px;">Klik op de tekening om een punt te plaatsen of te selecteren.</div>
+<div class="deel-modal" id="deelModal">
+  <div class="deel-panel">
+    <button class="deel-close" onclick="closeDeelModal()">×</button>
+    <div class="deel-title" id="deelTitle">Deel 1</div>
+    <div class="deel-hint">Tik op de tekening om een schade- of mankementpunt te plaatsen.</div>
 
-    <div class="zoom-toolbar">
-      <button class="mini-btn" onclick="zoomBy(1.15)">+</button>
-      <button class="mini-btn" onclick="zoomBy(1/1.15)">−</button>
-      <button class="mini-btn" onclick="resetView()">Reset</button>
-      <button class="mini-btn" onclick="fitView()">Passend</button>
-      <button class="mini-btn" onclick="undoHistory()">Undo</button>
-      <button class="mini-btn" onclick="redoHistory()">Redo</button>
-      <span class="zoom-pill" id="zoomPercentLabel">Zoom 100%</span>
-      <label class="toggle-chip"><input type="checkbox" id="gridToggle"> Raster</label>
-      <label class="toggle-chip"><input type="checkbox" id="snapToggle"> Snap</label>
-      <label class="toggle-chip"><input type="checkbox" id="editModeToggle" checked> Bewerken</label>
-      <label class="toggle-chip"><input type="checkbox" id="showMarkersToggle" checked> Punten</label>
+    <div class="canvas-toolbar">
+      <button class="ctool" onclick="zoomIn()">🔍 +</button>
+      <button class="ctool" onclick="zoomOut()">🔍 −</button>
+      <button class="ctool" onclick="fitView()">⊡ Passend</button>
+      <button class="ctool" onclick="resetView()">↺ Reset</button>
+      <span class="zoom-lbl" id="zoomLbl">100%</span>
+      <label style="display:flex;align-items:center;gap:7px;font-size:14px;font-weight:bold;color:#374151;cursor:pointer;">
+        <input type="checkbox" id="editToggle" checked style="width:18px;height:18px;"> Bewerken aan
+      </label>
     </div>
 
-    <div class="zoom-wrap">
-      <canvas class="zoom-canvas" id="zoomCanvas" tabindex="0"></canvas>
+    <div class="canvas-wrap">
+      <canvas class="main-canvas" id="mainCanvas" tabindex="0"></canvas>
     </div>
 
-    <div class="point-form">
-      <div class="point-box" id="modalPointInfo">Nog geen punt geselecteerd</div>
-      <div class="field"><label>Naam punt</label><input type="text" id="pointName" placeholder="Bijv. Inlaat Noord 01"></div>
-      <div class="field"><label>Collega</label><input type="text" id="pointAssignedTo" placeholder="Bijv. Henry"></div>
-      <div class="field"><label>Laatste wijziging door</label><input type="text" id="pointUpdatedBy" placeholder="Bijv. Diederik"></div>
-      <div class="field"><label>Status</label>
-        <select id="pointStatus">
-          <option value="open">Open</option>
-          <option value="done">Klaar</option>
-        </select>
-      </div>
-      <div class="field"><label>Interne notitie</label><textarea id="pointInternalNote" placeholder="Interne notitie"></textarea></div>
-      <div class="field">
-        <label>Opmerking toevoegen</label>
-        <textarea id="pointCommentInput" placeholder="Voeg een opmerking toe"></textarea>
-        <div style="margin-top:10px;"><button class="mini-btn" onclick="addDraftComment()">Toevoegen</button></div>
-        <div class="comment-list" id="draftCommentsList"></div>
-      </div>
+    <!-- Punt formulier -->
+    <div class="punt-kaart">
+      <div class="punt-info" id="puntInfo">👆 Tik op de tekening om een punt te plaatsen</div>
 
-      <div class="tabs-row">
-        <button class="tab-btn active" onclick="switchPhaseTab('start')">Start</button>
-        <button class="tab-btn" onclick="switchPhaseTab('middle')">Midden</button>
-        <button class="tab-btn" onclick="switchPhaseTab('end')">Eind</button>
-      </div>
-
-      <div class="phase-panel active" id="phasePanel-start">
-        <div class="phase-date" id="phaseDate-start">Datum: nog niet ingevuld</div>
-        <div class="field"><label>Foto's Start</label>
-          <label class="photo-btn" for="phaseUpload-start">Foto's uploaden</label>
-          <input class="file-input" type="file" id="phaseUpload-start" accept="image/*" multiple>
-          <div class="empty-gallery" id="empty-start">Nog geen foto's</div>
-          <div class="gallery-grid hidden" id="gallery-start"></div>
+      <div class="punt-grid">
+        <div class="punt-fld">
+          <label>📌 Omschrijving schade</label>
+          <input type="text" id="pNaam" placeholder="Bijv. Scheefstand paal 3">
         </div>
-        <div class="field"><label>Opmerking Start</label><textarea id="phaseRemark-start" placeholder="Opmerking startfase"></textarea></div>
-      </div>
-      <div class="phase-panel" id="phasePanel-middle">
-        <div class="phase-date" id="phaseDate-middle">Datum: nog niet ingevuld</div>
-        <div class="field"><label>Foto's Midden</label>
-          <label class="photo-btn" for="phaseUpload-middle">Foto's uploaden</label>
-          <input class="file-input" type="file" id="phaseUpload-middle" accept="image/*" multiple>
-          <div class="empty-gallery" id="empty-middle">Nog geen foto's</div>
-          <div class="gallery-grid hidden" id="gallery-middle"></div>
+        <div class="punt-fld">
+          <label>👷 Collega verantwoordelijk</label>
+          <input type="text" id="pCollega" placeholder="Bijv. Henry">
         </div>
-        <div class="field"><label>Opmerking Midden</label><textarea id="phaseRemark-middle" placeholder="Opmerking middenfase"></textarea></div>
-      </div>
-      <div class="phase-panel" id="phasePanel-end">
-        <div class="phase-date" id="phaseDate-end">Datum: nog niet ingevuld</div>
-        <div class="field"><label>Foto's Eind</label>
-          <label class="photo-btn" for="phaseUpload-end">Foto's uploaden</label>
-          <input class="file-input" type="file" id="phaseUpload-end" accept="image/*" multiple>
-          <div class="empty-gallery" id="empty-end">Nog geen foto's</div>
-          <div class="gallery-grid hidden" id="gallery-end"></div>
+        <div class="punt-fld">
+          <label>🚦 Status</label>
+          <select id="pStatus">
+            <option value="open">🔴 Open — nog te doen</option>
+            <option value="done">🟢 Klaar — afgerond</option>
+          </select>
         </div>
-        <div class="field"><label>Opmerking Eind</label><textarea id="phaseRemark-end" placeholder="Opmerking eindfase"></textarea></div>
+        <div class="punt-fld">
+          <label>📅 Datum melding</label>
+          <input type="text" id="pDatum" placeholder="Bijv. 07-05-2026">
+        </div>
+        <div class="punt-fld full">
+          <label>📝 Notitie / toelichting</label>
+          <textarea id="pNotitie" placeholder="Beschrijf het probleem..."></textarea>
+        </div>
       </div>
 
-      <div class="modal-actions">
-        <button class="btn btn-light" onclick="resetDraft()">Nieuw punt</button>
-        <button class="btn btn-primary" onclick="saveDraftToProject()">Opslaan</button>
-        <button class="btn btn-red" onclick="deleteSelectedPoint()">Verwijderen</button>
-        <button class="btn btn-secondary" onclick="closePartModal()">Sluiten</button>
+      <!-- Foto's -->
+      <div class="foto-sectie">
+        <div class="foto-sectie-title">📷 Foto's van de schade</div>
+        <label class="upload-lbl-sm" for="puntFotoInput">+ Foto's toevoegen</label>
+        <input class="file-input" type="file" id="puntFotoInput" accept="image/*" multiple>
+        <div class="foto-leeg" id="fotoLeeg">Nog geen foto's toegevoegd</div>
+        <div class="foto-grid hidden" id="fotoGrid"></div>
       </div>
-      <div id="saveMessage" class="save-message hidden">Opgeslagen ✓</div>
+
+      <div class="acties">
+        <button class="btn btn-green" onclick="savePunt()">✓ Punt opslaan</button>
+        <button class="btn btn-white" onclick="nieuwPunt()">+ Nieuw punt</button>
+        <button class="btn btn-red" onclick="deletePunt()">🗑 Verwijderen</button>
+        <button class="btn btn-gray" onclick="closeDeelModal()">Sluiten</button>
+      </div>
+      <div id="opslaanMsg" class="opgeslagen-msg hidden">✓ Punt opgeslagen!</div>
     </div>
 
-    <div class="saved-list">
-      <div class="saved-list-head" id="savedListHead">Opgeslagen punten</div>
-      <div class="saved-list-body" id="savedItemsContainer"><div class="saved-empty">Nog geen punten.</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== HELP MODAL ===== -->
-<div class="modal" id="helpModal">
-  <div class="modal-panel-dark">
-    <button class="modal-close-white" onclick="document.getElementById('helpModal').classList.remove('open')">×</button>
-    <div style="font-size:20px;font-weight:bold;color:white;margin-bottom:14px;">Sneltoetsen</div>
-    <div class="help-grid">
-      <div class="help-item"><strong>Klik</strong> Punt plaatsen/selecteren</div>
-      <div class="help-item"><strong>Scroll</strong> Inzoomen/uitzoomen</div>
-      <div class="help-item"><strong>Sleep</strong> Canvas bewegen</div>
-      <div class="help-item"><strong>Delete</strong> Punt verwijderen</div>
-      <div class="help-item"><strong>Ctrl+Z</strong> Undo</div>
-      <div class="help-item"><strong>Ctrl+Y</strong> Redo</div>
-      <div class="help-item"><strong>Pijltjes</strong> Punt verplaatsen</div>
-      <div class="help-item"><strong>Escape</strong> Selectie opheffen</div>
-    </div>
-    <div style="margin-top:18px;">
-      <button class="btn btn-gray" onclick="document.getElementById('helpModal').classList.remove('open')">Sluiten</button>
+    <!-- Punten lijst -->
+    <div class="punten-lijst">
+      <div class="punten-lijst-header" id="pLijstHeader">Punten in dit deel</div>
+      <div class="punten-lijst-body" id="pLijstBody"></div>
     </div>
   </div>
 </div>
 
 <!-- ===== LIGHTBOX ===== -->
 <div class="lightbox" id="lightbox">
-  <div class="lightbox-inner">
-    <img class="lightbox-image" id="lightboxImage" src="" alt="">
-    <button class="lightbox-close" onclick="closeLightbox()">×</button>
-    <button class="lightbox-arrow left" onclick="lightboxNav(-1)">‹</button>
-    <button class="lightbox-arrow right" onclick="lightboxNav(1)">›</button>
-    <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+  <div class="lb-inner">
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <button class="lb-close" onclick="closeLb()">×</button>
+    <button class="lb-arrow left" onclick="lbNav(-1)">‹</button>
+    <button class="lb-arrow right" onclick="lbNav(1)">›</button>
   </div>
 </div>
 
 <script>
-const TOTAL_PARTS = 5;
-let projects = JSON.parse(localStorage.getItem('bouwProjects') || '[]');
-let currentProjectIndex = -1;
-let currentPartIndex = 0;
-let selectedPointId = null;
-let draftComments = [];
-let draftPhasePhotos = { start: [], middle: [], end: [] };
-let undoStack = [], redoStack = [];
-let editingProjectIndex = -1;
-let newProjectPhoto = null;
-let canvasImg = null;
-let zoom = 1, panX = 0, panY = 0;
-let isPanning = false, panStartX = 0, panStartY = 0;
-let clickStartX = 0, clickStartY = 0, didPan = false;
-let lightboxPhotos = [], lightboxIndex = 0;
+const DELEN = 5;
+let projects = JSON.parse(localStorage.getItem('edProjects') || '[]');
+let projIdx = -1, deelIdx = 0, selPuntId = null;
+let draftFotos = [];
+let editProjIdx = -1, nieuwFoto = null;
+let canvasImg = null, zoom = 1, panX = 0, panY = 0;
+let isPan = false, panSX = 0, panSY = 0, cSX = 0, cSY = 0, didPan = false;
+let lbFotos = [], lbIdx = 0;
 
+// ===== INIT =====
 function init() {
-  renderDashboard();
-  document.getElementById('mainPlanUpload').addEventListener('change', handleMainPlanUpload);
-  document.getElementById('importProjectInput').addEventListener('change', handleImportProject);
-  document.getElementById('projectPhotoInput').addEventListener('change', handleProjectPhotoSelect);
-  ['start','middle','end'].forEach(ph =>
-    document.getElementById('phaseUpload-'+ph).addEventListener('change', e => handlePhaseUpload(e, ph))
-  );
-  document.getElementById('gridToggle').addEventListener('change', drawCanvas);
-  document.getElementById('showMarkersToggle').addEventListener('change', drawCanvas);
+  renderDash();
+  document.getElementById('planUpload').addEventListener('change', handlePlanUpload);
+  document.getElementById('projFotoInput').addEventListener('change', handleProjFoto);
+  document.getElementById('puntFotoInput').addEventListener('change', handlePuntFotos);
   document.addEventListener('click', e => {
     if (!e.target.closest('.card-menu-btn') && !e.target.closest('.card-dropdown'))
       document.querySelectorAll('.card-dropdown.open').forEach(d => d.classList.remove('open'));
@@ -637,476 +526,451 @@ function init() {
 }
 
 // ===== DASHBOARD =====
-function renderDashboard() {
+function renderDash() {
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
-  const filtered = projects.filter(p => p.name.toLowerCase().includes(q) || (p.location||'').toLowerCase().includes(q));
-  const totalPts = projects.reduce((a,p) => a + p.parts.reduce((b,pt) => b + (pt.points||[]).length, 0), 0);
-  const donePts  = projects.reduce((a,p) => a + p.parts.reduce((b,pt) => b + (pt.points||[]).filter(x=>x.status==='done').length, 0), 0);
+  const filtered = projects.filter(p => p.naam.toLowerCase().includes(q) || (p.locatie||'').toLowerCase().includes(q));
+  const totPts = projects.reduce((a,p) => a + p.delen.reduce((b,d) => b+(d.punten||[]).length,0), 0);
+  const donePts = projects.reduce((a,p) => a + p.delen.reduce((b,d) => b+(d.punten||[]).filter(x=>x.status==='done').length,0), 0);
+
   document.getElementById('dashStats').innerHTML = `
     <div class="stat-pill"><span class="stat-dot"></span>${projects.length} project${projects.length!==1?'en':''}</div>
-    <div class="stat-pill"><span class="stat-dot orange"></span>${totalPts} punt${totalPts!==1?'en':''} totaal</div>
+    <div class="stat-pill"><span class="stat-dot orange"></span>${totPts} schade punt${totPts!==1?'en':''}</div>
     <div class="stat-pill"><span class="stat-dot green"></span>${donePts} afgerond</div>`;
 
   const grid = document.getElementById('projectGrid');
-  if (!filtered.length) {
-    grid.innerHTML = `<div style="color:rgba(255,255,255,0.6);padding:20px;grid-column:1/-1;">Geen projecten gevonden.</div>`;
-    return;
-  }
+  if (!filtered.length) { grid.innerHTML='<div style="color:rgba(255,255,255,0.6);padding:20px;grid-column:1/-1;">Geen projecten gevonden.</div>'; return; }
+
   grid.innerHTML = filtered.map(p => {
     const ri = projects.indexOf(p);
-    const cnt = p.parts.reduce((a,pt) => a+(pt.points||[]).length, 0);
-    const imgHtml = p.photo
-      ? `<img class="project-card-img" src="${p.photo}" alt="" onclick="openProject(${ri})">`
+    const cnt = p.delen.reduce((a,d) => a+(d.punten||[]).length, 0);
+    const img = p.foto
+      ? `<img class="project-card-img" src="${p.foto}" alt="" onclick="openProject(${ri})">`
       : `<div class="project-card-img-placeholder" onclick="openProject(${ri})">🏗️</div>`;
     return `<div class="project-card">
-      ${imgHtml}
-      <button class="card-menu-btn" onclick="toggleCardMenu(event,${ri})">⋮</button>
-      <div class="card-dropdown" id="cardMenu${ri}">
-        <div class="card-dropdown-item" onclick="openProject(${ri});closeAllMenus()">📂 Openen</div>
+      ${img}
+      <button class="card-menu-btn" onclick="toggleMenu(event,${ri})">⋮</button>
+      <div class="card-dropdown" id="cm${ri}">
+        <div class="card-dropdown-item" onclick="openProject(${ri});closeMenus()">📂 Openen</div>
         <div class="card-dropdown-item" onclick="editProject(${ri})">✏️ Bewerken</div>
         <div class="card-dropdown-item danger" onclick="deleteProject(${ri})">🗑️ Verwijderen</div>
       </div>
       <div class="project-card-body" onclick="openProject(${ri})">
-        <div class="project-card-title">${p.name}</div>
-        <div class="project-card-sub">${p.location||'Geen locatie'}</div>
+        <div class="project-card-title">${p.naam}</div>
+        <div class="project-card-sub">${p.locatie||'Geen locatie'}</div>
         <div class="project-card-footer">
           <span class="project-card-points">${cnt} punt${cnt!==1?'en':''}</span>
-          <span class="project-card-role">${p.role||''}</span>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-function filterProjects() { renderDashboard(); }
-function toggleCardMenu(e, i) { e.stopPropagation(); closeAllMenus(); document.getElementById('cardMenu'+i)?.classList.toggle('open'); }
-function closeAllMenus() { document.querySelectorAll('.card-dropdown.open').forEach(d=>d.classList.remove('open')); }
+function filterProjects() { renderDash(); }
+function toggleMenu(e,i) { e.stopPropagation(); closeMenus(); document.getElementById('cm'+i)?.classList.toggle('open'); }
+function closeMenus() { document.querySelectorAll('.card-dropdown.open').forEach(d=>d.classList.remove('open')); }
 
-// ===== PROJECT FORM =====
-function openNewProjectModal() {
-  editingProjectIndex = -1; newProjectPhoto = null;
-  document.getElementById('projectFormTitle').textContent = 'Nieuw project';
-  document.getElementById('projectFormSub').textContent = 'Vul de gegevens in en upload een projectfoto.';
-  document.getElementById('newProjectName').value = '';
-  document.getElementById('newProjectLocation').value = '';
-  document.getElementById('newProjectRole').value = '';
-  document.getElementById('photoPreviewWrap').style.display = 'none';
-  document.getElementById('photoUploadArea').style.display = 'block';
-  document.getElementById('projectFormModal').classList.add('open');
-}
-
-function editProject(index) {
-  closeAllMenus();
-  editingProjectIndex = index;
-  const p = projects[index];
-  newProjectPhoto = p.photo || null;
-  document.getElementById('projectFormTitle').textContent = 'Project bewerken';
-  document.getElementById('projectFormSub').textContent = 'Wijzig naam, locatie of foto.';
-  document.getElementById('newProjectName').value = p.name || '';
-  document.getElementById('newProjectLocation').value = p.location || '';
-  document.getElementById('newProjectRole').value = p.role || '';
-  if (p.photo) {
-    document.getElementById('photoPreviewImg').src = p.photo;
-    document.getElementById('photoPreviewWrap').style.display = 'block';
-    document.getElementById('photoUploadArea').style.display = 'none';
-  } else {
-    document.getElementById('photoPreviewWrap').style.display = 'none';
-    document.getElementById('photoUploadArea').style.display = 'block';
+// ===== PROJECT MODAL =====
+function openProjectModal(isEdit=false) {
+  if (!isEdit) {
+    editProjIdx=-1; nieuwFoto=null;
+    document.getElementById('pModalTitle').textContent='Nieuw project';
+    document.getElementById('projNaam').value='';
+    document.getElementById('projLocatie').value='';
+    document.getElementById('puPreview').style.display='none';
+    document.getElementById('puArea').style.display='block';
   }
-  document.getElementById('projectFormModal').classList.add('open');
+  document.getElementById('projectModal').classList.add('open');
+}
+function closeProjectModal() { document.getElementById('projectModal').classList.remove('open'); }
+
+function editProject(i) {
+  closeMenus();
+  editProjIdx=i;
+  const p=projects[i];
+  nieuwFoto=p.foto||null;
+  document.getElementById('pModalTitle').textContent='Project bewerken';
+  document.getElementById('projNaam').value=p.naam||'';
+  document.getElementById('projLocatie').value=p.locatie||'';
+  if (p.foto) {
+    document.getElementById('puPreviewImg').src=p.foto;
+    document.getElementById('puPreview').style.display='block';
+    document.getElementById('puArea').style.display='none';
+  } else {
+    document.getElementById('puPreview').style.display='none';
+    document.getElementById('puArea').style.display='block';
+  }
+  openProjectModal(true);
 }
 
-function closeProjectFormModal() { document.getElementById('projectFormModal').classList.remove('open'); }
-
-function handleProjectPhotoSelect(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    newProjectPhoto = ev.target.result;
-    document.getElementById('photoPreviewImg').src = newProjectPhoto;
-    document.getElementById('photoPreviewWrap').style.display = 'block';
-    document.getElementById('photoUploadArea').style.display = 'none';
+function handleProjFoto(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    nieuwFoto=ev.target.result;
+    document.getElementById('puPreviewImg').src=nieuwFoto;
+    document.getElementById('puPreview').style.display='block';
+    document.getElementById('puArea').style.display='none';
   };
-  reader.readAsDataURL(file);
-  e.target.value = '';
+  r.readAsDataURL(file); e.target.value='';
 }
 
-function saveProjectForm() {
-  const name = document.getElementById('newProjectName').value.trim();
-  if (!name) { alert('Vul een projectnaam in.'); return; }
-  const location = document.getElementById('newProjectLocation').value.trim();
-  const role = document.getElementById('newProjectRole').value.trim();
-
-  if (editingProjectIndex >= 0) {
-    projects[editingProjectIndex].name = name;
-    projects[editingProjectIndex].location = location;
-    projects[editingProjectIndex].role = role;
-    if (newProjectPhoto) projects[editingProjectIndex].photo = newProjectPhoto;
+function saveProject() {
+  const naam=document.getElementById('projNaam').value.trim();
+  if (!naam) { alert('Vul een projectnaam in.'); return; }
+  const locatie=document.getElementById('projLocatie').value.trim();
+  if (editProjIdx>=0) {
+    projects[editProjIdx].naam=naam;
+    projects[editProjIdx].locatie=locatie;
+    if (nieuwFoto) projects[editProjIdx].foto=nieuwFoto;
   } else {
-    projects.push({
-      name, location, role,
-      photo: newProjectPhoto,
-      mainPlan: null,
-      parts: Array.from({ length: TOTAL_PARTS }, () => ({ points: [] }))
-    });
+    projects.push({ naam, locatie, foto:nieuwFoto, plan:null, delen:Array.from({length:DELEN},()=>({punten:[]})) });
   }
-  saveProjects();
-  closeProjectFormModal();
-  renderDashboard();
+  save(); closeProjectModal(); renderDash();
 }
 
-function deleteProject(index) {
-  closeAllMenus();
-  if (!confirm(`Project "${projects[index].name}" verwijderen?`)) return;
-  projects.splice(index, 1);
-  saveProjects(); renderDashboard();
+function deleteProject(i) {
+  closeMenus();
+  if (!confirm(`Project "${projects[i].naam}" verwijderen?`)) return;
+  projects.splice(i,1); save(); renderDash();
 }
 
-// ===== PROJECT APP =====
-function openProject(index) {
-  currentProjectIndex = index;
-  const p = projects[index];
-  if (!p.parts || p.parts.length < TOTAL_PARTS)
-    p.parts = Array.from({ length: TOTAL_PARTS }, (_, i) => p.parts?.[i] || { points: [] });
-  saveProjects();
-  document.getElementById('dashboardPage').classList.add('hidden');
-  document.getElementById('projectPage').classList.remove('hidden');
-  document.getElementById('sidebarProjectName').textContent = p.name;
-  document.getElementById('contentProjectTitle').textContent = p.name;
-  renderSidebarMenu(); renderSplitGrid();
-  if (p.mainPlan) showMainPlan(p.mainPlan);
-  else { document.getElementById('mainPlanCanvas').style.display='none'; document.getElementById('mainPlanPlaceholder').classList.remove('hidden'); }
+// ===== PROJECT PAGINA =====
+function openProject(i) {
+  projIdx=i;
+  const p=projects[i];
+  if (!p.delen||p.delen.length<DELEN)
+    p.delen=Array.from({length:DELEN},(_,j)=>p.delen?.[j]||{punten:[]});
+  save();
+  document.getElementById('dashPage').classList.add('hidden');
+  document.getElementById('projPage').classList.remove('hidden');
+  document.getElementById('sbProjNaam').textContent=p.naam;
+  document.getElementById('projPageTitle').textContent=p.naam;
+  renderSidebar(); renderSplitGrid();
+  if (p.plan) showPlan(p.plan);
+  else { document.getElementById('planCanvas').style.display='none'; document.getElementById('planPlaceholder').classList.remove('hidden'); }
 }
 
-function goBackToProjects() {
-  document.getElementById('projectPage').classList.add('hidden');
-  document.getElementById('dashboardPage').classList.remove('hidden');
-  renderDashboard();
+function goBack() {
+  document.getElementById('projPage').classList.add('hidden');
+  document.getElementById('dashPage').classList.remove('hidden');
+  renderDash();
 }
 
-function renderSidebarMenu() {
-  const p = projects[currentProjectIndex];
-  document.getElementById('sidebarMenu').innerHTML = p.parts.map((part,i) => {
-    const cnt = (part.points||[]).length;
-    return `<div class="menu-item ${i===currentPartIndex?'active':''}" onclick="currentPartIndex=${i};renderSidebarMenu();openPartModal(${i})">
-      <span>Deel ${i+1}</span><span class="menu-count">(${cnt})</span></div>`;
+function renderSidebar() {
+  const p=projects[projIdx];
+  document.getElementById('sbMenu').innerHTML=p.delen.map((d,i)=>{
+    const cnt=(d.punten||[]).length;
+    return `<div class="sb-item ${i===deelIdx?'active':''}" onclick="deelIdx=${i};renderSidebar();openDeel(${i})">
+      <span>Deel ${i+1}</span><span class="sb-count">(${cnt})</span></div>`;
   }).join('');
 }
 
 // ===== SPLIT GRID =====
 function renderSplitGrid() {
-  const p = projects[currentProjectIndex];
-  document.getElementById('splitGrid').innerHTML = p.parts.map((part,i) => {
-    const cnt = (part.points||[]).length;
-    return `<div class="split-card" onclick="openPartModal(${i})">
-      <div class="split-head"><span>Deel ${i+1}</span><span class="badge-count">${cnt} punt${cnt!==1?'en':''}</span></div>
-      <canvas class="split-thumb" id="thumb${i}"></canvas>
+  const p=projects[projIdx];
+  document.getElementById('splitGrid').innerHTML=p.delen.map((d,i)=>{
+    const cnt=(d.punten||[]).length;
+    return `<div class="split-card" onclick="openDeel(${i})">
+      <div class="split-head"><span>Deel ${i+1}</span><span class="badge">${cnt} punt${cnt!==1?'en':''}</span></div>
+      <canvas class="split-thumb" id="th${i}"></canvas>
     </div>`;
   }).join('');
-  setTimeout(() => p.parts.forEach((_,i) => drawThumb(i)), 60);
+  setTimeout(()=>p.delen.forEach((_,i)=>drawThumb(i)),60);
 }
 
 function drawThumb(pi) {
-  const canvas = document.getElementById('thumb'+pi); if (!canvas) return;
-  const dpr = window.devicePixelRatio||1;
-  const dW = canvas.offsetWidth||220, dH = canvas.offsetHeight||190;
-  canvas.width = dW*dpr; canvas.height = dH*dpr;
-  const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
-  ctx.clearRect(0,0,dW,dH);
-  const p = projects[currentProjectIndex];
-  const points = p.parts[pi].points||[];
-
-  if (!p.mainPlan) {
+  const cv=document.getElementById('th'+pi); if(!cv) return;
+  const dpr=window.devicePixelRatio||1, dW=cv.offsetWidth||220, dH=cv.offsetHeight||200;
+  cv.width=dW*dpr; cv.height=dH*dpr;
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,dW,dH);
+  const p=projects[projIdx], pts=p.delen[pi].punten||[];
+  if (!p.plan) {
     ctx.fillStyle='#f1f5f9'; ctx.fillRect(0,0,dW,dH);
-    ctx.fillStyle='#94a3b8'; ctx.font='13px Arial';
+    ctx.fillStyle='#94a3b8'; ctx.font='bold 14px Arial';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('Deel '+(pi+1), dW/2, dH/2); return;
+    ctx.fillText('Deel '+(pi+1),dW/2,dH/2); return;
   }
-  const img = new Image();
-  img.onload = () => {
-    const segW = img.naturalWidth/TOTAL_PARTS;
-    const segX = segW*pi, segH = img.naturalHeight;
-    const scale = Math.min(dW/segW, dH/segH);
-    const drawW = segW*scale, drawH = segH*scale;
-    const offX = (dW-drawW)/2, offY = (dH-drawH)/2;
-    ctx.drawImage(img, segX, 0, segW, segH, offX, offY, drawW, drawH);
-    points.forEach(pt => {
-      const lx = offX+(pt.x-segX)*scale, ly = offY+pt.y*scale;
-      ctx.beginPath(); ctx.arc(lx,ly,8,0,Math.PI*2);
-      ctx.fillStyle = pt.status==='done'?'#22c55e':'#ef4444'; ctx.fill();
+  const img=new Image();
+  img.onload=()=>{
+    const segW=img.naturalWidth/DELEN, segX=segW*pi, segH=img.naturalHeight;
+    const scale=Math.min(dW/segW,dH/segH);
+    const dw=segW*scale, dh=segH*scale, ox=(dW-dw)/2, oy=(dH-dh)/2;
+    ctx.drawImage(img,segX,0,segW,segH,ox,oy,dw,dh);
+    pts.forEach(pt=>{
+      const lx=ox+(pt.x-segX)*scale, ly=oy+pt.y*scale;
+      ctx.beginPath(); ctx.arc(lx,ly,9,0,Math.PI*2);
+      ctx.fillStyle=pt.status==='done'?'#22c55e':'#ef4444'; ctx.fill();
       ctx.strokeStyle='white'; ctx.lineWidth=2; ctx.stroke();
-      ctx.fillStyle='white'; ctx.font='bold 8px Arial';
+      ctx.fillStyle='white'; ctx.font='bold 9px Arial';
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('✕',lx,ly);
     });
   };
-  img.src = p.mainPlan;
+  img.src=p.plan;
 }
 
-// ===== MAIN PLAN =====
-function handleMainPlanUpload(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    projects[currentProjectIndex].mainPlan = ev.target.result;
-    saveProjects(); showMainPlan(ev.target.result); renderSplitGrid();
+// ===== PLAN UPLOAD =====
+function handlePlanUpload(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    projects[projIdx].plan=ev.target.result;
+    save(); showPlan(ev.target.result); renderSplitGrid();
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(file);
 }
 
-function showMainPlan(src) {
-  const canvas = document.getElementById('mainPlanCanvas');
-  const ctx = canvas.getContext('2d');
-  const img = new Image();
-  img.onload = () => {
-    canvas.width=img.naturalWidth; canvas.height=img.naturalHeight;
+function showPlan(src) {
+  const cv=document.getElementById('planCanvas'), ctx=cv.getContext('2d'), img=new Image();
+  img.onload=()=>{
+    cv.width=img.naturalWidth; cv.height=img.naturalHeight;
     ctx.drawImage(img,0,0);
-    document.getElementById('mainPlanPlaceholder').classList.add('hidden');
-    canvas.style.display='block';
+    document.getElementById('planPlaceholder').classList.add('hidden');
+    cv.style.display='block';
   };
   img.src=src;
 }
 
 // ===== DEEL MODAL =====
-function openPartModal(pi) {
-  currentPartIndex=pi; selectedPointId=null; undoStack=[]; redoStack=[];
-  resetDraft();
-  document.getElementById('modalTitle').textContent='Deel '+(pi+1);
-  document.getElementById('savedListHead').textContent='Opgeslagen punten in deel '+(pi+1);
-  document.getElementById('partModal').classList.add('open');
-  renderSavedItems(); initCanvas(); renderSidebarMenu();
+function openDeel(i) {
+  deelIdx=i; selPuntId=null; draftFotos=[];
+  nieuwPunt();
+  document.getElementById('deelTitle').textContent='Deel '+(i+1);
+  document.getElementById('pLijstHeader').textContent='Punten in deel '+(i+1);
+  document.getElementById('deelModal').classList.add('open');
+  initCanvas(); renderPuntenLijst(); renderSidebar();
 }
 
-function closePartModal() {
-  document.getElementById('partModal').classList.remove('open');
-  renderSplitGrid(); renderSidebarMenu();
+function closeDeelModal() {
+  document.getElementById('deelModal').classList.remove('open');
+  renderSplitGrid(); renderSidebar();
 }
 
 // ===== CANVAS =====
-function getSegment() {
+function getSeg() {
   if (!canvasImg) return {segX:0,segW:800,segH:600};
-  return { segX:(canvasImg.naturalWidth/TOTAL_PARTS)*currentPartIndex, segW:canvasImg.naturalWidth/TOTAL_PARTS, segH:canvasImg.naturalHeight };
+  return {segX:canvasImg.naturalWidth/DELEN*deelIdx, segW:canvasImg.naturalWidth/DELEN, segH:canvasImg.naturalHeight};
 }
 
 function initCanvas() {
-  const canvas = document.getElementById('zoomCanvas');
+  const cv=document.getElementById('mainCanvas');
   zoom=1; panX=0; panY=0;
-  const p = projects[currentProjectIndex];
-  if (p.mainPlan) { canvasImg=new Image(); canvasImg.onload=fitView; canvasImg.src=p.mainPlan; }
+  const p=projects[projIdx];
+  if (p.plan) { canvasImg=new Image(); canvasImg.onload=fitView; canvasImg.src=p.plan; }
   else { canvasImg=null; drawCanvas(); }
-  canvas.onmousedown=onCanvasMouseDown; canvas.onmousemove=onCanvasMouseMove;
-  canvas.onmouseup=onCanvasMouseUp; canvas.onwheel=onCanvasWheel;
-  canvas.onkeydown=onCanvasKeyDown; canvas.ontouchstart=onTouchStart;
-  canvas.ontouchmove=onTouchMove; canvas.ontouchend=onTouchEnd;
+  cv.onmousedown=mDown; cv.onmousemove=mMove; cv.onmouseup=mUp;
+  cv.onwheel=mWheel; cv.onkeydown=kDown;
+  cv.ontouchstart=tStart; cv.ontouchmove=tMove; cv.ontouchend=tEnd;
 }
 
 function drawCanvas() {
-  const canvas=document.getElementById('zoomCanvas'); if(!canvas) return;
-  const dpr=window.devicePixelRatio||1, dW=canvas.offsetWidth, dH=canvas.offsetHeight;
-  canvas.width=dW*dpr; canvas.height=dH*dpr;
-  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const cv=document.getElementById('mainCanvas'); if(!cv) return;
+  const dpr=window.devicePixelRatio||1, dW=cv.offsetWidth, dH=cv.offsetHeight;
+  cv.width=dW*dpr; cv.height=dH*dpr;
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
   ctx.clearRect(0,0,dW,dH);
   ctx.save(); ctx.translate(panX,panY); ctx.scale(zoom,zoom);
-  const {segX,segW,segH}=getSegment();
-  if(canvasImg) ctx.drawImage(canvasImg,segX,0,segW,segH,0,0,segW,segH);
-  else { ctx.fillStyle='#f8fafc'; ctx.fillRect(0,0,800,600); }
-  if(document.getElementById('gridToggle').checked) drawGrid(ctx,dW,dH);
-  if(document.getElementById('showMarkersToggle').checked) {
-    (projects[currentProjectIndex].parts[currentPartIndex].points||[]).forEach(pt=>drawMarker(ctx,pt.x-segX,pt.y,pt));
-  }
+  const {segX,segW,segH}=getSeg();
+  if (canvasImg) ctx.drawImage(canvasImg,segX,0,segW,segH,0,0,segW,segH);
+  else { ctx.fillStyle='#f0f7ff'; ctx.fillRect(0,0,800,600); ctx.fillStyle='#94a3b8'; ctx.font='bold 18px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('Upload eerst een plattegrond',400,300); }
+  (projects[projIdx].delen[deelIdx].punten||[]).forEach(pt=>drawMarker(ctx,pt.x-segX,pt.y,pt));
   ctx.restore();
-  document.getElementById('zoomPercentLabel').textContent='Zoom '+Math.round(zoom*100)+'%';
-}
-
-function drawGrid(ctx,dW,dH) {
-  const step=50; ctx.strokeStyle='rgba(100,149,200,0.18)'; ctx.lineWidth=0.5/zoom;
-  const sx=Math.floor(-panX/zoom/step)*step, sy=Math.floor(-panY/zoom/step)*step;
-  const ex=sx+dW/zoom+step*2, ey=sy+dH/zoom+step*2;
-  for(let x=sx;x<ex;x+=step){ctx.beginPath();ctx.moveTo(x,sy);ctx.lineTo(x,ey);ctx.stroke();}
-  for(let y=sy;y<ey;y+=step){ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(ex,y);ctx.stroke();}
+  document.getElementById('zoomLbl').textContent=Math.round(zoom*100)+'%';
 }
 
 function drawMarker(ctx,lx,ly,pt) {
-  const r=12/zoom, sel=pt.id===selectedPointId;
+  const r=14/zoom, sel=pt.id===selPuntId;
   ctx.beginPath(); ctx.arc(lx,ly,r,0,Math.PI*2);
   ctx.fillStyle=pt.status==='done'?'#22c55e':'#ef4444'; ctx.fill();
-  if(sel){ ctx.strokeStyle='#2563eb'; ctx.lineWidth=3/zoom; ctx.stroke();
-    ctx.beginPath(); ctx.arc(lx,ly,r+5/zoom,0,Math.PI*2);
-    ctx.strokeStyle='rgba(37,99,235,0.35)'; ctx.lineWidth=2/zoom; ctx.stroke();
-  } else { ctx.strokeStyle='white'; ctx.lineWidth=2/zoom; ctx.stroke(); }
-  ctx.fillStyle='white'; ctx.font=`bold ${Math.max(9,11/zoom)}px Arial`;
+  if(sel){ ctx.strokeStyle='#2563eb'; ctx.lineWidth=4/zoom; ctx.stroke();
+    ctx.beginPath(); ctx.arc(lx,ly,r+6/zoom,0,Math.PI*2);
+    ctx.strokeStyle='rgba(37,99,235,0.3)'; ctx.lineWidth=3/zoom; ctx.stroke();
+  } else { ctx.strokeStyle='white'; ctx.lineWidth=2.5/zoom; ctx.stroke(); }
+  ctx.fillStyle='white'; ctx.font=`bold ${Math.max(10,13/zoom)}px Arial`;
   ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('✕',lx,ly);
-  if(pt.name){ ctx.fillStyle='#1f2937'; ctx.font=`${Math.max(8,10/zoom)}px Arial`; ctx.textAlign='left'; ctx.fillText(pt.name,lx+r+3/zoom,ly); }
+  if(pt.naam){ ctx.fillStyle='#1e3a5f'; ctx.font=`bold ${Math.max(9,11/zoom)}px Arial`; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(pt.naam,lx+r+4/zoom,ly); }
 }
 
-function getSegCoords(canvas,e) {
-  const rect=canvas.getBoundingClientRect();
-  return { lx:(e.clientX-rect.left-panX)/zoom, ly:(e.clientY-rect.top-panY)/zoom };
-}
-function localToFull(lx,ly){ return {x:lx+getSegment().segX, y:ly}; }
-function fullToLocal(x,y){ return {lx:x-getSegment().segX, ly:y}; }
+function segCoords(cv,e){const r=cv.getBoundingClientRect();return{lx:(e.clientX-r.left-panX)/zoom,ly:(e.clientY-r.top-panY)/zoom};}
+function toFull(lx,ly){return{x:lx+getSeg().segX,y:ly};}
+function toLoc(x,y){return{lx:x-getSeg().segX,ly:y};}
 
-function onCanvasMouseDown(e) { clickStartX=e.clientX; clickStartY=e.clientY; didPan=false; isPanning=true; panStartX=e.clientX-panX; panStartY=e.clientY-panY; }
-function onCanvasMouseMove(e) {
-  if(!isPanning) return;
-  if(Math.abs(e.clientX-clickStartX)>4||Math.abs(e.clientY-clickStartY)>4) didPan=true;
-  panX=e.clientX-panStartX; panY=e.clientY-panStartY; drawCanvas();
+function mDown(e){cSX=e.clientX;cSY=e.clientY;didPan=false;isPan=true;panSX=e.clientX-panX;panSY=e.clientY-panY;}
+function mMove(e){if(!isPan)return;if(Math.abs(e.clientX-cSX)>5||Math.abs(e.clientY-cSY)>5)didPan=true;panX=e.clientX-panSX;panY=e.clientY-panSY;drawCanvas();}
+function mUp(e){
+  isPan=false; if(didPan){didPan=false;return;}
+  if(!document.getElementById('editToggle').checked) return;
+  const cv=document.getElementById('mainCanvas');
+  const {lx,ly}=segCoords(cv,e);
+  const pts=projects[projIdx].delen[deelIdx].punten||[];
+  const hit=pts.find(pt=>{const{lx:px,ly:py}=toLoc(pt.x,pt.y);return Math.hypot(px-lx,py-ly)<18/zoom;});
+  if(hit) selectPunt(hit.id);
+  else { const f=toFull(lx,ly); plaatsPunt(f.x,f.y); }
 }
-function onCanvasMouseUp(e) {
-  isPanning=false; if(didPan){didPan=false;return;}
-  if(!document.getElementById('editModeToggle').checked) return;
-  const canvas=document.getElementById('zoomCanvas');
-  const {lx,ly}=getSegCoords(canvas,e);
-  const snap=document.getElementById('snapToggle').checked;
-  const sx=snap?Math.round(lx/50)*50:lx, sy=snap?Math.round(ly/50)*50:ly;
-  const points=projects[currentProjectIndex].parts[currentPartIndex].points||[];
-  const hitR=16/zoom;
-  const hit=points.find(pt=>{const{lx:plx,ly:ply}=fullToLocal(pt.x,pt.y);return Math.hypot(plx-sx,ply-sy)<hitR;});
-  if(hit) selectPoint(hit.id);
-  else { const f=localToFull(sx,sy); placeNewPoint(f.x,f.y); }
-}
-function onCanvasWheel(e) {
+function mWheel(e){
   e.preventDefault();
-  const rect=document.getElementById('zoomCanvas').getBoundingClientRect();
-  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-  const f=e.deltaY>0?1/1.1:1.1, nz=Math.min(Math.max(zoom*f,0.1),10);
+  const r=document.getElementById('mainCanvas').getBoundingClientRect();
+  const mx=e.clientX-r.left, my=e.clientY-r.top;
+  const f=e.deltaY>0?1/1.1:1.1, nz=Math.min(Math.max(zoom*f,0.1),12);
   panX=mx-(mx-panX)*(nz/zoom); panY=my-(my-panY)*(nz/zoom); zoom=nz; drawCanvas();
 }
-let lastTouchDist=0;
-function onTouchStart(e) {
-  if(e.touches.length===2) lastTouchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-  else { isPanning=true; panStartX=e.touches[0].clientX-panX; panStartY=e.touches[0].clientY-panY; clickStartX=e.touches[0].clientX; clickStartY=e.touches[0].clientY; didPan=false; }
-}
-function onTouchMove(e) {
-  e.preventDefault();
-  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); zoom=Math.min(Math.max(zoom*(d/lastTouchDist),0.1),10); lastTouchDist=d; drawCanvas(); }
-  else if(isPanning){ if(Math.abs(e.touches[0].clientX-clickStartX)>6)didPan=true; panX=e.touches[0].clientX-panStartX; panY=e.touches[0].clientY-panStartY; drawCanvas(); }
-}
-function onTouchEnd(){isPanning=false;}
-function onCanvasKeyDown(e) {
-  if((e.ctrlKey||e.metaKey)&&e.key==='z'){undoHistory();return;}
-  if((e.ctrlKey||e.metaKey)&&e.key==='y'){redoHistory();return;}
-  if(!selectedPointId) return;
-  const pt=(projects[currentProjectIndex].parts[currentPartIndex].points||[]).find(p=>p.id===selectedPointId);
-  if(!pt) return;
-  const step=e.shiftKey?10:1;
-  if(e.key==='ArrowLeft'){pt.x-=step;e.preventDefault();}
-  else if(e.key==='ArrowRight'){pt.x+=step;e.preventDefault();}
-  else if(e.key==='ArrowUp'){pt.y-=step;e.preventDefault();}
-  else if(e.key==='ArrowDown'){pt.y+=step;e.preventDefault();}
-  else if(e.key==='Delete'||e.key==='Backspace'){deleteSelectedPoint();return;}
-  else if(e.key==='Escape'){selectedPointId=null;drawCanvas();return;}
-  saveProjects(); drawCanvas();
+let ltDist=0;
+function tStart(e){if(e.touches.length===2)ltDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);else{isPan=true;panSX=e.touches[0].clientX-panX;panSY=e.touches[0].clientY-panY;cSX=e.touches[0].clientX;cSY=e.touches[0].clientY;didPan=false;}}
+function tMove(e){e.preventDefault();if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);zoom=Math.min(Math.max(zoom*(d/ltDist),0.1),12);ltDist=d;drawCanvas();}else if(isPan){if(Math.abs(e.touches[0].clientX-cSX)>6)didPan=true;panX=e.touches[0].clientX-panSX;panY=e.touches[0].clientY-panSY;drawCanvas();}}
+function tEnd(){isPan=false;}
+function kDown(e){
+  if(!selPuntId)return;
+  const pt=(projects[projIdx].delen[deelIdx].punten||[]).find(p=>p.id===selPuntId);
+  if(!pt)return;
+  const s=e.shiftKey?10:1;
+  if(e.key==='ArrowLeft'){pt.x-=s;e.preventDefault();}
+  else if(e.key==='ArrowRight'){pt.x+=s;e.preventDefault();}
+  else if(e.key==='ArrowUp'){pt.y-=s;e.preventDefault();}
+  else if(e.key==='ArrowDown'){pt.y+=s;e.preventDefault();}
+  else if(e.key==='Delete'||e.key==='Backspace'){deletePunt();return;}
+  else if(e.key==='Escape'){selPuntId=null;drawCanvas();return;}
+  save(); drawCanvas();
 }
 
-function zoomBy(f){const c=document.getElementById('zoomCanvas');const cx=c.offsetWidth/2,cy=c.offsetHeight/2;const nz=Math.min(Math.max(zoom*f,0.1),10);panX=cx-(cx-panX)*(nz/zoom);panY=cy-(cy-panY)*(nz/zoom);zoom=nz;drawCanvas();}
+function zoomIn(){zoomBy(1.2);}
+function zoomOut(){zoomBy(1/1.2);}
+function zoomBy(f){const cv=document.getElementById('mainCanvas');const cx=cv.offsetWidth/2,cy=cv.offsetHeight/2;const nz=Math.min(Math.max(zoom*f,0.1),12);panX=cx-(cx-panX)*(nz/zoom);panY=cy-(cy-panY)*(nz/zoom);zoom=nz;drawCanvas();}
 function resetView(){zoom=1;panX=0;panY=0;drawCanvas();}
-function fitView(){const c=document.getElementById('zoomCanvas');const{segW,segH}=getSegment();zoom=Math.min(c.offsetWidth/segW,c.offsetHeight/segH)*0.95;panX=(c.offsetWidth-segW*zoom)/2;panY=(c.offsetHeight-segH*zoom)/2;drawCanvas();}
+function fitView(){const cv=document.getElementById('mainCanvas');const{segW,segH}=getSeg();zoom=Math.min(cv.offsetWidth/segW,cv.offsetHeight/segH)*0.94;panX=(cv.offsetWidth-segW*zoom)/2;panY=(cv.offsetHeight-segH*zoom)/2;drawCanvas();}
 
 // ===== PUNTEN =====
-function placeNewPoint(x,y) {
-  pushUndo();
-  const p=projects[currentProjectIndex];
-  if(!p.parts[currentPartIndex].points) p.parts[currentPartIndex].points=[];
+function plaatsPunt(x,y){
+  const p=projects[projIdx];
+  if(!p.delen[deelIdx].punten) p.delen[deelIdx].punten=[];
   const id='pt_'+Date.now();
-  p.parts[currentPartIndex].points.push({id,x,y,name:'',assignedTo:'',updatedBy:'',status:'open',internalNote:'',comments:[],
-    phases:{start:{photos:[],remark:'',date:''},middle:{photos:[],remark:'',date:''},end:{photos:[],remark:'',date:''}}});
-  saveProjects(); selectPoint(id); drawCanvas(); renderSavedItems();
+  const datum=new Date().toLocaleDateString('nl-NL');
+  p.delen[deelIdx].punten.push({id,x,y,naam:'',collega:'',status:'open',datum,notitie:'',fotos:[]});
+  save(); selectPunt(id); drawCanvas(); renderPuntenLijst();
 }
 
-function selectPoint(id) {
-  selectedPointId=id;
-  const pt=(projects[currentProjectIndex].parts[currentPartIndex].points||[]).find(p=>p.id===id);
+function selectPunt(id){
+  selPuntId=id;
+  draftFotos=[];
+  const pt=(projects[projIdx].delen[deelIdx].punten||[]).find(p=>p.id===id);
   if(!pt) return;
-  document.getElementById('pointName').value=pt.name||'';
-  document.getElementById('pointAssignedTo').value=pt.assignedTo||'';
-  document.getElementById('pointUpdatedBy').value=pt.updatedBy||'';
-  document.getElementById('pointStatus').value=pt.status||'open';
-  document.getElementById('pointInternalNote').value=pt.internalNote||'';
-  draftComments=[...(pt.comments||[])];
-  draftPhasePhotos={start:[...(pt.phases?.start?.photos||[])],middle:[...(pt.phases?.middle?.photos||[])],end:[...(pt.phases?.end?.photos||[])]};
-  const{lx,ly}=fullToLocal(pt.x,pt.y);
-  document.getElementById('modalPointInfo').textContent=`Geselecteerd: ${pt.name||'(naamloos)'} — X: ${Math.round(lx)}, Y: ${Math.round(ly)}`;
-  ['start','middle','end'].forEach(ph=>{
-    document.getElementById('phaseDate-'+ph).textContent='Datum: '+(pt.phases?.[ph]?.date||'nog niet ingevuld');
-    document.getElementById('phaseRemark-'+ph).value=pt.phases?.[ph]?.remark||'';
-  });
-  renderDraftComments(); renderDraftGalleries(); drawCanvas();
+  document.getElementById('pNaam').value=pt.naam||'';
+  document.getElementById('pCollega').value=pt.collega||'';
+  document.getElementById('pStatus').value=pt.status||'open';
+  document.getElementById('pDatum').value=pt.datum||'';
+  document.getElementById('pNotitie').value=pt.notitie||'';
+  draftFotos=[...(pt.fotos||[])];
+  const{lx,ly}=toLoc(pt.x,pt.y);
+  document.getElementById('puntInfo').innerHTML=`<strong>✓ Geselecteerd:</strong> ${pt.naam||'(geen naam)'} &nbsp;|&nbsp; X:${Math.round(lx)} Y:${Math.round(ly)}`;
+  renderFotos(); drawCanvas();
 }
 
-function deleteSelectedPoint() {
-  if(!selectedPointId) return;
-  if(!confirm('Punt verwijderen?')) return;
-  pushUndo();
-  const p=projects[currentProjectIndex];
-  p.parts[currentPartIndex].points=(p.parts[currentPartIndex].points||[]).filter(pt=>pt.id!==selectedPointId);
-  selectedPointId=null; saveProjects(); drawCanvas(); renderSavedItems(); resetDraft();
+function nieuwPunt(){
+  selPuntId=null; draftFotos=[];
+  document.getElementById('pNaam').value='';
+  document.getElementById('pCollega').value='';
+  document.getElementById('pStatus').value='open';
+  document.getElementById('pDatum').value=new Date().toLocaleDateString('nl-NL');
+  document.getElementById('pNotitie').value='';
+  document.getElementById('puntInfo').innerHTML='👆 Tik op de tekening om een punt te plaatsen';
+  renderFotos(); drawCanvas();
 }
 
-function resetDraft() {
-  selectedPointId=null; draftComments=[]; draftPhasePhotos={start:[],middle:[],end:[]};
-  ['pointName','pointAssignedTo','pointUpdatedBy','pointCommentInput','pointInternalNote'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('pointStatus').value='open';
-  document.getElementById('modalPointInfo').textContent='Nog geen punt geselecteerd';
-  ['start','middle','end'].forEach(ph=>{
-    document.getElementById('phaseDate-'+ph).textContent='Datum: nog niet ingevuld';
-    document.getElementById('phaseRemark-'+ph).value='';
-    document.getElementById('gallery-'+ph).innerHTML='';
-    document.getElementById('gallery-'+ph).classList.add('hidden');
-    document.getElementById('empty-'+ph).classList.remove('hidden');
-  });
-  renderDraftComments(); drawCanvas();
-}
-
-function saveDraftToProject() {
-  if(!selectedPointId){alert('Selecteer eerst een punt.');return;}
-  const pt=(projects[currentProjectIndex].parts[currentPartIndex].points||[]).find(p=>p.id===selectedPointId);
+function savePunt(){
+  if(!selPuntId){alert('Selecteer eerst een punt op de tekening.');return;}
+  const pt=(projects[projIdx].delen[deelIdx].punten||[]).find(p=>p.id===selPuntId);
   if(!pt) return;
-  pt.name=document.getElementById('pointName').value;
-  pt.assignedTo=document.getElementById('pointAssignedTo').value;
-  pt.updatedBy=document.getElementById('pointUpdatedBy').value;
-  pt.status=document.getElementById('pointStatus').value;
-  pt.internalNote=document.getElementById('pointInternalNote').value;
-  pt.comments=[...draftComments];
-  const now=new Date().toLocaleDateString('nl-NL');
-  ['start','middle','end'].forEach(ph=>{
-    if(!pt.phases[ph]) pt.phases[ph]={};
-    pt.phases[ph].photos=[...draftPhasePhotos[ph]];
-    pt.phases[ph].remark=document.getElementById('phaseRemark-'+ph).value;
-    if(draftPhasePhotos[ph].length>0&&!pt.phases[ph].date){pt.phases[ph].date=now;document.getElementById('phaseDate-'+ph).textContent='Datum: '+now;}
-  });
-  saveProjects(); drawCanvas(); renderSavedItems(); renderSidebarMenu();
-  const msg=document.getElementById('saveMessage');
-  msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),2000);
+  pt.naam=document.getElementById('pNaam').value;
+  pt.collega=document.getElementById('pCollega').value;
+  pt.status=document.getElementById('pStatus').value;
+  pt.datum=document.getElementById('pDatum').value;
+  pt.notitie=document.getElementById('pNotitie').value;
+  pt.fotos=[...draftFotos];
+  save(); drawCanvas(); renderPuntenLijst(); renderSidebar();
+  const m=document.getElementById('opslaanMsg');
+  m.classList.remove('hidden'); setTimeout(()=>m.classList.add('hidden'),2500);
 }
 
-function addDraftComment(){const txt=document.getElementById('pointCommentInput').value.trim();if(!txt)return;draftComments.push({text:txt,date:new Date().toLocaleString('nl-NL')});document.getElementById('pointCommentInput').value='';renderDraftComments();}
-function renderDraftComments(){document.getElementById('draftCommentsList').innerHTML=draftComments.map((c,i)=>`<div class="comment-item"><strong>${c.date}</strong><br>${c.text}<button class="mini-btn" style="float:right;" onclick="removeDraftComment(${i})">×</button></div>`).join('');}
-function removeDraftComment(i){draftComments.splice(i,1);renderDraftComments();}
+function deletePunt(){
+  if(!selPuntId) return;
+  if(!confirm('Dit punt verwijderen?')) return;
+  const p=projects[projIdx];
+  p.delen[deelIdx].punten=(p.delen[deelIdx].punten||[]).filter(pt=>pt.id!==selPuntId);
+  selPuntId=null; draftFotos=[];
+  save(); drawCanvas(); renderPuntenLijst(); renderSidebar(); nieuwPunt();
+}
 
-function handlePhaseUpload(e,phase){Array.from(e.target.files).forEach(file=>{const r=new FileReader();r.onload=ev=>{draftPhasePhotos[phase].push(ev.target.result);renderDraftGalleries();};r.readAsDataURL(file);});e.target.value='';}
-function renderDraftGalleries(){['start','middle','end'].forEach(ph=>{const photos=draftPhasePhotos[ph];const empty=document.getElementById('empty-'+ph);const gallery=document.getElementById('gallery-'+ph);if(!photos.length){empty.classList.remove('hidden');gallery.classList.add('hidden');gallery.innerHTML='';return;}empty.classList.add('hidden');gallery.classList.remove('hidden');gallery.innerHTML=photos.map((src,i)=>`<div class="gallery-item" onclick="openLightbox(draftPhasePhotos['${ph}'],${i})"><img src="${src}" alt=""><button class="gallery-remove" onclick="event.stopPropagation();removeDraftPhoto('${ph}',${i})">×</button></div>`).join('');});}
-function removeDraftPhoto(ph,i){draftPhasePhotos[ph].splice(i,1);renderDraftGalleries();}
+// ===== FOTO'S =====
+function handlePuntFotos(e){
+  Array.from(e.target.files).forEach(file=>{
+    const r=new FileReader();
+    r.onload=ev=>{draftFotos.push(ev.target.result);renderFotos();};
+    r.readAsDataURL(file);
+  });
+  e.target.value='';
+}
 
-function switchPhaseTab(tab){['start','middle','end'].forEach(t=>document.getElementById('phasePanel-'+t).classList.toggle('active',t===tab));document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['start','middle','end'][i]===tab));}
+function renderFotos(){
+  const leeg=document.getElementById('fotoLeeg');
+  const grid=document.getElementById('fotoGrid');
+  if(!draftFotos.length){leeg.classList.remove('hidden');grid.classList.add('hidden');grid.innerHTML='';return;}
+  leeg.classList.add('hidden'); grid.classList.remove('hidden');
+  grid.innerHTML=draftFotos.map((src,i)=>
+    `<div class="foto-item" onclick="openLb(draftFotos,${i})">
+      <img src="${src}" alt="">
+      <button class="foto-del" onclick="event.stopPropagation();delFoto(${i})">×</button>
+    </div>`).join('');
+}
+function delFoto(i){draftFotos.splice(i,1);renderFotos();}
 
-function renderSavedItems(){const points=(projects[currentProjectIndex].parts[currentPartIndex].points||[]);const c=document.getElementById('savedItemsContainer');if(!points.length){c.innerHTML='<div class="saved-empty">Nog geen opgeslagen punten.</div>';return;}c.innerHTML=points.map(pt=>{const tot=['start','middle','end'].reduce((a,ph)=>a+(pt.phases?.[ph]?.photos?.length||0),0);return`<div class="saved-item" onclick="selectPoint('${pt.id}')"><div class="saved-item-top"><div class="saved-item-title">${pt.name||'(naamloos)'}<span class="status-badge ${pt.status==='done'?'status-done':'status-open'}">${pt.status==='done'?'Klaar':'Open'}</span></div><span class="saved-photo-count">${tot} foto('s)</span></div>${pt.assignedTo?`<div class="saved-item-meta">Collega: ${pt.assignedTo}</div>`:''} ${pt.internalNote?`<div class="saved-item-text">${pt.internalNote}</div>`:''}</div>`;}).join('');}
+// ===== PUNTEN LIJST =====
+function renderPuntenLijst(){
+  const pts=(projects[projIdx].delen[deelIdx].punten||[]);
+  const body=document.getElementById('pLijstBody');
+  if(!pts.length){body.innerHTML='<div class="punt-leeg">Nog geen punten in dit deel</div>';return;}
+  body.innerHTML=pts.map((pt,i)=>{
+    const fCnt=(pt.fotos||[]).length;
+    return `<div class="punt-rij" onclick="selectPunt('${pt.id}')">
+      <div class="punt-num ${pt.status==='done'?'done':''}">${i+1}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="punt-naam">${pt.naam||'(geen omschrijving)'}
+          <span class="status-badge ${pt.status==='done'?'s-done':'s-open'}">${pt.status==='done'?'Klaar':'Open'}</span>
+        </div>
+        <div class="punt-meta">${pt.collega?'👷 '+pt.collega+' &nbsp;':''} ${pt.datum?'📅 '+pt.datum:''}</div>
+      </div>
+      ${fCnt?`<div class="punt-fotos">📷 ${fCnt}</div>`:''}
+    </div>`;
+  }).join('');
+}
 
-function pushUndo(){undoStack.push(JSON.stringify(projects[currentProjectIndex].parts[currentPartIndex].points||[]));if(undoStack.length>50)undoStack.shift();redoStack=[];}
-function undoHistory(){if(!undoStack.length)return;redoStack.push(JSON.stringify(projects[currentProjectIndex].parts[currentPartIndex].points||[]));projects[currentProjectIndex].parts[currentPartIndex].points=JSON.parse(undoStack.pop());selectedPointId=null;saveProjects();drawCanvas();renderSavedItems();}
-function redoHistory(){if(!redoStack.length)return;undoStack.push(JSON.stringify(projects[currentProjectIndex].parts[currentPartIndex].points||[]));projects[currentProjectIndex].parts[currentPartIndex].points=JSON.parse(redoStack.pop());selectedPointId=null;saveProjects();drawCanvas();renderSavedItems();}
+// ===== LIGHTBOX =====
+function openLb(fotos,i){lbFotos=fotos;lbIdx=i;document.getElementById('lbImg').src=fotos[i];document.getElementById('lightbox').classList.add('open');}
+function closeLb(){document.getElementById('lightbox').classList.remove('open');}
+function lbNav(d){lbIdx=(lbIdx+d+lbFotos.length)%lbFotos.length;document.getElementById('lbImg').src=lbFotos[lbIdx];}
 
-function openLightbox(photos,index){lightboxPhotos=photos;lightboxIndex=index;document.getElementById('lightboxImage').src=photos[index];document.getElementById('lightboxCounter').textContent=(index+1)+' / '+photos.length;document.getElementById('lightbox').classList.add('open');}
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
-function lightboxNav(dir){lightboxIndex=(lightboxIndex+dir+lightboxPhotos.length)%lightboxPhotos.length;document.getElementById('lightboxImage').src=lightboxPhotos[lightboxIndex];document.getElementById('lightboxCounter').textContent=(lightboxIndex+1)+' / '+lightboxPhotos.length;}
+// ===== PDF =====
+function exportPdf(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const p=projects[projIdx];
+  doc.setFontSize(22);doc.setTextColor(30,58,92);doc.text(p.naam,14,22);
+  doc.setFontSize(12);doc.setTextColor(100);
+  doc.text('Locatie: '+(p.locatie||'-'),14,32);
+  doc.text('Datum rapport: '+new Date().toLocaleDateString('nl-NL'),14,40);
+  let y=52;
+  p.delen.forEach((d,di)=>{
+    const pts=d.punten||[]; if(!pts.length)return;
+    doc.setFontSize(15);doc.setTextColor(30,58,92);doc.text('Deel '+(di+1),14,y);y+=8;
+    doc.autoTable({startY:y,head:[['#','Omschrijving','Collega','Status','Datum']],
+      body:pts.map((pt,i)=>[i+1,pt.naam||'-',pt.collega||'-',pt.status==='done'?'Klaar':'Open',pt.datum||'-']),
+      styles:{fontSize:10,cellPadding:3},headStyles:{fillColor:[37,99,235]},margin:{left:14,right:14}});
+    y=doc.lastAutoTable.finalY+12; if(y>260){doc.addPage();y=20;}
+  });
+  doc.save((p.naam||'rapport')+'_rapport.pdf');
+}
 
-function exportProjectData(){const p=projects[currentProjectIndex];const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(p,null,2)],{type:'application/json'}));a.download=(p.name||'project')+'.json';a.click();}
-function handleImportProject(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);projects.push(d);saveProjects();renderDashboard();alert('Geïmporteerd: '+d.name);}catch{alert('Ongeldig bestand.');}};r.readAsText(file);e.target.value='';}
+// ===== SAVE =====
+function save(){localStorage.setItem('edProjects',JSON.stringify(projects));}
 
-function exportPdfReport(){const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});const p=projects[currentProjectIndex];doc.setFontSize(22);doc.setTextColor(30,58,92);doc.text(p.name||'Project',14,22);doc.setFontSize(12);doc.setTextColor(100);doc.text('Locatie: '+(p.location||'-'),14,32);doc.text('Datum: '+new Date().toLocaleDateString('nl-NL'),14,40);let y=52;p.parts.forEach((part,pi)=>{const pts=part.points||[];if(!pts.length)return;doc.setFontSize(14);doc.setTextColor(30,58,92);doc.text('Deel '+(pi+1),14,y);y+=8;doc.autoTable({startY:y,head:[['Naam','Collega','Status','Notitie']],body:pts.map(pt=>[pt.name||'-',pt.assignedTo||'-',pt.status==='done'?'Klaar':'Open',pt.internalNote||'-']),styles:{fontSize:10,cellPadding:3},headStyles:{fillColor:[37,99,235]},margin:{left:14,right:14}});y=doc.lastAutoTable.finalY+12;if(y>260){doc.addPage();y=20;}});doc.save((p.name||'rapport')+'_rapport.pdf');}
-
-function openHelpModal(){document.getElementById('helpModal').classList.add('open');}
-function saveProjects(){localStorage.setItem('bouwProjects',JSON.stringify(projects));}
-window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
