@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bouw Tool Projecten</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -26,9 +28,7 @@
       font-weight: bold;
       color: #16324c;
     }
-    .projects-wrap {
-      padding: 24px 28px 40px;
-    }
+    .projects-wrap { padding: 24px 28px 40px; }
     .projects-toolbar {
       display: flex;
       justify-content: space-between;
@@ -60,6 +60,10 @@
       background: white;
       border: 1px solid #d4dee8;
       color: #17324d;
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: white;
     }
 
     .project-grid {
@@ -149,13 +153,8 @@
       font-size: 17px;
     }
     .menu-item:hover,
-    .menu-item.active {
-      background: rgba(255,255,255,0.10);
-    }
-    .menu-count {
-      color: #b8c7d5;
-      font-size: 14px;
-    }
+    .menu-item.active { background: rgba(255,255,255,0.10); }
+    .menu-count { color: #b8c7d5; font-size: 14px; }
 
     .project-main {
       flex: 1;
@@ -209,7 +208,6 @@
       min-height: 110px;
       resize: vertical;
     }
-
     .upload-btn {
       display: inline-block;
       background: #1f7ae0;
@@ -260,7 +258,8 @@
     }
 
     .toolbar-row,
-    .toolbar-row-2 {
+    .toolbar-row-2,
+    .toolbar-row-3 {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
@@ -271,7 +270,9 @@
     .toolbar-row input,
     .toolbar-row select,
     .toolbar-row-2 input,
-    .toolbar-row-2 select {
+    .toolbar-row-2 select,
+    .toolbar-row-3 input,
+    .toolbar-row-3 select {
       padding: 10px 12px;
       border: 1px solid #d5e0ea;
       border-radius: 10px;
@@ -377,7 +378,7 @@
     }
     .modal.open { display: flex; }
     .modal-panel {
-      width: min(1320px, 100%);
+      width: min(1480px, 100%);
       max-height: 94vh;
       overflow: auto;
       background: white;
@@ -782,6 +783,63 @@
       border-radius: 999px;
     }
 
+    .help-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .help-item {
+      border: 1px solid #dbe6ef;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      color: #334155;
+    }
+    .help-item strong {
+      display: inline-block;
+      min-width: 92px;
+      color: #0f172a;
+    }
+
+    .comment-list {
+      margin-top: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .comment-item {
+      border: 1px solid #dbe6ef;
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .color-chip {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 2px solid rgba(0,0,0,0.15);
+      vertical-align: middle;
+    }
+
+    .autosave-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ecfeff;
+      color: #0f766e;
+      border: 1px solid #99f6e4;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
     @media (max-width: 1400px) {
       .split-grid { grid-template-columns: repeat(3, 1fr); }
     }
@@ -820,7 +878,7 @@
 
       <div class="project-grid">
         <div class="project-card" onclick="openProject('Pilot watergang Kromme Nieuwegracht', 'Kromme Nieuwegracht, Utrecht', 'Support')">
-          <img class="project-image" src="m5.jpg" alt="Projectfoto Pilot watergang">
+          <img class="project-image" src="m1.jpg" alt="Projectfoto Pilot watergang">
           <div class="project-info">
             <div class="project-title">Pilot watergang Kromme Nieuwegracht</div>
             <div class="project-subtitle">Kromme Nieuwegracht, Utrecht</div>
@@ -829,7 +887,7 @@
         </div>
 
         <div class="project-card" onclick="openProject('Restauratie Brugdeel West', 'Utrecht centrum', 'Team restauratie')">
-          <img class="project-image" src="m4.jpg" alt="Projectfoto Restauratie Brugdeel West">
+          <img class="project-image" src="m3.jpg" alt="Projectfoto Restauratie Brugdeel West">
           <div class="project-info">
             <div class="project-title">Restauratie Brugdeel West</div>
             <div class="project-subtitle">Utrecht centrum</div>
@@ -838,7 +896,7 @@
         </div>
 
         <div class="project-card" onclick="openProject('Herstel Metselwerk Zuidzijde', 'Binnenstad Utrecht', 'Uitvoerder')">
-          <img class="project-image" src="m2.jpg" alt="Projectfoto Herstel Metselwerk Zuidzijde">
+          <img class="project-image" src="m5.jpg" alt="Projectfoto Herstel Metselwerk Zuidzijde">
           <div class="project-info">
             <div class="project-title">Herstel Metselwerk Zuidzijde</div>
             <div class="project-subtitle">Binnenstad Utrecht</div>
@@ -871,8 +929,11 @@
       <div class="project-main-top">
         <button class="btn btn-light" type="button" onclick="goBackToProjects()">← Terug naar projecten</button>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <span class="autosave-indicator" id="autosaveIndicator">Autosave actief</span>
+          <button class="btn btn-light" type="button" onclick="openHelpModal()">Sneltoetsen</button>
           <label class="btn btn-light" for="importProjectInput" style="display:inline-flex; align-items:center;">Project importeren</label>
           <input class="file-input" type="file" id="importProjectInput" accept=".json,application/json">
+          <button class="btn btn-light" type="button" onclick="exportPdfReport()">PDF rapport</button>
           <button class="btn btn-primary" type="button" onclick="exportProjectData()">Project exporteren</button>
         </div>
       </div>
@@ -906,13 +967,27 @@
         <div class="summary-row">
           <div class="summary-pill" id="summaryOpen">Open: 0</div>
           <div class="summary-pill" id="summaryDone">Klaar: 0</div>
+          <div class="summary-pill" id="summaryHidden">Verborgen: 0</div>
+          <div class="summary-pill" id="summaryLocked">Vergrendeld: 0</div>
         </div>
 
         <div class="toolbar-row">
-          <input type="text" id="pointSearchInput" placeholder="Zoek op collega of opmerking">
+          <input type="text" id="pointSearchInput" placeholder="Zoek op collega, opmerking of naam">
           <select id="sortSelect">
             <option value="newest">Nieuwste eerst</option>
             <option value="oldest">Oudste eerst</option>
+            <option value="name">Naam A-Z</option>
+          </select>
+          <select id="labelFilterSelect">
+            <option value="all">Alle labels</option>
+            <option value="red">Rood</option>
+            <option value="blue">Blauw</option>
+            <option value="green">Groen</option>
+            <option value="yellow">Geel</option>
+            <option value="none">Geen label</option>
+          </select>
+          <select id="groupFilterSelect">
+            <option value="all">Alle groepen</option>
           </select>
         </div>
 
@@ -924,38 +999,23 @@
 
         <div class="split-grid">
           <div class="split-card" onclick="openPartModal(1)">
-            <div class="split-head">
-              <span>Deel 1</span>
-              <span class="badge-count" id="countBadge1">0 punten</span>
-            </div>
+            <div class="split-head"><span>Deel 1</span><span class="badge-count" id="countBadge1">0 punten</span></div>
             <div class="split-thumb-wrap"><canvas class="split-thumb" id="thumb1"></canvas></div>
           </div>
           <div class="split-card" onclick="openPartModal(2)">
-            <div class="split-head">
-              <span>Deel 2</span>
-              <span class="badge-count" id="countBadge2">0 punten</span>
-            </div>
+            <div class="split-head"><span>Deel 2</span><span class="badge-count" id="countBadge2">0 punten</span></div>
             <div class="split-thumb-wrap"><canvas class="split-thumb" id="thumb2"></canvas></div>
           </div>
           <div class="split-card" onclick="openPartModal(3)">
-            <div class="split-head">
-              <span>Deel 3</span>
-              <span class="badge-count" id="countBadge3">0 punten</span>
-            </div>
+            <div class="split-head"><span>Deel 3</span><span class="badge-count" id="countBadge3">0 punten</span></div>
             <div class="split-thumb-wrap"><canvas class="split-thumb" id="thumb3"></canvas></div>
           </div>
           <div class="split-card" onclick="openPartModal(4)">
-            <div class="split-head">
-              <span>Deel 4</span>
-              <span class="badge-count" id="countBadge4">0 punten</span>
-            </div>
+            <div class="split-head"><span>Deel 4</span><span class="badge-count" id="countBadge4">0 punten</span></div>
             <div class="split-thumb-wrap"><canvas class="split-thumb" id="thumb4"></canvas></div>
           </div>
           <div class="split-card" onclick="openPartModal(5)">
-            <div class="split-head">
-              <span>Deel 5</span>
-              <span class="badge-count" id="countBadge5">0 punten</span>
-            </div>
+            <div class="split-head"><span>Deel 5</span><span class="badge-count" id="countBadge5">0 punten</span></div>
             <div class="split-thumb-wrap"><canvas class="split-thumb" id="thumb5"></canvas></div>
           </div>
         </div>
@@ -969,7 +1029,7 @@
 
       <div class="modal-title" id="modalTitle">Deel 1</div>
       <div class="modal-subtitle">
-        Klik of sleep op de tekening om punten te plaatsen of te bewerken. Gebruik zoom, pan, raster en selectiehulpen voor precies werk.
+        Klik of sleep op de tekening om punten te plaatsen of te bewerken. Gebruik zoom, pan, raster, selectie en bulkacties voor precies werk.
       </div>
 
       <div class="zoom-toolbar">
@@ -977,6 +1037,8 @@
         <button class="mini-btn" type="button" onclick="zoomBy(1/1.15)">−</button>
         <button class="mini-btn" type="button" onclick="resetView()">Reset view</button>
         <button class="mini-btn" type="button" onclick="fitView()">Passen in beeld</button>
+        <button class="mini-btn" type="button" onclick="undoHistory()">Undo</button>
+        <button class="mini-btn" type="button" onclick="redoHistory()">Redo</button>
         <span class="zoom-pill" id="zoomPercentLabel">Zoom 100%</span>
         <label class="toggle-chip"><input type="checkbox" id="gridToggle"> Raster</label>
         <label class="toggle-chip"><input type="checkbox" id="snapToggle"> Snap</label>
@@ -992,7 +1054,6 @@
         <input type="number" id="exactXInput" placeholder="X exact" step="1">
         <input type="number" id="exactYInput" placeholder="Y exact" step="1">
         <button class="mini-btn" type="button" onclick="applyExactCoordinates()">Zet exact X/Y</button>
-        <button class="mini-btn" type="button" onclick="undoLastMove()">Undo verplaatsing</button>
         <button class="mini-btn" type="button" onclick="copySelectedToAnotherPart()">Kopieer selectie naar ander deel</button>
         <select id="copyToPartSelect">
           <option value="1">Naar deel 1</option>
@@ -1001,10 +1062,53 @@
           <option value="4">Naar deel 4</option>
           <option value="5">Naar deel 5</option>
         </select>
+        <button class="mini-btn" type="button" onclick="pasteClipboardSelection()">Plakken</button>
+        <button class="mini-btn" type="button" onclick="cutSelected()">Knippen</button>
+        <button class="mini-btn" type="button" onclick="duplicateSelected()">Dupliceren</button>
+        <button class="mini-btn" type="button" onclick="deleteSelectedWithConfirm()">Verwijder selectie</button>
+      </div>
+
+      <div class="toolbar-row-3">
+        <button class="mini-btn" type="button" onclick="setSelectedStatus('open')">Selectie Open</button>
+        <button class="mini-btn" type="button" onclick="setSelectedStatus('done')">Selectie Klaar</button>
+        <button class="mini-btn" type="button" onclick="alignSelected('left')">Links</button>
+        <button class="mini-btn" type="button" onclick="alignSelected('centerX')">Centreer X</button>
+        <button class="mini-btn" type="button" onclick="alignSelected('right')">Rechts</button>
+        <button class="mini-btn" type="button" onclick="distributeSelected('horizontal')">Verdeel horizontaal</button>
+        <button class="mini-btn" type="button" onclick="distributeSelected('vertical')">Verdeel verticaal</button>
+      </div>
+
+      <div class="toolbar-row-3">
+        <button class="mini-btn" type="button" onclick="lockSelected(true)">Vergrendel</button>
+        <button class="mini-btn" type="button" onclick="lockSelected(false)">Ontgrendel</button>
+        <button class="mini-btn" type="button" onclick="hideSelected(true)">Verberg</button>
+        <button class="mini-btn" type="button" onclick="showAllHidden()">Toon verborgen</button>
+        <button class="mini-btn" type="button" onclick="groupSelected()">Groepeer</button>
+        <button class="mini-btn" type="button" onclick="ungroupSelected()">Ontgroepeer</button>
+        <button class="mini-btn" type="button" onclick="bringSelectedToFront()">Naar voren</button>
+        <button class="mini-btn" type="button" onclick="sendSelectedToBack()">Naar achteren</button>
+      </div>
+
+      <div class="toolbar-row-3">
+        <select id="labelColorSelect">
+          <option value="red">Rood label</option>
+          <option value="blue">Blauw label</option>
+          <option value="green">Groen label</option>
+          <option value="yellow">Geel label</option>
+          <option value="none">Geen label</option>
+        </select>
+        <button class="mini-btn" type="button" onclick="setLabelForSelected()">Label toepassen</button>
+        <input type="text" id="bulkRenamePrefix" placeholder="Bulk naamprefix, bv. Punt">
+        <button class="mini-btn" type="button" onclick="bulkRenameSelected()">Bulk hernoemen</button>
       </div>
 
       <div class="point-form">
         <div class="point-box" id="modalPointInfo">Nog geen nieuw punt gekozen</div>
+
+        <div class="field">
+          <label for="pointName">Naam punt</label>
+          <input type="text" id="pointName" placeholder="Bijvoorbeeld: Inlaat Noord 01">
+        </div>
 
         <div class="field">
           <label for="pointAssignedTo">Collega</label>
@@ -1022,6 +1126,20 @@
             <option value="open">Open</option>
             <option value="done">Klaar</option>
           </select>
+        </div>
+
+        <div class="field">
+          <label for="pointInternalNote">Interne notitie</label>
+          <textarea id="pointInternalNote" placeholder="Korte interne notitie voor dit punt"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="pointCommentInput">Nieuwe opmerking toevoegen</label>
+          <textarea id="pointCommentInput" placeholder="Voeg hier een losse opmerking toe aan dit punt"></textarea>
+          <div style="margin-top:10px;">
+            <button class="mini-btn" type="button" onclick="addDraftComment()">Opmerking toevoegen</button>
+          </div>
+          <div class="comment-list" id="draftCommentsList"></div>
         </div>
 
         <div class="tabs-row">
@@ -1104,6 +1222,9 @@
         <div id="detailStatusWrap" class="detail-meta"></div>
         <div id="detailUpdatedAt" class="detail-meta"></div>
         <div id="detailUpdatedBy" class="detail-meta"></div>
+        <div id="detailPointName" class="detail-meta"></div>
+        <div id="detailInternalNote" class="detail-meta"></div>
+        <div id="detailCommentsWrap" class="detail-meta"></div>
 
         <div class="tabs-row">
           <button class="tab-btn active detail-tab-btn" type="button" onclick="switchDetailTab('start')">Start</button>
@@ -1138,6 +1259,29 @@
     </div>
   </div>
 
+  <div class="modal" id="helpModal">
+    <div class="modal-panel" style="max-width:920px;">
+      <button class="modal-close" type="button" onclick="closeHelpModal()">×</button>
+      <div class="modal-title">Sneltoetsen en hulp</div>
+      <div class="modal-subtitle">Overzicht van de belangrijkste acties in de editor.</div>
+      <div class="help-list">
+        <div class="help-item"><strong>Ctrl/Cmd + Z</strong> Undo</div>
+        <div class="help-item"><strong>Ctrl/Cmd + Y</strong> Redo</div>
+        <div class="help-item"><strong>Delete</strong> Selectie verwijderen</div>
+        <div class="help-item"><strong>Ctrl/Cmd + C</strong> Kopiëren</div>
+        <div class="help-item"><strong>Ctrl/Cmd + V</strong> Plakken</div>
+        <div class="help-item"><strong>Ctrl/Cmd + X</strong> Knippen</div>
+        <div class="help-item"><strong>Ctrl/Cmd + D</strong> Dupliceren</div>
+        <div class="help-item"><strong>Pijltjes</strong> Verplaats selectie</div>
+        <div class="help-item"><strong>Shift + pijltjes</strong> Grotere verplaatsing</div>
+        <div class="help-item"><strong>Shift + sleep</strong> Selectierechthoek</div>
+        <div class="help-item"><strong>Dubbelklik</strong> Inzoomen op cursor</div>
+        <div class="help-item"><strong>Muiswiel</strong> In- en uitzoomen</div>
+        <div class="help-item"><strong>Esc</strong> Deselecteren</div>
+      </div>
+    </div>
+  </div>
+
   <div class="lightbox" id="lightbox">
     <div class="lightbox-inner">
       <button class="lightbox-close" type="button" onclick="closeLightbox()">×</button>
@@ -1160,12 +1304,21 @@
     let currentStatusFilter = 'open';
     let currentSearchTerm = '';
     let currentSortOrder = 'newest';
+    let currentLabelFilter = 'all';
+    let currentGroupFilter = 'all';
 
     let lightboxImages = [];
     let lightboxIndex = 0;
 
     const phaseKeys = ['start', 'middle', 'end'];
     const phaseLabels = { start: 'Start', middle: 'Midden', end: 'Eind' };
+    const labelColors = {
+      red: '#ef4444',
+      blue: '#3b82f6',
+      green: '#22c55e',
+      yellow: '#facc15',
+      none: '#cbd5e1'
+    };
 
     const partData = {
       1: { items: [] },
@@ -1188,7 +1341,7 @@
     const MIN_ZOOM = 1;
     const MAX_ZOOM = 4;
     const GRID_SIZE = 20;
-    const STORAGE_KEY = 'bouw_tool_project_state_v1';
+    const STORAGE_KEY = 'bouw_tool_project_state_v2';
 
     let selectedItemIds = [];
     let dragState = null;
@@ -1196,7 +1349,13 @@
     let panStart = null;
     let pinchState = null;
     let selectionRect = null;
-    let undoMoveStack = [];
+
+    let historyUndo = [];
+    let historyRedo = [];
+    let clipboardItems = [];
+    let groupIdSeed = 1;
+
+    let autosaveTimer = null;
 
     function createDefaultView() {
       return {
@@ -1213,15 +1372,23 @@
     function createEmptyDraft() {
       return {
         marker: null,
+        pointName: '',
         assignedTo: '',
         updatedBy: '',
         status: 'open',
+        label: 'none',
+        internalNote: '',
+        comments: [],
         phases: {
           start: { photos: [], remark: '', date: '' },
           middle: { photos: [], remark: '', date: '' },
           end: { photos: [], remark: '', date: '' }
         }
       };
+    }
+
+    function cloneDeep(obj) {
+      return JSON.parse(JSON.stringify(obj));
     }
 
     function openProject(name, subtitle, role) {
@@ -1234,6 +1401,7 @@
       document.getElementById('projectNameInput').value = name;
       loadPersistedState();
       refreshAllViews();
+      setupAutosave();
     }
 
     function goBackToProjects() {
@@ -1266,11 +1434,17 @@
       return Math.max(10, Math.min(22, base * (0.85 + (v.zoom - 1) * 0.25)));
     }
 
-    function drawNumberedMarker(ctx, x, y, number, status, opts = {}) {
+    function getLabelColor(label) {
+      return labelColors[label] || labelColors.none;
+    }
+
+    function drawNumberedMarker(ctx, x, y, number, status, item, opts = {}) {
       const radius = opts.radius || getPointRadius();
+      const fill = item?.label && item.label !== 'none' ? getLabelColor(item.label) : (status === 'done' ? '#22c55e' : '#facc15');
+
       ctx.beginPath();
-      ctx.fillStyle = status === 'done' ? '#22c55e' : '#facc15';
-      ctx.strokeStyle = opts.selected ? '#dc2626' : (opts.active ? '#1d4ed8' : '#7c5a00');
+      ctx.fillStyle = fill;
+      ctx.strokeStyle = item?.locked ? '#111827' : (opts.selected ? '#dc2626' : (opts.active ? '#1d4ed8' : '#7c5a00'));
       ctx.lineWidth = opts.selected ? 4 : (opts.active ? 3 : 2);
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
@@ -1286,6 +1460,22 @@
         ctx.setLineDash([]);
       }
 
+      if (item?.locked) {
+        ctx.fillStyle = '#111827';
+        ctx.font = 'bold 10px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('L', x, y - radius - 10);
+      }
+
+      if (item?.favorite) {
+        ctx.fillStyle = '#1d4ed8';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('★', x + radius + 10, y - radius - 6);
+      }
+
       ctx.fillStyle = status === 'done' ? '#ffffff' : '#17324d';
       ctx.font = 'bold 12px Arial';
       ctx.textAlign = 'center';
@@ -1297,6 +1487,11 @@
       return Object.keys(partData).flatMap(part => {
         return partData[part].items.map(item => ({ ...item, part: Number(part) }));
       });
+    }
+
+    function getGroupDisplayName(groupId) {
+      if (!groupId) return 'Geen groep';
+      return 'Groep ' + groupId;
     }
 
     function getPointNumber(item) {
@@ -1313,9 +1508,13 @@
 
     function itemMatchesSearch(item) {
       if (!currentSearchTerm) return true;
+      const commentsText = (item.comments || []).map(c => c.text).join(' ');
       const haystack = [
+        item.pointName || '',
         item.assignedTo || '',
         item.updatedBy || '',
+        item.internalNote || '',
+        commentsText,
         item.phases.start.remark || '',
         item.phases.middle.remark || '',
         item.phases.end.remark || ''
@@ -1326,17 +1525,29 @@
 
     function getFilteredItems(items) {
       let result = [...items];
+
       if (currentStatusFilter !== 'all') {
         result = result.filter(item => item.status === currentStatusFilter);
+      }
+      if (currentLabelFilter !== 'all') {
+        result = result.filter(item => (item.label || 'none') === currentLabelFilter);
+      }
+      if (currentGroupFilter !== 'all') {
+        result = result.filter(item => String(item.groupId || '') === currentGroupFilter);
       }
       if (currentSearchTerm) {
         result = result.filter(item => itemMatchesSearch(item));
       }
+
       result.sort((a, b) => {
+        if (currentSortOrder === 'name') {
+          return (a.pointName || '').localeCompare(b.pointName || '', 'nl');
+        }
         const aTime = new Date(a.savedAt || 0).getTime();
         const bTime = new Date(b.savedAt || 0).getTime();
         return currentSortOrder === 'oldest' ? aTime - bTime : bTime - aTime;
       });
+
       return result;
     }
 
@@ -1364,16 +1575,76 @@
       return `<span class="${cls}">${getStatusLabel(status)}</span>`;
     }
 
+    function snapshotState() {
+      return {
+        partData: cloneDeep(partData),
+        viewState: cloneDeep(viewState),
+        projectName: document.getElementById('projectNameInput')?.value || '',
+        sourceImageDataUrl,
+        groupIdSeed
+      };
+    }
+
+    function restoreSnapshot(snapshot) {
+      Object.keys(partData).forEach(key => {
+        partData[key].items = cloneDeep(snapshot.partData[key]?.items || []);
+      });
+      Object.keys(viewState).forEach(key => {
+        viewState[key] = { ...createDefaultView(), ...(snapshot.viewState[key] || {}) };
+      });
+      groupIdSeed = snapshot.groupIdSeed || 1;
+      const input = document.getElementById('projectNameInput');
+      if (input) input.value = snapshot.projectName || '';
+      setSourceImageFromDataUrl(snapshot.sourceImageDataUrl || '', true);
+      refreshAllViews();
+      persistState();
+    }
+
+    function pushHistory() {
+      historyUndo.push(snapshotState());
+      if (historyUndo.length > 80) historyUndo.shift();
+      historyRedo = [];
+    }
+
+    function undoHistory() {
+      if (!historyUndo.length) return;
+      historyRedo.push(snapshotState());
+      const prev = historyUndo.pop();
+      restoreSnapshot(prev);
+    }
+
+    function redoHistory() {
+      if (!historyRedo.length) return;
+      historyUndo.push(snapshotState());
+      const next = historyRedo.pop();
+      restoreSnapshot(next);
+    }
+
     function updateSummaryCounts() {
       const allItems = getAllItems();
       const counts = allItems.reduce((acc, item) => {
         if (item.status === 'done') acc.done += 1;
         else acc.open += 1;
+        if (item.hidden) acc.hidden += 1;
+        if (item.locked) acc.locked += 1;
         return acc;
-      }, { open: 0, done: 0 });
+      }, { open: 0, done: 0, hidden: 0, locked: 0 });
 
       document.getElementById('summaryOpen').textContent = 'Open: ' + counts.open;
       document.getElementById('summaryDone').textContent = 'Klaar: ' + counts.done;
+      document.getElementById('summaryHidden').textContent = 'Verborgen: ' + counts.hidden;
+      document.getElementById('summaryLocked').textContent = 'Vergrendeld: ' + counts.locked;
+    }
+
+    function rebuildGroupFilterOptions() {
+      const groups = [...new Set(getAllItems().map(item => item.groupId).filter(Boolean))].sort((a, b) => a - b);
+      const select = document.getElementById('groupFilterSelect');
+      const current = currentGroupFilter;
+      select.innerHTML = '<option value="all">Alle groepen</option>' + groups.map(id =>
+        `<option value="${id}">${getGroupDisplayName(id)}</option>`
+      ).join('');
+      select.value = groups.map(String).includes(String(current)) ? String(current) : 'all';
+      currentGroupFilter = select.value;
     }
 
     function setStatusFilter(filter) {
@@ -1423,9 +1694,9 @@
 
       ctx.drawImage(sourceImage, 0, 0, width, height);
 
-      getFilteredItems(getAllItems()).forEach(item => {
+      getFilteredItems(getAllItems()).filter(item => !item.hidden).forEach(item => {
         if (!item.globalMarker) return;
-        drawNumberedMarker(ctx, item.globalMarker.x, item.globalMarker.y, getPointNumber(item), item.status, {
+        drawNumberedMarker(ctx, item.globalMarker.x, item.globalMarker.y, getPointNumber(item), item.status, item, {
           active: item.id === highlightedItemId || item.id === openedDetailItemId,
           selected: selectedItemIds.includes(item.id),
           radius: 12
@@ -1541,9 +1812,9 @@
         ctx.drawImage(sourceImage, sx, 0, sliceWidth, sourceImage.height, 0, 0, width, height);
 
         if (view.showMarkers) {
-          getFilteredItems(partData[partIndex].items).forEach(item => {
+          getFilteredItems(partData[partIndex].items).filter(item => !item.hidden).forEach(item => {
             if (!item.marker) return;
-            drawNumberedMarker(ctx, item.marker.x, item.marker.y, getPointNumber(item), item.status, {
+            drawNumberedMarker(ctx, item.marker.x, item.marker.y, getPointNumber(item), item.status, item, {
               active: item.id === highlightedItemId || item.id === openedDetailItemId,
               selected: selectedItemIds.includes(item.id)
             });
@@ -1580,9 +1851,9 @@
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(sourceImage, sx, 0, sliceWidth, sourceImage.height, 0, 0, width, height);
 
-        getFilteredItems(partData[partIndex].items).forEach(item => {
+        getFilteredItems(partData[partIndex].items).filter(item => !item.hidden).forEach(item => {
           if (!item.marker) return;
-          drawNumberedMarker(ctx, item.marker.x, item.marker.y, getPointNumber(item), item.status, {
+          drawNumberedMarker(ctx, item.marker.x, item.marker.y, getPointNumber(item), item.status, item, {
             active: item.id === highlightedItemId || item.id === openedDetailItemId,
             selected: selectedItemIds.includes(item.id),
             radius: 12
@@ -1653,6 +1924,21 @@
       });
     }
 
+    function renderDraftComments() {
+      const el = document.getElementById('draftCommentsList');
+      if (!currentDraft.comments.length) {
+        el.innerHTML = '<div class="saved-empty">Nog geen losse opmerkingen toegevoegd.</div>';
+        return;
+      }
+      el.innerHTML = currentDraft.comments.map((c, i) => `
+        <div class="comment-item">
+          <div><strong>${formatDateTime(c.date)}</strong></div>
+          <div>${escapeHtml(c.text)}</div>
+          <div style="margin-top:8px;"><button class="mini-btn" type="button" onclick="removeDraftComment(${i})">Verwijder</button></div>
+        </div>
+      `).join('');
+    }
+
     function renderPhaseDraftUI(phase) {
       const phaseData = currentDraft.phases[phase];
       document.getElementById('phaseDate-' + phase).textContent =
@@ -1689,16 +1975,18 @@
 
     function updateDraftUI() {
       const info = document.getElementById('modalPointInfo');
+      document.getElementById('pointName').value = currentDraft.pointName || '';
       document.getElementById('pointAssignedTo').value = currentDraft.assignedTo || '';
       document.getElementById('pointUpdatedBy').value = currentDraft.updatedBy || '';
       document.getElementById('pointStatus').value = currentDraft.status || 'open';
+      document.getElementById('pointInternalNote').value = currentDraft.internalNote || '';
 
       const selected = getSelectedItemsForActivePart();
       if (selected.length > 1) {
-        info.textContent = `${selected.length} punten geselecteerd. Groepsverplaatsing en kopiëren beschikbaar.`;
+        info.textContent = `${selected.length} punten geselecteerd. Groepsacties beschikbaar.`;
       } else if (selected.length === 1) {
         const item = selected[0];
-        info.textContent = `Geselecteerd punt #${getPointNumber(item)} • X ${Math.round(item.marker.x)} • Y ${Math.round(item.marker.y)}`;
+        info.textContent = `Geselecteerd punt #${getPointNumber(item)} • X ${Math.round(item.marker.x)} • Y ${Math.round(item.marker.y)} • ${item.pointName || 'zonder naam'}`;
       } else if (currentDraft.marker) {
         const editText = editingItemId ? ' (bewerken)' : '';
         info.textContent = `Punt in deel ${activePart} op X: ${Math.round(currentDraft.marker.x)} en Y: ${Math.round(currentDraft.marker.y)}${editText}`;
@@ -1706,6 +1994,7 @@
         info.textContent = editingItemId ? 'Bestaand punt bewerken' : 'Nog geen nieuw punt gekozen';
       }
 
+      renderDraftComments();
       renderAllDraftPhases();
       updateExactCoordFields();
     }
@@ -1716,9 +2005,12 @@
       phaseKeys.forEach(phase => {
         document.getElementById('phaseUpload-' + phase).value = '';
       });
+      document.getElementById('pointName').value = '';
       document.getElementById('pointAssignedTo').value = '';
       document.getElementById('pointUpdatedBy').value = '';
       document.getElementById('pointStatus').value = 'open';
+      document.getElementById('pointInternalNote').value = '';
+      document.getElementById('pointCommentInput').value = '';
       if (hideMessage) {
         document.getElementById('saveMessage').classList.add('hidden');
       }
@@ -1774,6 +2066,14 @@
       drawMainPlanCanvas();
     }
 
+    function openHelpModal() {
+      document.getElementById('helpModal').classList.add('open');
+    }
+
+    function closeHelpModal() {
+      document.getElementById('helpModal').classList.remove('open');
+    }
+
     function closeDetailModal() {
       document.getElementById('detailModal').classList.remove('open');
       openedDetailItemId = null;
@@ -1805,12 +2105,28 @@
     }
 
     function readDraftFormFields() {
+      currentDraft.pointName = document.getElementById('pointName').value.trim();
       currentDraft.assignedTo = document.getElementById('pointAssignedTo').value.trim();
       currentDraft.updatedBy = document.getElementById('pointUpdatedBy').value.trim();
       currentDraft.status = document.getElementById('pointStatus').value || 'open';
+      currentDraft.internalNote = document.getElementById('pointInternalNote').value.trim();
       phaseKeys.forEach(phase => {
         currentDraft.phases[phase].remark = document.getElementById('phaseRemark-' + phase).value;
       });
+    }
+
+    function addDraftComment() {
+      const input = document.getElementById('pointCommentInput');
+      const text = input.value.trim();
+      if (!text) return;
+      currentDraft.comments.push({ text, date: new Date().toISOString() });
+      input.value = '';
+      renderDraftComments();
+    }
+
+    function removeDraftComment(index) {
+      currentDraft.comments.splice(index, 1);
+      renderDraftComments();
     }
 
     function saveDraftToProject() {
@@ -1820,6 +2136,8 @@
         alert('Zet eerst een kruis op de tekening.');
         return;
       }
+
+      pushHistory();
 
       const now = new Date().toISOString();
       const globalMarker = getGlobalMarkerFromPartMarker(activePart, currentDraft.marker);
@@ -1831,25 +2149,37 @@
             ...partData[activePart].items[itemIndex],
             marker: { ...currentDraft.marker },
             globalMarker,
+            pointName: currentDraft.pointName,
             assignedTo: currentDraft.assignedTo,
             updatedBy: currentDraft.updatedBy,
             status: currentDraft.status,
+            label: currentDraft.label || partData[activePart].items[itemIndex].label || 'none',
+            internalNote: currentDraft.internalNote,
+            comments: cloneDeep(currentDraft.comments),
             updatedAt: now,
-            phases: JSON.parse(JSON.stringify(currentDraft.phases))
+            phases: cloneDeep(currentDraft.phases)
           };
         }
       } else {
         const newItem = {
-          id: Date.now(),
+          id: Date.now() + Math.floor(Math.random() * 1000),
           part: activePart,
           marker: { ...currentDraft.marker },
           globalMarker,
+          pointName: currentDraft.pointName,
           assignedTo: currentDraft.assignedTo,
           updatedBy: currentDraft.updatedBy,
           status: currentDraft.status,
-          phases: JSON.parse(JSON.stringify(currentDraft.phases)),
+          label: currentDraft.label || 'none',
+          internalNote: currentDraft.internalNote,
+          comments: cloneDeep(currentDraft.comments),
+          favorite: false,
+          hidden: false,
+          locked: false,
+          groupId: null,
           savedAt: now,
-          updatedAt: now
+          updatedAt: now,
+          phases: cloneDeep(currentDraft.phases)
         };
         partData[activePart].items.push(newItem);
       }
@@ -1877,6 +2207,9 @@
       container.innerHTML = items.map((item) => {
         const totalPhotos = phaseKeys.reduce((sum, phase) => sum + item.phases[phase].photos.length, 0);
         const pointNumber = getPointNumber(item);
+        const commentsCount = (item.comments || []).length;
+        const groupText = item.groupId ? getGroupDisplayName(item.groupId) : 'Geen groep';
+        const labelHtml = `<span class="color-chip" style="background:${getLabelColor(item.label || 'none')}"></span>`;
 
         return `
           <div class="saved-item">
@@ -1884,8 +2217,12 @@
               <div>
                 <div class="saved-item-title">
                   <span class="number-badge">#${pointNumber}</span>
-                  <span>Punt ${pointNumber}</span>
+                  <span>${escapeHtml(item.pointName || ('Punt ' + pointNumber))}</span>
                   ${getStatusBadgeHtml(item.status)}
+                  ${labelHtml}
+                  ${item.favorite ? '<span class="zoom-pill">Favoriet</span>' : ''}
+                  ${item.locked ? '<span class="zoom-pill">Vergrendeld</span>' : ''}
+                  ${item.hidden ? '<span class="zoom-pill">Verborgen</span>' : ''}
                   ${selectedItemIds.includes(item.id) ? '<span class="zoom-pill">Geselecteerd</span>' : ''}
                 </div>
                 <div class="saved-item-meta">
@@ -1893,12 +2230,14 @@
                   Laatste wijziging: ${formatDateTime(item.updatedAt || item.savedAt)}<br>
                   Laatste wijziging door: ${item.updatedBy ? escapeHtml(item.updatedBy) : 'niet ingevuld'}<br>
                   Collega: ${item.assignedTo ? escapeHtml(item.assignedTo) : 'niet ingevuld'}<br>
+                  Groep: ${escapeHtml(groupText)}<br>
                   X/Y: ${Math.round(item.marker.x)} / ${Math.round(item.marker.y)}
                 </div>
               </div>
-              <div class="saved-photo-count">${totalPhotos} foto${totalPhotos === 1 ? '' : "'s"}</div>
+              <div class="saved-photo-count">${totalPhotos} foto${totalPhotos === 1 ? '' : "'s"} • ${commentsCount} opmerkingen</div>
             </div>
             <div class="saved-item-text">
+              Interne notitie: ${item.internalNote ? escapeHtml(item.internalNote) : 'geen'}<br>
               Start: ${item.phases.start.remark ? escapeHtml(item.phases.start.remark) : 'geen opmerking'}<br>
               Midden: ${item.phases.middle.remark ? escapeHtml(item.phases.middle.remark) : 'geen opmerking'}<br>
               Eind: ${item.phases.end.remark ? escapeHtml(item.phases.end.remark) : 'geen opmerking'}
@@ -1908,10 +2247,12 @@
               <button class="mini-btn" type="button" onclick="editSavedItem(${item.id})">Bewerken</button>
               <button class="mini-btn" type="button" onclick="toggleItemSelection(${item.id})">${selectedItemIds.includes(item.id) ? 'Deselecteer' : 'Selecteer'}</button>
               <button class="mini-btn" type="button" onclick="openDetailFromSaved(${item.id})">Open dossier</button>
+              <button class="mini-btn" type="button" onclick="toggleFavorite(${item.id})">${item.favorite ? 'Favoriet uit' : 'Favoriet aan'}</button>
+              <button class="mini-btn" type="button" onclick="toggleItemHidden(${item.id})">${item.hidden ? 'Toon punt' : 'Verberg punt'}</button>
+              <button class="mini-btn" type="button" onclick="toggleItemLocked(${item.id})">${item.locked ? 'Ontgrendel' : 'Vergrendel'}</button>
               ${item.status === 'open'
                 ? `<button class="mini-btn" type="button" onclick="quickSetStatus(${item.id}, 'done')">Klaar zetten</button>`
                 : `<button class="mini-btn" type="button" onclick="quickSetStatus(${item.id}, 'open')">Opnieuw open zetten</button>`}
-              <button class="mini-btn" type="button" onclick="toggleItemHidden(${item.id})">${item.hidden ? 'Toon punt' : 'Verberg punt'}</button>
               <button class="mini-btn" type="button" onclick="deleteSavedItem(${item.id})">Verwijderen</button>
             </div>
           </div>
@@ -1926,10 +2267,14 @@
       selectedItemIds = [item.id];
       currentDraft = {
         marker: { ...item.marker },
+        pointName: item.pointName || '',
         assignedTo: item.assignedTo || '',
         updatedBy: item.updatedBy || '',
         status: item.status || 'open',
-        phases: JSON.parse(JSON.stringify(item.phases))
+        label: item.label || 'none',
+        internalNote: item.internalNote || '',
+        comments: cloneDeep(item.comments || []),
+        phases: cloneDeep(item.phases)
       };
 
       highlightedItemId = item.id;
@@ -1948,10 +2293,14 @@
       selectedItemIds = [item.id];
       currentDraft = {
         marker: { ...item.marker },
+        pointName: item.pointName || '',
         assignedTo: item.assignedTo || '',
         updatedBy: item.updatedBy || '',
         status: item.status || 'open',
-        phases: JSON.parse(JSON.stringify(item.phases))
+        label: item.label || 'none',
+        internalNote: item.internalNote || '',
+        comments: cloneDeep(item.comments || []),
+        phases: cloneDeep(item.phases)
       };
 
       editingItemId = item.id;
@@ -1969,7 +2318,7 @@
       if (!item) return;
       const actor = prompt('Wie doet deze wijziging?', item.updatedBy || item.assignedTo || '');
       if (actor === null) return;
-
+      pushHistory();
       item.status = newStatus;
       item.updatedBy = actor.trim();
       item.updatedAt = new Date().toISOString();
@@ -1979,9 +2328,32 @@
       persistState();
     }
 
+    function toggleFavorite(itemId) {
+      const item = partData[activePart].items.find(entry => entry.id === itemId);
+      if (!item) return;
+      pushHistory();
+      item.favorite = !item.favorite;
+      item.updatedAt = new Date().toISOString();
+      renderSavedItems();
+      refreshAllViews();
+      persistState();
+    }
+
+    function toggleItemLocked(itemId) {
+      const item = partData[activePart].items.find(entry => entry.id === itemId);
+      if (!item) return;
+      pushHistory();
+      item.locked = !item.locked;
+      item.updatedAt = new Date().toISOString();
+      renderSavedItems();
+      refreshAllViews();
+      persistState();
+    }
+
     function toggleItemHidden(itemId) {
       const item = partData[activePart].items.find(entry => entry.id === itemId);
       if (!item) return;
+      pushHistory();
       item.hidden = !item.hidden;
       renderSavedItems();
       refreshAllViews();
@@ -1991,6 +2363,7 @@
     function deleteSavedItem(itemId) {
       const ok = confirm('Weet je zeker dat je dit opgeslagen punt wilt verwijderen?');
       if (!ok) return;
+      pushHistory();
 
       partData[activePart].items = partData[activePart].items.filter(entry => entry.id !== itemId);
       selectedItemIds = selectedItemIds.filter(id => id !== itemId);
@@ -2021,6 +2394,10 @@
       document.getElementById('detailStatusWrap').innerHTML = 'Status: ' + getStatusBadgeHtml(item.status);
       document.getElementById('detailUpdatedAt').textContent = 'Laatste wijziging: ' + formatDateTime(item.updatedAt || item.savedAt);
       document.getElementById('detailUpdatedBy').textContent = 'Laatste wijziging door: ' + (item.updatedBy || 'niet ingevuld');
+      document.getElementById('detailPointName').innerHTML = 'Naam: ' + escapeHtml(item.pointName || 'niet ingevuld');
+      document.getElementById('detailInternalNote').innerHTML = 'Interne notitie: ' + escapeHtml(item.internalNote || 'geen');
+      document.getElementById('detailCommentsWrap').innerHTML =
+        'Opmerkingen: ' + ((item.comments || []).length ? (item.comments.map(c => `${formatDateTime(c.date)} — ${escapeHtml(c.text)}`).join('<br>')) : 'geen');
 
       phaseKeys.forEach(phase => {
         const phaseData = item.phases[phase];
@@ -2108,13 +2485,13 @@
       openLightbox(item.phases[phase].photos, index);
     }
 
-    function setSourceImageFromDataUrl(dataUrl) {
+    function setSourceImageFromDataUrl(dataUrl, silent = false) {
       sourceImageDataUrl = dataUrl || '';
       if (!dataUrl) {
         sourceImage = null;
         document.getElementById('mainPlanCanvas').style.display = 'none';
         document.getElementById('mainPlanPlaceholder').style.display = 'block';
-        refreshAllViews();
+        if (!silent) refreshAllViews();
         return;
       }
 
@@ -2201,10 +2578,14 @@
       editingItemId = item.id;
       currentDraft = {
         marker: { ...item.marker },
+        pointName: item.pointName || '',
         assignedTo: item.assignedTo || '',
         updatedBy: item.updatedBy || '',
         status: item.status || 'open',
-        phases: JSON.parse(JSON.stringify(item.phases))
+        label: item.label || 'none',
+        internalNote: item.internalNote || '',
+        comments: cloneDeep(item.comments || []),
+        phases: cloneDeep(item.phases)
       };
       updateDraftUI();
       renderSavedItems();
@@ -2283,53 +2664,27 @@
       drawMainPlanCanvas();
     }
 
-    function pushUndoState(items) {
-      undoMoveStack.push(items.map(item => ({ id: item.id, x: item.marker.x, y: item.marker.y })));
-      if (undoMoveStack.length > 50) undoMoveStack.shift();
-    }
-
-    function undoLastMove() {
-      const last = undoMoveStack.pop();
-      if (!last) return;
-      last.forEach(entry => {
-        const item = partData[activePart].items.find(i => i.id === entry.id);
-        if (item) {
-          item.marker.x = entry.x;
-          item.marker.y = entry.y;
-          recalcGlobalMarker(item);
-          item.updatedAt = new Date().toISOString();
-        }
-      });
-      refreshAllViews();
-      persistState();
-    }
-
-    function moveSelectedBy(dx, dy, askConfirm = false) {
-      const items = getSelectedItemsForActivePart();
+    function moveSelectedBy(dx, dy) {
+      const items = getSelectedItemsForActivePart().filter(item => !item.locked);
       if (!items.length) return;
+      pushHistory();
 
-      if (askConfirm) {
-        const ok = confirm('Nieuwe positie van geselecteerde punt(en) opslaan?');
-        if (!ok) return;
-      }
+      const canvas = document.getElementById('zoomCanvas');
+      const rect = canvas.getBoundingClientRect();
+      const maxX = rect.width || 1000;
+      const maxY = rect.height || 460;
 
-      pushUndoState(items);
-      const view = viewState[activePart];
       items.forEach(item => {
         let x = item.marker.x + dx;
         let y = item.marker.y + dy;
-        if (view.snapToGrid) {
+        if (viewState[activePart].snapToGrid) {
           x = snapCoord(x);
           y = snapCoord(y);
         }
-        const canvas = document.getElementById('zoomCanvas');
-        const rect = canvas.getBoundingClientRect();
-        const maxX = rect.width || 1000;
-        const maxY = rect.height || 460;
         item.marker.x = Math.max(0, Math.min(maxX, x));
         item.marker.y = Math.max(0, Math.min(maxY, y));
-        recalcGlobalMarker(item);
         item.updatedAt = new Date().toISOString();
+        recalcGlobalMarker(item);
       });
 
       refreshAllViews();
@@ -2341,13 +2696,13 @@
       const y = Number(document.getElementById('exactYInput').value);
       if (Number.isNaN(x) || Number.isNaN(y)) return;
 
-      const selected = getSelectedItemsForActivePart();
+      const selected = getSelectedItemsForActivePart().filter(item => !item.locked);
       if (selected.length === 1) {
-        pushUndoState(selected);
+        pushHistory();
         selected[0].marker.x = x;
         selected[0].marker.y = y;
-        recalcGlobalMarker(selected[0]);
         selected[0].updatedAt = new Date().toISOString();
+        recalcGlobalMarker(selected[0]);
         currentDraft.marker = { x, y };
         refreshAllViews();
         persistState();
@@ -2366,13 +2721,13 @@
         return;
       }
 
+      pushHistory();
       selected.forEach(item => {
-        const clone = JSON.parse(JSON.stringify(item));
+        const clone = cloneDeep(item);
         clone.id = Date.now() + Math.floor(Math.random() * 100000);
         clone.part = targetPart;
         clone.savedAt = new Date().toISOString();
         clone.updatedAt = clone.savedAt;
-        clone.marker = { ...item.marker };
         clone.globalMarker = getGlobalMarkerFromPartMarker(targetPart, clone.marker);
         partData[targetPart].items.push(clone);
       });
@@ -2380,6 +2735,240 @@
       refreshAllViews();
       persistState();
       alert('Selectie gekopieerd naar deel ' + targetPart + '.');
+    }
+
+    function duplicateSelected() {
+      const selected = getSelectedItemsForActivePart();
+      if (!selected.length) return;
+      pushHistory();
+      const clones = [];
+      selected.forEach(item => {
+        const clone = cloneDeep(item);
+        clone.id = Date.now() + Math.floor(Math.random() * 100000);
+        clone.marker.x += 16;
+        clone.marker.y += 16;
+        clone.savedAt = new Date().toISOString();
+        clone.updatedAt = clone.savedAt;
+        recalcGlobalMarker(clone);
+        partData[activePart].items.push(clone);
+        clones.push(clone.id);
+      });
+      selectedItemIds = clones;
+      refreshAllViews();
+      persistState();
+    }
+
+    function copySelectedToClipboard() {
+      const selected = getSelectedItemsForActivePart();
+      if (!selected.length) return;
+      clipboardItems = cloneDeep(selected);
+    }
+
+    function pasteClipboardSelection() {
+      if (!clipboardItems.length) return;
+      pushHistory();
+      const clones = [];
+      clipboardItems.forEach(item => {
+        const clone = cloneDeep(item);
+        clone.id = Date.now() + Math.floor(Math.random() * 100000);
+        clone.part = activePart;
+        clone.marker.x += 20;
+        clone.marker.y += 20;
+        clone.savedAt = new Date().toISOString();
+        clone.updatedAt = clone.savedAt;
+        recalcGlobalMarker(clone);
+        partData[activePart].items.push(clone);
+        clones.push(clone.id);
+      });
+      selectedItemIds = clones;
+      refreshAllViews();
+      persistState();
+    }
+
+    function cutSelected() {
+      copySelectedToClipboard();
+      deleteSelected(false);
+    }
+
+    function deleteSelected(confirmNeeded = true) {
+      const selected = getSelectedItemsForActivePart();
+      if (!selected.length) return;
+      if (confirmNeeded) {
+        const ok = confirm('Geselecteerde punt(en) verwijderen?');
+        if (!ok) return;
+      }
+      pushHistory();
+      const ids = new Set(selected.map(i => i.id));
+      partData[activePart].items = partData[activePart].items.filter(item => !ids.has(item.id));
+      selectedItemIds = [];
+      highlightedItemId = null;
+      editingItemId = null;
+      refreshAllViews();
+      persistState();
+    }
+
+    function deleteSelectedWithConfirm() {
+      deleteSelected(true);
+    }
+
+    function setSelectedStatus(status) {
+      const items = getSelectedItemsForActivePart();
+      if (!items.length) return;
+      pushHistory();
+      items.forEach(item => {
+        item.status = status;
+        item.updatedAt = new Date().toISOString();
+      });
+      refreshAllViews();
+      persistState();
+    }
+
+    function alignSelected(mode) {
+      const items = getSelectedItemsForActivePart().filter(item => !item.locked);
+      if (items.length < 2) return;
+      pushHistory();
+
+      if (mode === 'left') {
+        const minX = Math.min(...items.map(i => i.marker.x));
+        items.forEach(i => i.marker.x = minX);
+      }
+      if (mode === 'centerX') {
+        const avg = items.reduce((s, i) => s + i.marker.x, 0) / items.length;
+        items.forEach(i => i.marker.x = avg);
+      }
+      if (mode === 'right') {
+        const maxX = Math.max(...items.map(i => i.marker.x));
+        items.forEach(i => i.marker.x = maxX);
+      }
+
+      items.forEach(i => {
+        i.updatedAt = new Date().toISOString();
+        recalcGlobalMarker(i);
+      });
+      refreshAllViews();
+      persistState();
+    }
+
+    function distributeSelected(mode) {
+      const items = getSelectedItemsForActivePart().filter(item => !item.locked);
+      if (items.length < 3) return;
+      pushHistory();
+
+      const prop = mode === 'horizontal' ? 'x' : 'y';
+      const sorted = [...items].sort((a, b) => a.marker[prop] - b.marker[prop]);
+      const min = sorted[0].marker[prop];
+      const max = sorted[sorted.length - 1].marker[prop];
+      const step = (max - min) / (sorted.length - 1);
+
+      sorted.forEach((item, index) => {
+        item.marker[prop] = min + step * index;
+        item.updatedAt = new Date().toISOString();
+        recalcGlobalMarker(item);
+      });
+
+      refreshAllViews();
+      persistState();
+    }
+
+    function lockSelected(lockValue) {
+      const items = getSelectedItemsForActivePart();
+      if (!items.length) return;
+      pushHistory();
+      items.forEach(item => {
+        item.locked = lockValue;
+        item.updatedAt = new Date().toISOString();
+      });
+      refreshAllViews();
+      persistState();
+    }
+
+    function hideSelected(hiddenValue) {
+      const items = getSelectedItemsForActivePart();
+      if (!items.length) return;
+      pushHistory();
+      items.forEach(item => item.hidden = hiddenValue);
+      refreshAllViews();
+      persistState();
+    }
+
+    function showAllHidden() {
+      pushHistory();
+      getAllItems().forEach(item => item.hidden = false);
+      refreshAllViews();
+      persistState();
+    }
+
+    function groupSelected() {
+      const items = getSelectedItemsForActivePart();
+      if (items.length < 2) return;
+      pushHistory();
+      const gid = groupIdSeed++;
+      items.forEach(item => {
+        item.groupId = gid;
+        item.updatedAt = new Date().toISOString();
+      });
+      refreshAllViews();
+      persistState();
+    }
+
+    function ungroupSelected() {
+      const items = getSelectedItemsForActivePart();
+      if (!items.length) return;
+      pushHistory();
+      items.forEach(item => {
+        item.groupId = null;
+        item.updatedAt = new Date().toISOString();
+      });
+      refreshAllViews();
+      persistState();
+    }
+
+    function bringSelectedToFront() {
+      const items = getSelectedItemsForActivePart();
+      if (!items.length) return;
+      pushHistory();
+      const ids = new Set(items.map(i => i.id));
+      const rest = partData[activePart].items.filter(i => !ids.has(i.id));
+      partData[activePart].items = [...rest, ...items];
+      refreshAllViews();
+      persistState();
+    }
+
+    function sendSelectedToBack() {
+      const items = getSelectedItemsForActivePart();
+      if (!items.length) return;
+      pushHistory();
+      const ids = new Set(items.map(i => i.id));
+      const rest = partData[activePart].items.filter(i => !ids.has(i.id));
+      partData[activePart].items = [...items, ...rest];
+      refreshAllViews();
+      persistState();
+    }
+
+    function setLabelForSelected() {
+      const color = document.getElementById('labelColorSelect').value;
+      const items = getSelectedItemsForActivePart();
+      if (!items.length) return;
+      pushHistory();
+      items.forEach(item => {
+        item.label = color;
+        item.updatedAt = new Date().toISOString();
+      });
+      refreshAllViews();
+      persistState();
+    }
+
+    function bulkRenameSelected() {
+      const prefix = document.getElementById('bulkRenamePrefix').value.trim();
+      const items = getSelectedItemsForActivePart();
+      if (!items.length || !prefix) return;
+      pushHistory();
+      items.forEach((item, index) => {
+        item.pointName = `${prefix} ${index + 1}`;
+        item.updatedAt = new Date().toISOString();
+      });
+      refreshAllViews();
+      persistState();
     }
 
     function getCanvasScreenPos(ev) {
@@ -2429,9 +3018,9 @@
             selectItem(hit, false);
           }
 
-          if (editMode) {
-            const items = getSelectedItemsForActivePart();
-            pushUndoState(items);
+          if (editMode && !hit.locked) {
+            pushHistory();
+            const items = getSelectedItemsForActivePart().filter(item => !item.locked);
             const world = toWorldCoordinates(pos.x, pos.y);
             dragState = {
               type: 'move-items',
@@ -2535,7 +3124,6 @@
       });
 
       function finishPointer(ev) {
-        const pos = getCanvasScreenPos(ev);
         pointers.delete(ev.pointerId);
 
         if (pinchState && pointers.size < 2) {
@@ -2550,10 +3138,6 @@
         }
 
         if (dragState && dragState.type === 'move-items') {
-          if (viewState[activePart].editMode) {
-            const ok = confirm('Nieuwe positie van geselecteerde punt(en) opslaan?');
-            if (!ok) undoLastMove();
-          }
           dragState = null;
           renderSavedItems();
           updateDraftUI();
@@ -2585,13 +3169,55 @@
       }, { passive: false });
 
       canvas.addEventListener('keydown', (ev) => {
+        const isMac = navigator.platform.toUpperCase().includes('MAC');
+        const mod = isMac ? ev.metaKey : ev.ctrlKey;
+
+        if (mod && ev.key.toLowerCase() === 'z') {
+          ev.preventDefault();
+          undoHistory();
+          return;
+        }
+        if (mod && (ev.key.toLowerCase() === 'y' || (isMac && ev.shiftKey && ev.key.toLowerCase() === 'z'))) {
+          ev.preventDefault();
+          redoHistory();
+          return;
+        }
+        if (mod && ev.key.toLowerCase() === 'c') {
+          ev.preventDefault();
+          copySelectedToClipboard();
+          return;
+        }
+        if (mod && ev.key.toLowerCase() === 'v') {
+          ev.preventDefault();
+          pasteClipboardSelection();
+          return;
+        }
+        if (mod && ev.key.toLowerCase() === 'x') {
+          ev.preventDefault();
+          cutSelected();
+          return;
+        }
+        if (mod && ev.key.toLowerCase() === 'd') {
+          ev.preventDefault();
+          duplicateSelected();
+          return;
+        }
+
         const selected = getSelectedItemsForActivePart();
-        if (!selected.length) return;
 
         if (ev.key === 'Escape') {
           deselectAll();
           return;
         }
+        if (ev.key === 'Delete' || ev.key === 'Backspace') {
+          if (selected.length) {
+            ev.preventDefault();
+            deleteSelectedWithConfirm();
+          }
+          return;
+        }
+
+        if (!selected.length) return;
 
         let step = ev.shiftKey ? 10 : 1;
         let dx = 0;
@@ -2604,12 +3230,13 @@
 
         if (dx !== 0 || dy !== 0) {
           ev.preventDefault();
-          moveSelectedBy(dx, dy, false);
+          moveSelectedBy(dx, dy);
         }
       });
     }
 
     function refreshAllViews() {
+      rebuildGroupFilterOptions();
       updateSummaryCounts();
       updateAllPartCounts();
       drawMainPlanCanvas();
@@ -2625,11 +3252,30 @@
         sourceImageDataUrl,
         projectName: document.getElementById('projectNameInput')?.value || '',
         partData,
-        viewState
+        viewState,
+        groupIdSeed
       };
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(safeData));
       } catch (e) {}
+    }
+
+    function indicateAutosave() {
+      const el = document.getElementById('autosaveIndicator');
+      if (!el) return;
+      el.textContent = 'Autosave opgeslagen';
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => {
+        el.textContent = 'Autosave actief';
+      }, 1200);
+    }
+
+    function setupAutosave() {
+      clearInterval(autosaveTimer);
+      autosaveTimer = setInterval(() => {
+        persistState();
+        indicateAutosave();
+      }, 4000);
     }
 
     function loadPersistedState() {
@@ -2655,6 +3301,8 @@
           });
         }
 
+        groupIdSeed = parsed.groupIdSeed || 1;
+
         if (parsed.sourceImageDataUrl) {
           setSourceImageFromDataUrl(parsed.sourceImageDataUrl);
         }
@@ -2667,7 +3315,8 @@
         projectName: document.getElementById('projectNameInput').value || '',
         mainPlanImage: sourceImageDataUrl,
         parts: partData,
-        viewState
+        viewState,
+        groupIdSeed
       };
 
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -2682,6 +3331,7 @@
       reader.onload = function(e) {
         try {
           const data = JSON.parse(e.target.result);
+          pushHistory();
 
           if (data.projectName) document.getElementById('projectNameInput').value = data.projectName;
           if (data.parts) {
@@ -2694,6 +3344,7 @@
               viewState[key] = { ...createDefaultView(), ...(data.viewState[key] || {}) };
             });
           }
+          if (data.groupIdSeed) groupIdSeed = data.groupIdSeed;
           if (data.mainPlanImage) setSourceImageFromDataUrl(data.mainPlanImage);
 
           refreshAllViews();
@@ -2706,9 +3357,71 @@
       reader.readAsText(file);
     }
 
+    function exportPdfReport() {
+      const allItems = getAllItems();
+      if (!allItems.length) {
+        alert('Er zijn nog geen punten om te exporteren.');
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'pt', 'a4');
+      const title = document.getElementById('projectNameInput').value || 'Projectrapport';
+      doc.setFontSize(18);
+      doc.text(title, 40, 40);
+      doc.setFontSize(11);
+      doc.text('Exportdatum: ' + formatDateTime(new Date().toISOString()), 40, 60);
+
+      const body = allItems.map(item => [
+        item.part,
+        getPointNumber(item),
+        item.pointName || '',
+        getStatusLabel(item.status),
+        item.assignedTo || '',
+        item.updatedBy || '',
+        item.label || 'none',
+        item.groupId || '',
+        item.internalNote || '',
+        (item.comments || []).length
+      ]);
+
+      doc.autoTable({
+        startY: 80,
+        head: [[
+          'Deel', '#', 'Naam', 'Status', 'Collega', 'Gewijzigd door', 'Label', 'Groep', 'Interne notitie', 'Opmerkingen'
+        ]],
+        body,
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 4 },
+        headStyles: { fillColor: [31, 122, 224] },
+        margin: { left: 24, right: 24 }
+      });
+
+      let y = doc.lastAutoTable.finalY + 20;
+      allItems.forEach(item => {
+        if (y > 720) {
+          doc.addPage();
+          y = 40;
+        }
+        doc.setFontSize(11);
+        doc.text(`Deel ${item.part} • Punt ${getPointNumber(item)} • ${item.pointName || 'zonder naam'}`, 40, y);
+        y += 14;
+        doc.setFontSize(9);
+        doc.text(`Status: ${getStatusLabel(item.status)} | Label: ${item.label || 'none'} | Groep: ${item.groupId || 'geen'}`, 40, y);
+        y += 12;
+        doc.text(`Start: ${item.phases.start.remark || 'geen'} | Midden: ${item.phases.middle.remark || 'geen'} | Eind: ${item.phases.end.remark || 'geen'}`, 40, y);
+        y += 12;
+        doc.text(`Interne notitie: ${(item.internalNote || 'geen').slice(0, 120)}`, 40, y);
+        y += 18;
+      });
+
+      doc.save('project-rapport.pdf');
+    }
+
     document.getElementById('mainPlanUpload').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (!file) return;
+      pushHistory();
       const reader = new FileReader();
       reader.onload = function(e) {
         setSourceImageFromDataUrl(e.target.result);
@@ -2728,6 +3441,16 @@
 
     document.getElementById('sortSelect').addEventListener('change', function() {
       currentSortOrder = this.value;
+      refreshAllViews();
+    });
+
+    document.getElementById('labelFilterSelect').addEventListener('change', function() {
+      currentLabelFilter = this.value;
+      refreshAllViews();
+    });
+
+    document.getElementById('groupFilterSelect').addEventListener('change', function() {
+      currentGroupFilter = this.value;
       refreshAllViews();
     });
 
@@ -2753,6 +3476,15 @@
       persistState();
     });
 
+    ['projectNameInput', 'pointName', 'pointAssignedTo', 'pointUpdatedBy', 'pointInternalNote'].forEach(id => {
+      document.addEventListener('input', function(e) {
+        if (e.target && e.target.id === id) {
+          persistState();
+          indicateAutosave();
+        }
+      });
+    });
+
     phaseKeys.forEach(phase => {
       document.getElementById('phaseUpload-' + phase).addEventListener('change', function(event) {
         const files = Array.from(event.target.files || []);
@@ -2776,6 +3508,8 @@
       document.getElementById('phaseRemark-' + phase).addEventListener('input', function() {
         currentDraft.phases[phase].remark = this.value;
         if (this.value.trim()) setAutomaticPhaseDate(phase);
+        persistState();
+        indicateAutosave();
       });
     });
 
@@ -2786,7 +3520,7 @@
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
 
-      const allItems = getFilteredItems(getAllItems());
+      const allItems = getFilteredItems(getAllItems()).filter(item => !item.hidden);
       for (const item of allItems) {
         if (!item.globalMarker) continue;
         const dx = x - item.globalMarker.x;
@@ -2804,6 +3538,12 @@
 
     window.addEventListener('resize', function() {
       refreshAllViews();
+    });
+
+    window.addEventListener('keydown', function(ev) {
+      if (ev.key === '?') {
+        openHelpModal();
+      }
     });
 
     refreshAllViews();
