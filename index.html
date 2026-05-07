@@ -273,11 +273,45 @@
       margin-top: 12px;
     }
 
+    .toolbar-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }
+    .toolbar-row input,
+    .toolbar-row select {
+      padding: 10px 12px;
+      border: 1px solid #d5e0ea;
+      border-radius: 10px;
+      font-size: 14px;
+      background: white;
+    }
+
+    .summary-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+    .summary-pill {
+      background: #f8fafc;
+      border: 1px solid #dbe6ef;
+      color: #17324d;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
     .filter-row {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 18px;
+      margin-top: 10px;
       margin-bottom: 6px;
     }
     .filter-btn {
@@ -580,6 +614,10 @@
     .saved-item-title {
       font-weight: bold;
       color: #17324d;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
     }
     .saved-item-meta {
       color: #64748b;
@@ -631,6 +669,20 @@
       background: #dcfce7;
       color: #166534;
       border: 1px solid #b7e4c2;
+    }
+
+    .number-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: #17324d;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
     }
 
     .detail-section {
@@ -841,7 +893,7 @@
       <div class="content-card">
         <h2 id="contentProjectTitle">Pilot watergang Kromme Nieuwegracht</h2>
         <p id="contentProjectSubtitle">
-          Upload hieronder de hoofdplattegrond. Opgeslagen punten verschijnen daarna als gele klikbare stippen.
+          Upload hieronder de hoofdplattegrond. Opgeslagen punten verschijnen daarna als klikbare markeringen.
         </p>
 
         <div class="field">
@@ -861,12 +913,25 @@
         </div>
 
         <div class="hint">
-          Klik op een deel om een nieuw punt te maken. Opgeslagen punten zie je daarna terug als gele ronde stippen op de hoofdplattegrond.
+          Klik op een deel om een nieuw punt te maken. Opgeslagen punten verschijnen op de hoofdplattegrond en in de deeltekeningen.
+        </div>
+
+        <div class="summary-row">
+          <div class="summary-pill" id="summaryOpen">Open: 0</div>
+          <div class="summary-pill" id="summaryDone">Klaar: 0</div>
+        </div>
+
+        <div class="toolbar-row">
+          <input type="text" id="pointSearchInput" placeholder="Zoek op collega of opmerking">
+          <select id="sortSelect">
+            <option value="newest">Nieuwste eerst</option>
+            <option value="oldest">Oudste eerst</option>
+          </select>
         </div>
 
         <div class="filter-row">
-          <button class="filter-btn active" type="button" onclick="setStatusFilter('all')">Alles</button>
-          <button class="filter-btn" type="button" onclick="setStatusFilter('open')">Open</button>
+          <button class="filter-btn" type="button" onclick="setStatusFilter('all')">Alles</button>
+          <button class="filter-btn active" type="button" onclick="setStatusFilter('open')">Open</button>
           <button class="filter-btn" type="button" onclick="setStatusFilter('done')">Klaar</button>
         </div>
 
@@ -944,6 +1009,11 @@
         <div class="field">
           <label for="pointAssignedTo">Collega</label>
           <input type="text" id="pointAssignedTo" placeholder="Bijvoorbeeld: Henry of Diederik">
+        </div>
+
+        <div class="field">
+          <label for="pointUpdatedBy">Laatste wijziging door</label>
+          <input type="text" id="pointUpdatedBy" placeholder="Bijvoorbeeld: Henry">
         </div>
 
         <div class="field">
@@ -1032,6 +1102,8 @@
         <div class="detail-meta" id="detailMeta">Deel 1</div>
         <div id="detailAssigned" class="detail-meta"></div>
         <div id="detailStatusWrap" class="detail-meta"></div>
+        <div id="detailUpdatedAt" class="detail-meta"></div>
+        <div id="detailUpdatedBy" class="detail-meta"></div>
 
         <div class="tabs-row">
           <button class="tab-btn active detail-tab-btn" type="button" onclick="switchDetailTab('start')">Start</button>
@@ -1078,13 +1150,16 @@
 
   <script>
     let sourceImage = null;
+    let sourceImageDataUrl = '';
     let activePart = 1;
     let highlightedItemId = null;
     let activePhaseTab = 'start';
     let activeDetailTab = 'start';
     let openedDetailItemId = null;
     let editingItemId = null;
-    let currentStatusFilter = 'all';
+    let currentStatusFilter = 'open';
+    let currentSearchTerm = '';
+    let currentSortOrder = 'newest';
 
     let lightboxImages = [];
     let lightboxIndex = 0;
@@ -1110,6 +1185,7 @@
       return {
         marker: null,
         assignedTo: '',
+        updatedBy: '',
         status: 'open',
         phases: {
           start: { photos: [], remark: '', date: '' },
@@ -1125,8 +1201,9 @@
       document.getElementById('sidebarProjectName').textContent = name;
       document.getElementById('contentProjectTitle').textContent = name;
       document.getElementById('contentProjectSubtitle').textContent =
-        subtitle + ' • ' + role + '. Upload hieronder de hoofdplattegrond. Opgeslagen punten verschijnen daarna als gele klikbare stippen.';
+        subtitle + ' • ' + role + '. Upload hieronder de hoofdplattegrond. Opgeslagen punten verschijnen daarna als klikbare markeringen.';
       document.getElementById('projectNameInput').value = name;
+      refreshAllViews();
     }
 
     function goBackToProjects() {
@@ -1164,19 +1241,20 @@
       ctx.stroke();
     }
 
-    function drawYellowDot(ctx, x, y, active = false) {
+    function drawNumberedMarker(ctx, x, y, number, status, active = false) {
       ctx.beginPath();
-      ctx.fillStyle = active ? '#f59e0b' : '#facc15';
-      ctx.strokeStyle = '#7c5a00';
-      ctx.lineWidth = 2;
-      ctx.arc(x, y, active ? 11 : 9, 0, Math.PI * 2);
+      ctx.fillStyle = status === 'done' ? '#22c55e' : '#facc15';
+      ctx.strokeStyle = active ? '#1d4ed8' : '#7c5a00';
+      ctx.lineWidth = active ? 3 : 2;
+      ctx.arc(x, y, active ? 14 : 12, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
-      ctx.beginPath();
-      ctx.fillStyle = '#fff8cc';
-      ctx.arc(x, y, 3, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle = status === 'done' ? '#ffffff' : '#17324d';
+      ctx.font = 'bold 12px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(number), x, y);
     }
 
     function getAllItems() {
@@ -1188,9 +1266,49 @@
       });
     }
 
+    function getPointNumber(item) {
+      const partItems = [...partData[item.part].items].sort((a, b) => {
+        return new Date(a.savedAt).getTime() - new Date(b.savedAt).getTime();
+      });
+      const index = partItems.findIndex(entry => entry.id === item.id);
+      return index >= 0 ? index + 1 : '?';
+    }
+
+    function normalizeText(text) {
+      return (text || '').toString().toLowerCase().trim();
+    }
+
+    function itemMatchesSearch(item) {
+      if (!currentSearchTerm) return true;
+      const haystack = [
+        item.assignedTo || '',
+        item.updatedBy || '',
+        item.phases.start.remark || '',
+        item.phases.middle.remark || '',
+        item.phases.end.remark || ''
+      ].join(' ').toLowerCase();
+
+      return haystack.includes(currentSearchTerm);
+    }
+
     function getFilteredItems(items) {
-      if (currentStatusFilter === 'all') return items;
-      return items.filter(item => item.status === currentStatusFilter);
+      let result = [...items];
+
+      if (currentStatusFilter !== 'all') {
+        result = result.filter(item => item.status === currentStatusFilter);
+      }
+
+      if (currentSearchTerm) {
+        result = result.filter(item => itemMatchesSearch(item));
+      }
+
+      result.sort((a, b) => {
+        const aTime = new Date(a.savedAt || 0).getTime();
+        const bTime = new Date(b.savedAt || 0).getTime();
+        return currentSortOrder === 'oldest' ? aTime - bTime : bTime - aTime;
+      });
+
+      return result;
     }
 
     function formatDateTime(isoString) {
@@ -1220,6 +1338,18 @@
       return `<span class="${cls}">${getStatusLabel(status)}</span>`;
     }
 
+    function updateSummaryCounts() {
+      const allItems = getAllItems();
+      const counts = allItems.reduce((acc, item) => {
+        if (item.status === 'done') acc.done += 1;
+        else acc.open += 1;
+        return acc;
+      }, { open: 0, done: 0 });
+
+      document.getElementById('summaryOpen').textContent = 'Open: ' + counts.open;
+      document.getElementById('summaryDone').textContent = 'Klaar: ' + counts.done;
+    }
+
     function setStatusFilter(filter) {
       currentStatusFilter = filter;
       document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -1236,13 +1366,7 @@
         }
       });
 
-      drawMainPlanCanvas();
-      for (let i = 1; i <= 5; i++) {
-        drawThumb(i);
-      }
-      if (document.getElementById('partModal').classList.contains('open')) {
-        renderSavedItems();
-      }
+      refreshAllViews();
     }
 
     function updatePartCountBadge(partIndex) {
@@ -1286,7 +1410,14 @@
 
       getFilteredItems(getAllItems()).forEach(item => {
         if (!item.globalMarker) return;
-        drawYellowDot(ctx, item.globalMarker.x, item.globalMarker.y, item.id === highlightedItemId || item.id === openedDetailItemId);
+        drawNumberedMarker(
+          ctx,
+          item.globalMarker.x,
+          item.globalMarker.y,
+          getPointNumber(item),
+          item.status,
+          item.id === highlightedItemId || item.id === openedDetailItemId
+        );
       });
     }
 
@@ -1319,12 +1450,20 @@
       ctx.drawImage(sourceImage, sx, 0, sliceWidth, sourceImage.height, 0, 0, width, height);
 
       getFilteredItems(partData[partIndex].items).forEach(item => {
-        if (item.marker) drawCross(ctx, item.marker.x, item.marker.y);
+        if (!item.marker) return;
+        drawNumberedMarker(
+          ctx,
+          item.marker.x,
+          item.marker.y,
+          getPointNumber(item),
+          item.status,
+          item.id === highlightedItemId || item.id === openedDetailItemId
+        );
       });
 
       if (isZoom && currentDraft.marker) {
         ctx.save();
-        ctx.globalAlpha = 0.9;
+        ctx.globalAlpha = 0.92;
         drawCross(ctx, currentDraft.marker.x, currentDraft.marker.y);
         ctx.restore();
       }
@@ -1410,6 +1549,7 @@
       const info = document.getElementById('modalPointInfo');
 
       document.getElementById('pointAssignedTo').value = currentDraft.assignedTo || '';
+      document.getElementById('pointUpdatedBy').value = currentDraft.updatedBy || '';
       document.getElementById('pointStatus').value = currentDraft.status || 'open';
 
       if (currentDraft.marker) {
@@ -1433,6 +1573,7 @@
         document.getElementById('phaseUpload-' + phase).value = '';
       });
       document.getElementById('pointAssignedTo').value = '';
+      document.getElementById('pointUpdatedBy').value = '';
       document.getElementById('pointStatus').value = 'open';
       if (hideMessage) {
         document.getElementById('saveMessage').classList.add('hidden');
@@ -1502,6 +1643,7 @@
 
     function readDraftFormFields() {
       currentDraft.assignedTo = document.getElementById('pointAssignedTo').value.trim();
+      currentDraft.updatedBy = document.getElementById('pointUpdatedBy').value.trim();
       currentDraft.status = document.getElementById('pointStatus').value || 'open';
       phaseKeys.forEach(phase => {
         currentDraft.phases[phase].remark = document.getElementById('phaseRemark-' + phase).value;
@@ -1516,6 +1658,7 @@
         return;
       }
 
+      const now = new Date().toISOString();
       const globalMarker = getGlobalMarkerFromPartMarker(activePart, currentDraft.marker);
 
       if (editingItemId) {
@@ -1526,7 +1669,9 @@
             marker: { ...currentDraft.marker },
             globalMarker,
             assignedTo: currentDraft.assignedTo,
+            updatedBy: currentDraft.updatedBy,
             status: currentDraft.status,
+            updatedAt: now,
             phases: JSON.parse(JSON.stringify(currentDraft.phases))
           };
         }
@@ -1537,18 +1682,17 @@
           marker: { ...currentDraft.marker },
           globalMarker,
           assignedTo: currentDraft.assignedTo,
+          updatedBy: currentDraft.updatedBy,
           status: currentDraft.status,
           phases: JSON.parse(JSON.stringify(currentDraft.phases)),
-          savedAt: new Date().toISOString()
+          savedAt: now,
+          updatedAt: now
         };
         partData[activePart].items.push(newItem);
       }
 
       renderSavedItems();
-      drawThumb(activePart);
-      drawZoomCanvas();
-      drawMainPlanCanvas();
-      updatePartCountBadge(activePart);
+      refreshAllViews();
 
       const saveMessage = document.getElementById('saveMessage');
       saveMessage.classList.remove('hidden');
@@ -1562,19 +1706,27 @@
       const items = getFilteredItems(partData[activePart].items);
 
       if (!items.length) {
-        container.innerHTML = `<div class="saved-empty">Nog geen opgeslagen punten in dit deel voor dit filter.</div>`;
+        container.innerHTML = `<div class="saved-empty">Nog geen opgeslagen punten in dit deel voor dit filter of zoekwoord.</div>`;
         return;
       }
 
-      container.innerHTML = items.map((item, index) => {
+      container.innerHTML = items.map((item) => {
         const totalPhotos = phaseKeys.reduce((sum, phase) => sum + item.phases[phase].photos.length, 0);
+        const pointNumber = getPointNumber(item);
+
         return `
           <div class="saved-item">
             <div class="saved-item-top">
               <div>
-                <div class="saved-item-title">Punt ${index + 1} ${getStatusBadgeHtml(item.status)}</div>
+                <div class="saved-item-title">
+                  <span class="number-badge">#${pointNumber}</span>
+                  <span>Punt ${pointNumber}</span>
+                  ${getStatusBadgeHtml(item.status)}
+                </div>
                 <div class="saved-item-meta">
-                  Opgeslagen op ${formatDateTime(item.savedAt)}<br>
+                  Aangemaakt: ${formatDateTime(item.savedAt)}<br>
+                  Laatste wijziging: ${formatDateTime(item.updatedAt || item.savedAt)}<br>
+                  Laatste wijziging door: ${item.updatedBy ? escapeHtml(item.updatedBy) : 'niet ingevuld'}<br>
                   Collega: ${item.assignedTo ? escapeHtml(item.assignedTo) : 'niet ingevuld'}
                 </div>
               </div>
@@ -1589,6 +1741,9 @@
               <button class="mini-btn" type="button" onclick="focusSavedItem(${item.id})">Toon op tekening</button>
               <button class="mini-btn" type="button" onclick="editSavedItem(${item.id})">Bewerken</button>
               <button class="mini-btn" type="button" onclick="openDetailFromSaved(${item.id})">Open dossier</button>
+              ${item.status === 'open'
+                ? `<button class="mini-btn" type="button" onclick="quickSetStatus(${item.id}, 'done')">Klaar zetten</button>`
+                : `<button class="mini-btn" type="button" onclick="quickSetStatus(${item.id}, 'open')">Opnieuw open zetten</button>`}
               <button class="mini-btn" type="button" onclick="deleteSavedItem(${item.id})">Verwijderen</button>
             </div>
           </div>
@@ -1603,6 +1758,7 @@
       currentDraft = {
         marker: { ...item.marker },
         assignedTo: item.assignedTo || '',
+        updatedBy: item.updatedBy || '',
         status: item.status || 'open',
         phases: JSON.parse(JSON.stringify(item.phases))
       };
@@ -1621,6 +1777,7 @@
       currentDraft = {
         marker: { ...item.marker },
         assignedTo: item.assignedTo || '',
+        updatedBy: item.updatedBy || '',
         status: item.status || 'open',
         phases: JSON.parse(JSON.stringify(item.phases))
       };
@@ -1634,6 +1791,21 @@
       drawMainPlanCanvas();
     }
 
+    function quickSetStatus(itemId, newStatus) {
+      const item = partData[activePart].items.find(entry => entry.id === itemId);
+      if (!item) return;
+
+      const actor = prompt('Wie doet deze wijziging?', item.updatedBy || item.assignedTo || '');
+      if (actor === null) return;
+
+      item.status = newStatus;
+      item.updatedBy = actor.trim();
+      item.updatedAt = new Date().toISOString();
+
+      renderSavedItems();
+      refreshAllViews();
+    }
+
     function deleteSavedItem(itemId) {
       const ok = confirm('Weet je zeker dat je dit opgeslagen punt wilt verwijderen?');
       if (!ok) return;
@@ -1645,10 +1817,7 @@
       if (editingItemId === itemId) editingItemId = null;
 
       renderSavedItems();
-      drawThumb(activePart);
-      drawZoomCanvas();
-      drawMainPlanCanvas();
-      updatePartCountBadge(activePart);
+      refreshAllViews();
     }
 
     function openDetailFromSaved(itemId) {
@@ -1659,11 +1828,15 @@
 
     function openDetailItem(item) {
       openedDetailItemId = item.id;
+      const pointNumber = getPointNumber(item);
+
       document.getElementById('detailModal').classList.add('open');
-      document.getElementById('detailTitle').textContent = 'Punt dossier';
-      document.getElementById('detailMeta').textContent = 'Deel ' + item.part + ' • opgeslagen op ' + formatDateTime(item.savedAt);
+      document.getElementById('detailTitle').textContent = 'Punt dossier #' + pointNumber;
+      document.getElementById('detailMeta').textContent = 'Deel ' + item.part + ' • aangemaakt op ' + formatDateTime(item.savedAt);
       document.getElementById('detailAssigned').textContent = 'Collega: ' + (item.assignedTo || 'niet ingevuld');
       document.getElementById('detailStatusWrap').innerHTML = 'Status: ' + getStatusBadgeHtml(item.status);
+      document.getElementById('detailUpdatedAt').textContent = 'Laatste wijziging: ' + formatDateTime(item.updatedAt || item.savedAt);
+      document.getElementById('detailUpdatedBy').textContent = 'Laatste wijziging door: ' + (item.updatedBy || 'niet ingevuld');
 
       phaseKeys.forEach(phase => {
         const phaseData = item.phases[phase];
@@ -1754,21 +1927,33 @@
       openLightbox(item.phases[phase].photos, index);
     }
 
+    function setSourceImageFromDataUrl(dataUrl) {
+      sourceImageDataUrl = dataUrl || '';
+      if (!dataUrl) {
+        sourceImage = null;
+        document.getElementById('mainPlanCanvas').style.display = 'none';
+        document.getElementById('mainPlanPlaceholder').style.display = 'block';
+        refreshAllViews();
+        return;
+      }
+
+      const img = new Image();
+      img.onload = function() {
+        sourceImage = img;
+        document.getElementById('mainPlanCanvas').style.display = 'block';
+        document.getElementById('mainPlanPlaceholder').style.display = 'none';
+        refreshAllViews();
+      };
+      img.src = dataUrl;
+    }
+
     document.getElementById('mainPlanUpload').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (!file || !file.type.startsWith('image/')) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        sourceImage = new Image();
-        sourceImage.onload = function() {
-          document.getElementById('mainPlanCanvas').style.display = 'block';
-          document.getElementById('mainPlanPlaceholder').style.display = 'none';
-
-          drawMainPlanCanvas();
-          for (let i = 1; i <= 5; i++) drawThumb(i);
-        };
-        sourceImage.src = e.target.result;
+        setSourceImageFromDataUrl(e.target.result);
       };
       reader.readAsDataURL(file);
     });
@@ -1788,23 +1973,34 @@
             document.getElementById('sidebarProjectName').textContent = imported.project;
           }
 
+          if (imported.mainPlanDataUrl) {
+            setSourceImageFromDataUrl(imported.mainPlanDataUrl);
+          } else {
+            setSourceImageFromDataUrl('');
+          }
+
           if (imported.parts) {
             for (let i = 1; i <= 5; i++) {
               partData[i].items = Array.isArray(imported.parts[i]?.items)
                 ? imported.parts[i].items.map(item => ({
                     ...item,
+                    part: item.part || i,
                     assignedTo: item.assignedTo || '',
+                    updatedBy: item.updatedBy || '',
                     status: item.status || 'open',
+                    savedAt: item.savedAt || new Date().toISOString(),
+                    updatedAt: item.updatedAt || item.savedAt || new Date().toISOString(),
                     phases: item.phases || createEmptyDraft().phases
                   }))
                 : [];
             }
           }
 
-          renderSavedItems();
-          drawMainPlanCanvas();
-          for (let i = 1; i <= 5; i++) drawThumb(i);
-          updateAllPartCounts();
+          refreshAllViews();
+          if (document.getElementById('partModal').classList.contains('open')) {
+            renderSavedItems();
+            drawZoomCanvas();
+          }
 
           alert('Project succesvol geïmporteerd.');
         } catch (error) {
@@ -1863,8 +2059,28 @@
       currentDraft.assignedTo = this.value;
     });
 
+    document.getElementById('pointUpdatedBy').addEventListener('input', function() {
+      currentDraft.updatedBy = this.value;
+    });
+
     document.getElementById('pointStatus').addEventListener('change', function() {
       currentDraft.status = this.value;
+    });
+
+    document.getElementById('pointSearchInput').addEventListener('input', function() {
+      currentSearchTerm = normalizeText(this.value);
+      refreshAllViews();
+      if (document.getElementById('partModal').classList.contains('open')) {
+        renderSavedItems();
+      }
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', function() {
+      currentSortOrder = this.value;
+      refreshAllViews();
+      if (document.getElementById('partModal').classList.contains('open')) {
+        renderSavedItems();
+      }
     });
 
     document.getElementById('mainPlanCanvas').addEventListener('click', function(event) {
@@ -1876,7 +2092,7 @@
         if (!item.globalMarker) return false;
         const dx = clickX - item.globalMarker.x;
         const dy = clickY - item.globalMarker.y;
-        return Math.sqrt(dx * dx + dy * dy) <= 12;
+        return Math.sqrt(dx * dx + dy * dy) <= 14;
       });
 
       if (clickedItem) {
@@ -1896,6 +2112,7 @@
       const payload = {
         project: document.getElementById('projectNameInput').value || document.getElementById('contentProjectTitle').textContent,
         exportedAt: new Date().toISOString(),
+        mainPlanDataUrl: sourceImageDataUrl || '',
         parts: partData
       };
 
@@ -1915,16 +2132,23 @@
       setTimeout(() => URL.revokeObjectURL(url), 100);
     }
 
-    window.addEventListener('resize', function() {
+    function refreshAllViews() {
+      updateSummaryCounts();
       drawMainPlanCanvas();
-      for (let i = 1; i <= 5; i++) drawThumb(i);
+      for (let i = 1; i <= 5; i++) {
+        drawThumb(i);
+      }
+      updateAllPartCounts();
+    }
+
+    window.addEventListener('resize', function() {
+      refreshAllViews();
       if (document.getElementById('partModal').classList.contains('open')) {
         drawZoomCanvas();
       }
     });
 
-    for (let i = 1; i <= 5; i++) drawThumb(i);
-    updateAllPartCounts();
+    refreshAllViews();
   </script>
 </body>
 </html>
