@@ -7,204 +7,567 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, sans-serif; background: #eef3f8; color: #1f2937; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Arial', sans-serif; background: #0f172a; color: #1f2937; min-height: 100vh; }
     .hidden { display: none !important; }
 
-    /* DASHBOARD */
-    .projects-page { min-height: 100vh; background: #f5f7fa; }
-    .projects-topbar { background: white; border-bottom: 1px solid #dce5ee; padding: 20px 28px; font-size: 28px; font-weight: bold; color: #16324c; }
-    .projects-wrap { padding: 24px 28px 40px; }
-    .projects-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .search-box input { width: 280px; padding: 12px 14px; border: 1px solid #d4dee8; border-radius: 10px; font-size: 15px; background: white; }
-    .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; }
-    .project-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 26px rgba(0,0,0,0.08); border: 1px solid #dfe8f0; cursor: pointer; transition: transform 0.18s, box-shadow 0.18s; }
-    .project-card:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(0,0,0,0.10); }
-    .project-image { width: 100%; height: 190px; object-fit: cover; display: block; background: #dce6ef; }
-    .project-info { padding: 18px; }
-    .project-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; color: #17324d; }
-    .project-subtitle { color: #6b7280; font-size: 15px; margin-bottom: 8px; }
-    .project-role { color: #7a8796; font-size: 14px; }
+    /* ===== DASHBOARD ===== */
+    .dashboard {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+    }
 
-    /* KNOPPEN */
-    .btn { border: none; border-radius: 10px; padding: 12px 18px; font-size: 15px; font-weight: bold; cursor: pointer; }
+    .dash-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 36px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+    }
+    .dash-logo {
+      font-size: 26px;
+      font-weight: 900;
+      color: white;
+      letter-spacing: 0.04em;
+    }
+    .dash-logo span { color: #38bdf8; }
+    .dash-topbar-right { display: flex; gap: 12px; align-items: center; }
+    .dash-search {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 10px 16px;
+      color: white;
+      font-size: 14px;
+      width: 220px;
+      outline: none;
+    }
+    .dash-search::placeholder { color: rgba(255,255,255,0.4); }
+    .dash-search:focus { border-color: #38bdf8; background: rgba(255,255,255,0.12); }
+
+    .dash-body { padding: 36px; }
+
+    .dash-hero {
+      text-align: center;
+      padding: 40px 20px 50px;
+    }
+    .dash-hero h1 {
+      font-size: 48px;
+      font-weight: 900;
+      color: white;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    .dash-hero h1 span { color: #38bdf8; }
+    .dash-hero p {
+      color: rgba(255,255,255,0.55);
+      font-size: 18px;
+      max-width: 520px;
+      margin: 0 auto 30px;
+      line-height: 1.6;
+    }
+
+    .dash-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .stat-pill {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 12px 22px;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stat-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #38bdf8;
+      display: inline-block;
+    }
+    .stat-dot.green { background: #22c55e; }
+    .stat-dot.orange { background: #f59e0b; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    /* Project kaart */
+    .project-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      position: relative;
+    }
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      border-color: rgba(56,189,248,0.4);
+    }
+    .project-card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      background: linear-gradient(135deg, #1e3a5f, #0f2744);
+    }
+    .project-card-img-placeholder {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #1e3a5f, #0f2744);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: rgba(255,255,255,0.15);
+    }
+    .project-card-body { padding: 18px 20px 20px; }
+    .project-card-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .project-card-sub {
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    .project-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .project-card-points {
+      background: rgba(56,189,248,0.15);
+      color: #38bdf8;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .project-card-role {
+      color: rgba(255,255,255,0.4);
+      font-size: 12px;
+    }
+
+    /* Drie-punten menu op kaart */
+    .card-menu-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(15,23,42,0.7);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+      transition: background 0.15s;
+    }
+    .card-menu-btn:hover { background: rgba(56,189,248,0.3); }
+
+    .card-dropdown {
+      position: absolute;
+      top: 52px;
+      right: 12px;
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 8px;
+      z-index: 100;
+      min-width: 180px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      display: none;
+    }
+    .card-dropdown.open { display: block; }
+    .card-dropdown-item {
+      padding: 10px 14px;
+      color: rgba(255,255,255,0.85);
+      font-size: 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.15s;
+    }
+    .card-dropdown-item:hover { background: rgba(255,255,255,0.08); }
+    .card-dropdown-item.danger { color: #f87171; }
+    .card-dropdown-item.danger:hover { background: rgba(248,113,113,0.1); }
+
+    /* Nieuw project knop */
+    .btn-new-project {
+      background: linear-gradient(135deg, #1f7ae0, #38bdf8);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 22px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 4px 18px rgba(31,122,224,0.4);
+    }
+    .btn-new-project:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ===== MODALS ===== */
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(8,15,30,0.85);
+      display: none; align-items: center; justify-content: center;
+      padding: 22px; z-index: 9000;
+      backdrop-filter: blur(4px);
+    }
+    .modal.open { display: flex; }
+    .modal-panel {
+      width: min(540px, 100%);
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 22px;
+      padding: 28px;
+      position: relative;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+    .modal-panel.wide { width: min(1480px, 100%); max-height: 94vh; overflow: auto; background: white; border: none; }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,0.08); border: none;
+      width: 38px; height: 38px; border-radius: 50%;
+      color: white; font-size: 20px; cursor: pointer;
+    }
+    .modal-close.dark { background: #f1f5f9; color: #17324d; }
+    .modal-title { font-size: 22px; font-weight: bold; color: white; margin-bottom: 6px; }
+    .modal-title.dark { color: #17324d; }
+    .modal-sub { color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 22px; line-height: 1.5; }
+    .modal-sub.dark { color: #64748b; }
+
+    .form-field { margin-bottom: 16px; }
+    .form-field label { display: block; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: bold; margin-bottom: 7px; }
+    .form-field label.dark { color: #374151; }
+    .form-field input[type="text"], .form-field select, .form-field textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 13px 15px;
+      color: white;
+      font-size: 15px;
+      font-family: Arial, sans-serif;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      border-color: #38bdf8;
+    }
+    .form-field input.light, .form-field select.light, .form-field textarea.light {
+      background: white; color: #1f2937; border: 1px solid #d5e0ea;
+    }
+    .form-field textarea { min-height: 90px; resize: vertical; }
+
+    /* Foto upload in modal */
+    .photo-upload-area {
+      border: 2px dashed rgba(255,255,255,0.2);
+      border-radius: 16px;
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 14px;
+    }
+    .photo-upload-area:hover {
+      border-color: #38bdf8;
+      background: rgba(56,189,248,0.05);
+    }
+    .photo-upload-area .upload-icon { font-size: 36px; margin-bottom: 10px; }
+    .photo-upload-area p { color: rgba(255,255,255,0.5); font-size: 13px; }
+    .photo-preview-wrap {
+      width: 100%; height: 180px;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      display: none;
+      position: relative;
+    }
+    .photo-preview-wrap img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .photo-preview-change {
+      position: absolute; bottom: 10px; right: 10px;
+      background: rgba(15,23,42,0.8); color: white;
+      border: none; border-radius: 10px; padding: 7px 12px;
+      font-size: 12px; font-weight: bold; cursor: pointer;
+    }
+
+    .modal-btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+    .btn {
+      border: none; border-radius: 12px; padding: 13px 20px;
+      font-size: 14px; font-weight: bold; cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-blue { background: linear-gradient(135deg, #1f7ae0, #38bdf8); color: white; }
+    .btn-dark { background: #334155; color: white; }
+    .btn-red { background: #dc2626; color: white; }
+    .btn-light { background: white; border: 1px solid #d4dee8; color: #17324d; }
     .btn-primary { background: #1f7ae0; color: white; }
     .btn-secondary { background: #17324d; color: white; }
-    .btn-light { background: white; border: 1px solid #d4dee8; color: #17324d; }
-    .btn-danger { background: #dc2626; color: white; }
-    .mini-btn { border: 1px solid #d4dee8; background: white; color: #17324d; border-radius: 10px; padding: 8px 12px; cursor: pointer; font-size: 13px; font-weight: bold; }
 
-    /* PROJECT APP */
+    /* ===== PROJECT APP ===== */
     .project-app { display: flex; min-height: 100vh; }
-    .sidebar { width: 320px; background: #213d57; color: #fff; padding: 18px 18px 24px; }
-    .logo { font-size: 30px; font-weight: bold; margin-bottom: 24px; }
-    .sidebar-label { font-size: 13px; color: #d3dde8; margin-bottom: 6px; }
-    .sidebar-project { font-size: 17px; font-weight: bold; line-height: 1.4; margin-bottom: 20px; }
-    .menu-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin: 18px 0 8px; color: #d8e1ea; }
-    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 10px; border-radius: 10px; margin-bottom: 4px; cursor: pointer; font-size: 17px; transition: background 0.18s; }
-    .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.10); }
-    .menu-count { color: #b8c7d5; font-size: 14px; }
+    .sidebar { width: 300px; background: #0f172a; color: #fff; padding: 20px 16px 28px; border-right: 1px solid rgba(255,255,255,0.07); }
+    .sidebar-logo { font-size: 22px; font-weight: 900; color: white; margin-bottom: 6px; }
+    .sidebar-logo span { color: #38bdf8; }
+    .sidebar-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; margin-top: 20px; }
+    .sidebar-project-name { font-size: 16px; font-weight: bold; color: white; line-height: 1.4; margin-bottom: 8px; }
+    .menu-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.35); margin: 20px 0 8px; }
+    .menu-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 12px; border-radius: 10px; margin-bottom: 3px;
+      cursor: pointer; font-size: 15px; color: rgba(255,255,255,0.75);
+      transition: background 0.15s, color 0.15s;
+    }
+    .menu-item:hover, .menu-item.active { background: rgba(56,189,248,0.12); color: white; }
+    .menu-count { color: rgba(255,255,255,0.35); font-size: 13px; }
 
-    .project-main { flex: 1; padding: 24px; background: #eef3f8; }
+    .project-main { flex: 1; padding: 24px; background: #eef3f8; overflow: auto; }
     .project-main-top { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
-    .content-card { background: white; border-radius: 18px; padding: 22px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
-    .content-card h2 { margin-top: 0; margin-bottom: 10px; font-size: 28px; color: #17324d; }
-    .content-card p { color: #5f6b78; line-height: 1.6; margin-bottom: 18px; }
+    .content-card { background: white; border-radius: 18px; padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
+    .content-card h2 { margin-top: 0; margin-bottom: 10px; font-size: 26px; color: #17324d; }
+    .content-card p { color: #5f6b78; line-height: 1.6; margin-bottom: 18px; font-size: 15px; }
 
     .field { margin-bottom: 16px; }
-    .field label { display: block; font-weight: bold; margin-bottom: 8px; }
-    .field input[type="text"], .field input[type="number"], .field select, .field textarea { width: 100%; border: 1px solid #d5e0ea; border-radius: 12px; padding: 14px 16px; font-size: 16px; font-family: Arial, sans-serif; background: white; }
+    .field label { display: block; font-weight: bold; margin-bottom: 8px; color: #374151; }
+    .field input[type="text"], .field select, .field textarea {
+      width: 100%; border: 1px solid #d5e0ea; border-radius: 12px;
+      padding: 13px 15px; font-size: 15px; font-family: Arial, sans-serif; background: white; outline: none;
+    }
     .field textarea { min-height: 110px; resize: vertical; }
 
-    .upload-btn { display: inline-block; background: #1f7ae0; color: white; padding: 12px 18px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    .photo-btn { display: inline-block; background: #18344f; color: white; padding: 10px 14px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+    .upload-btn { display: inline-block; background: #1f7ae0; color: white; padding: 12px 18px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px; }
+    .photo-btn { display: inline-block; background: #18344f; color: white; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
     .file-input { display: none; }
 
-    .plan-preview { margin-top: 18px; border: 1px solid #d8e2eb; border-radius: 16px; overflow: hidden; background: #f8fafc; }
-    .plan-preview-canvas { width: 100%; max-height: 360px; height: 360px; display: none; background: white; }
-    .placeholder { padding: 40px 20px; text-align: center; color: #6b7280; }
+    .plan-preview { margin-top: 16px; border: 1px solid #d8e2eb; border-radius: 16px; overflow: hidden; background: #f8fafc; }
+    .plan-preview-canvas { width: 100%; max-height: 340px; height: 340px; display: none; background: white; }
+    .placeholder { padding: 36px 20px; text-align: center; color: #6b7280; font-size: 14px; }
 
-    /* DEEL KAARTEN */
     .split-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 24px; }
     .split-card { background: #fff; border: 1px solid #dbe6ef; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.18s, box-shadow 0.18s; }
     .split-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); }
-    .split-head { padding: 14px 16px; background: #f7fafc; border-bottom: 1px solid #e5edf4; font-weight: bold; color: #17324d; display: flex; justify-content: space-between; align-items: center; }
-    canvas.split-thumb { width: 100%; height: 220px; display: block; background: #f8fafc; }
-    .badge-count { background: #eaf2fb; color: #1f7ae0; border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: bold; }
+    .split-head { padding: 12px 14px; background: #f7fafc; border-bottom: 1px solid #e5edf4; font-weight: bold; color: #17324d; display: flex; justify-content: space-between; align-items: center; }
+    canvas.split-thumb { width: 100%; height: 200px; display: block; background: #f8fafc; }
+    .badge-count { background: #eaf2fb; color: #1f7ae0; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: bold; }
 
-    /* MODAL */
-    .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.82); display: none; align-items: center; justify-content: center; padding: 22px; z-index: 9999; }
-    .modal.open { display: flex; }
-    .modal-panel { width: min(1480px, 100%); max-height: 94vh; overflow: auto; background: white; border-radius: 20px; box-shadow: 0 24px 50px rgba(0,0,0,0.25); padding: 22px; position: relative; }
-    .modal-close { position: absolute; top: 14px; right: 14px; border: none; background: #f1f5f9; width: 42px; height: 42px; border-radius: 50%; font-size: 22px; cursor: pointer; }
-    .modal-title { font-size: 28px; font-weight: bold; color: #17324d; margin-bottom: 6px; }
-    .modal-subtitle { color: #64748b; margin-bottom: 18px; line-height: 1.5; }
+    /* Deel modal */
+    .zoom-toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+    .zoom-pill { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: bold; }
+    .toggle-chip { display: inline-flex; align-items: center; gap: 7px; background: white; border: 1px solid #dbe6ef; border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: bold; color: #17324d; cursor: pointer; }
+    .zoom-wrap { border: 1px solid #dbe6ef; border-radius: 16px; overflow: hidden; background: #f8fafc; margin-bottom: 18px; touch-action: none; }
+    canvas.zoom-canvas { width: 100%; height: 440px; display: block; cursor: crosshair; background: #fff; touch-action: none; }
 
-    /* ZOOM CANVAS */
-    .zoom-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
-    .zoom-pill { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 999px; padding: 8px 12px; font-size: 13px; font-weight: bold; }
-    .toggle-chip { display: inline-flex; align-items: center; gap: 8px; background: white; border: 1px solid #dbe6ef; border-radius: 999px; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #17324d; cursor: pointer; }
-    .zoom-wrap { border: 1px solid #dbe6ef; border-radius: 16px; overflow: hidden; background: #f8fafc; margin-bottom: 18px; position: relative; touch-action: none; }
-    canvas.zoom-canvas { width: 100%; height: 460px; display: block; cursor: crosshair; background: #fff; touch-action: none; }
-
-    /* PUNT FORM */
     .point-form { border: 1px solid #dbe6ef; border-radius: 16px; padding: 18px; background: #f8fafc; margin-bottom: 18px; }
     .point-box { background: white; border: 1px solid #dbe6ef; border-radius: 12px; padding: 12px; margin-bottom: 14px; font-size: 14px; color: #475569; line-height: 1.5; }
 
-    /* TABS */
-    .tabs-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-    .tab-btn { padding: 12px 16px; border-radius: 10px; border: 1px solid #d5e0ea; background: white; color: #17324d; font-weight: bold; cursor: pointer; }
+    .tabs-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .tab-btn { padding: 10px 16px; border-radius: 10px; border: 1px solid #d5e0ea; background: white; color: #17324d; font-weight: bold; cursor: pointer; font-size: 13px; }
     .tab-btn.active { background: #1f7ae0; color: white; border-color: #1f7ae0; }
     .phase-panel { display: none; border: 1px solid #dbe6ef; border-radius: 14px; padding: 16px; background: white; margin-top: 6px; }
     .phase-panel.active { display: block; }
-    .phase-date { display: inline-block; background: #f8fafc; border: 1px solid #dbe6ef; color: #475569; border-radius: 999px; padding: 8px 12px; font-size: 13px; margin-bottom: 14px; }
+    .phase-date { display: inline-block; background: #f8fafc; border: 1px solid #dbe6ef; color: #475569; border-radius: 999px; padding: 7px 12px; font-size: 12px; margin-bottom: 12px; }
 
-    /* GALERIJ */
-    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-top: 10px; }
-    .gallery-item { border: 1px solid #dbe6ef; border-radius: 12px; overflow: hidden; background: white; min-height: 170px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
-    .gallery-item img { width: 100%; height: 170px; object-fit: cover; display: block; }
-    .gallery-remove { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(15,23,42,0.85); color: white; font-weight: bold; cursor: pointer; z-index: 2; }
-    .empty-gallery { width: 100%; min-height: 150px; border: 1px dashed #c8d5e3; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: white; color: #6b7280; font-size: 14px; text-align: center; padding: 18px; margin-top: 10px; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+    .gallery-item { border: 1px solid #dbe6ef; border-radius: 10px; overflow: hidden; background: white; min-height: 150px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
+    .gallery-item img { width: 100%; height: 150px; object-fit: cover; display: block; }
+    .gallery-remove { position: absolute; top: 7px; right: 7px; width: 26px; height: 26px; border-radius: 50%; border: none; background: rgba(15,23,42,0.85); color: white; font-weight: bold; cursor: pointer; z-index: 2; font-size: 13px; }
+    .empty-gallery { width: 100%; min-height: 120px; border: 1px dashed #c8d5e3; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: white; color: #6b7280; font-size: 13px; text-align: center; padding: 16px; margin-top: 10px; }
 
-    /* OPGESLAGEN PUNTEN */
-    .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
-    .save-message { margin-top: 14px; padding: 12px 14px; background: #e8f7ec; border: 1px solid #bfe3c8; color: #22663a; border-radius: 10px; font-size: 14px; font-weight: bold; }
+    .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .save-message { margin-top: 12px; padding: 12px 14px; background: #e8f7ec; border: 1px solid #bfe3c8; color: #22663a; border-radius: 10px; font-size: 14px; font-weight: bold; }
+
     .saved-list { border: 1px solid #dbe6ef; border-radius: 16px; background: #fff; overflow: hidden; }
     .saved-list-head { padding: 14px 16px; background: #f7fafc; border-bottom: 1px solid #e5edf4; font-weight: bold; color: #17324d; }
     .saved-list-body { padding: 14px; }
     .saved-empty { color: #6b7280; font-size: 14px; padding: 12px; border: 1px dashed #d5e0ea; border-radius: 12px; background: #fbfdff; }
-    .saved-item { border: 1px solid #dbe6ef; border-radius: 14px; padding: 14px; background: #fbfdff; margin-bottom: 12px; }
+    .saved-item { border: 1px solid #dbe6ef; border-radius: 14px; padding: 14px; background: #fbfdff; margin-bottom: 10px; cursor: pointer; }
     .saved-item:last-child { margin-bottom: 0; }
-    .saved-item-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+    .saved-item:hover { border-color: #1f7ae0; }
+    .saved-item-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
     .saved-item-title { font-weight: bold; color: #17324d; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .saved-item-meta { color: #64748b; font-size: 13px; margin-top: 4px; line-height: 1.5; }
-    .saved-item-text { color: #475569; line-height: 1.5; margin-top: 8px; white-space: pre-wrap; }
-    .saved-item-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-    .saved-photo-count { color: #1f7ae0; font-size: 13px; font-weight: bold; }
-    .status-badge { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: bold; }
+    .saved-item-meta { color: #64748b; font-size: 12px; margin-top: 4px; }
+    .saved-item-text { color: #475569; font-size: 13px; margin-top: 6px; white-space: pre-wrap; }
+    .saved-photo-count { color: #1f7ae0; font-size: 12px; font-weight: bold; }
+    .status-badge { display: inline-block; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: bold; }
     .status-open { background: #fef3c7; color: #92400e; border: 1px solid #f5d48a; }
     .status-done { background: #dcfce7; color: #166534; border: 1px solid #b7e4c2; }
 
-    /* AUTOSAVE */
-    .autosave-indicator { display: inline-flex; align-items: center; gap: 8px; background: #ecfeff; color: #0f766e; border: 1px solid #99f6e4; border-radius: 999px; padding: 8px 12px; font-size: 13px; font-weight: bold; }
+    .autosave-indicator { display: inline-flex; align-items: center; gap: 7px; background: #ecfeff; color: #0f766e; border: 1px solid #99f6e4; border-radius: 999px; padding: 8px 12px; font-size: 12px; font-weight: bold; }
 
-    /* LIGHTBOX */
-    .lightbox { position: fixed; inset: 0; background: rgba(15,23,42,0.92); display: none; align-items: center; justify-content: center; z-index: 12000; padding: 24px; }
+    .mini-btn { border: 1px solid #d4dee8; background: white; color: #17324d; border-radius: 10px; padding: 7px 11px; cursor: pointer; font-size: 12px; font-weight: bold; }
+
+    .comment-list { margin-top: 10px; display: grid; gap: 8px; }
+    .comment-item { border: 1px solid #dbe6ef; background: #fff; border-radius: 10px; padding: 10px 12px; color: #475569; font-size: 13px; line-height: 1.5; }
+
+    /* Lightbox */
+    .lightbox { position: fixed; inset: 0; background: rgba(8,15,30,0.94); display: none; align-items: center; justify-content: center; z-index: 12000; padding: 22px; }
     .lightbox.open { display: flex; }
-    .lightbox-inner { width: min(1200px, 100%); position: relative; display: flex; align-items: center; justify-content: center; }
-    .lightbox-image { max-width: 100%; max-height: 84vh; border-radius: 14px; background: white; object-fit: contain; }
-    .lightbox-close, .lightbox-arrow { position: absolute; border: none; border-radius: 50%; width: 48px; height: 48px; background: rgba(255,255,255,0.92); color: #17324d; font-size: 26px; font-weight: bold; cursor: pointer; }
+    .lightbox-inner { width: min(1100px, 100%); position: relative; display: flex; align-items: center; justify-content: center; }
+    .lightbox-image { max-width: 100%; max-height: 84vh; border-radius: 14px; object-fit: contain; }
+    .lightbox-close, .lightbox-arrow { position: absolute; border: none; border-radius: 50%; width: 46px; height: 46px; background: rgba(255,255,255,0.9); color: #17324d; font-size: 24px; font-weight: bold; cursor: pointer; }
     .lightbox-close { top: -10px; right: -10px; }
-    .lightbox-arrow.left { left: 10px; top: 50%; transform: translateY(-50%); }
-    .lightbox-arrow.right { right: 10px; top: 50%; transform: translateY(-50%); }
-    .lightbox-counter { position: absolute; left: 50%; bottom: -36px; transform: translateX(-50%); color: white; font-size: 14px; background: rgba(0,0,0,0.35); padding: 8px 12px; border-radius: 999px; }
+    .lightbox-arrow.left { left: 8px; top: 50%; transform: translateY(-50%); }
+    .lightbox-arrow.right { right: 8px; top: 50%; transform: translateY(-50%); }
+    .lightbox-counter { position: absolute; left: 50%; bottom: -34px; transform: translateX(-50%); color: white; font-size: 13px; background: rgba(0,0,0,0.4); padding: 7px 12px; border-radius: 999px; }
 
-    /* HELP */
-    .help-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-top: 12px; }
-    .help-item { border: 1px solid #dbe6ef; background: #f8fafc; border-radius: 12px; padding: 12px; font-size: 14px; color: #334155; }
-    .help-item strong { display: inline-block; min-width: 92px; color: #0f172a; }
-
-    /* COMMENT */
-    .comment-list { margin-top: 12px; display: grid; gap: 10px; }
-    .comment-item { border: 1px solid #dbe6ef; background: #fff; border-radius: 10px; padding: 10px 12px; color: #475569; font-size: 14px; line-height: 1.5; }
+    /* Help modal */
+    .help-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
+    .help-item { border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px; font-size: 13px; color: rgba(255,255,255,0.75); }
+    .help-item strong { display: inline-block; min-width: 80px; color: white; }
 
     @media (max-width: 1400px) { .split-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 1100px) { .split-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 820px) {
       .project-app { flex-direction: column; }
       .sidebar { width: 100%; }
-      .project-main { padding: 16px; }
-      .projects-topbar { padding: 18px 16px; font-size: 24px; }
-      .projects-wrap { padding: 16px; }
+      .project-main { padding: 14px; }
       .split-grid { grid-template-columns: 1fr; }
-      canvas.split-thumb { height: 240px; }
-      canvas.zoom-canvas { height: 340px; }
-      .plan-preview-canvas { height: 250px; }
+      canvas.split-thumb { height: 220px; }
+      canvas.zoom-canvas { height: 320px; }
+      .dash-hero h1 { font-size: 32px; }
+      .dash-body { padding: 20px; }
     }
   </style>
 </head>
 <body>
 
-<!-- DASHBOARD -->
-<div id="projectsPage" class="projects-page">
-  <div class="projects-topbar">Dashboard</div>
-  <div class="projects-wrap">
-    <div class="projects-toolbar">
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Zoeken" oninput="filterProjects()">
-      </div>
-      <button class="btn btn-primary" type="button" onclick="openNewProjectForm()">Nieuw project</button>
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboardPage" class="dashboard">
+  <div class="dash-topbar">
+    <div class="dash-logo">ed <span>controls</span></div>
+    <div class="dash-topbar-right">
+      <input type="text" class="dash-search" id="searchInput" placeholder="🔍  Zoek project..." oninput="filterProjects()">
+      <button class="btn-new-project" onclick="openNewProjectModal()">
+        <span style="font-size:18px;">+</span> Nieuw project
+      </button>
+    </div>
+  </div>
+
+  <div class="dash-body">
+    <div class="dash-hero">
+      <h1>Bouw <span>projecten</span><br>overzicht</h1>
+      <p>Beheer al je bouwprojecten, herstelwerkzaamheden en inspecties op één plek.</p>
+      <div class="dash-stats" id="dashStats"></div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Mijn projecten</div>
     </div>
     <div class="project-grid" id="projectGrid"></div>
   </div>
 </div>
 
-<!-- PROJECT PAGINA -->
+<!-- ===== NIEUW / BEWERK PROJECT MODAL ===== -->
+<div class="modal" id="projectFormModal">
+  <div class="modal-panel">
+    <button class="modal-close" onclick="closeProjectFormModal()">×</button>
+    <div class="modal-title" id="projectFormTitle">Nieuw project</div>
+    <div class="modal-sub" id="projectFormSub">Vul de projectgegevens in en upload een foto.</div>
+
+    <div class="photo-upload-area" id="photoUploadArea" onclick="document.getElementById('projectPhotoInput').click()">
+      <div class="upload-icon">📷</div>
+      <p>Klik om een projectfoto te uploaden</p>
+      <p style="font-size:11px; margin-top:4px;">JPG, PNG — maximaal 10 MB</p>
+    </div>
+    <input type="file" id="projectPhotoInput" class="file-input" accept="image/*">
+    <div class="photo-preview-wrap" id="photoPreviewWrap">
+      <img id="photoPreviewImg" src="" alt="">
+      <button class="photo-preview-change" onclick="document.getElementById('projectPhotoInput').click()">Foto wijzigen</button>
+    </div>
+
+    <div class="form-field">
+      <label>Projectnaam *</label>
+      <input type="text" id="newProjectName" placeholder="Bijv. Restauratie Brugdeel West" class="">
+    </div>
+    <div class="form-field">
+      <label>Locatie</label>
+      <input type="text" id="newProjectLocation" placeholder="Bijv. Utrecht centrum">
+    </div>
+    <div class="form-field">
+      <label>Rol / team</label>
+      <input type="text" id="newProjectRole" placeholder="Bijv. Uitvoerder of Team restauratie">
+    </div>
+
+    <div class="modal-btn-row">
+      <button class="btn btn-blue" onclick="saveProjectForm()">Project opslaan</button>
+      <button class="btn btn-dark" onclick="closeProjectFormModal()">Annuleren</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROJECT APP ===== -->
 <div id="projectPage" class="project-app hidden">
   <aside class="sidebar">
-    <div class="logo">ed controls</div>
+    <div class="sidebar-logo">ed <span>controls</span></div>
     <div class="sidebar-label">Project</div>
-    <div class="sidebar-project" id="sidebarProjectName"></div>
-    <div class="menu-title">Delen</div>
+    <div class="sidebar-project-name" id="sidebarProjectName"></div>
+    <div class="menu-section-title">Delen</div>
     <div id="sidebarMenu"></div>
   </aside>
 
   <main class="project-main">
     <div class="project-main-top">
-      <button class="btn btn-light" type="button" onclick="goBackToProjects()">← Terug</button>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <span class="autosave-indicator">Autosave actief</span>
-        <button class="btn btn-light" type="button" onclick="openHelpModal()">Sneltoetsen</button>
-        <label class="btn btn-light" for="importProjectInput">Project importeren</label>
-        <input class="file-input" type="file" id="importProjectInput" accept=".json,application/json">
-        <button class="btn btn-light" type="button" onclick="exportPdfReport()">PDF rapport</button>
-        <button class="btn btn-primary" type="button" onclick="exportProjectData()">Project exporteren</button>
+      <button class="btn btn-light" onclick="goBackToProjects()">← Terug</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <span class="autosave-indicator">✓ Autosave actief</span>
+        <button class="btn btn-light" onclick="openHelpModal()">Sneltoetsen</button>
+        <label class="btn btn-light" for="importProjectInput" style="cursor:pointer;">Importeren</label>
+        <input class="file-input" type="file" id="importProjectInput" accept=".json">
+        <button class="btn btn-light" onclick="exportPdfReport()">PDF rapport</button>
+        <button class="btn btn-primary" onclick="exportProjectData()">Exporteren</button>
       </div>
     </div>
 
     <div class="content-card">
       <h2 id="contentProjectTitle"></h2>
-      <p>Upload de hoofdplattegrond. Klik daarna op een deel om punten te beheren.</p>
+      <p>Upload de hoofdplattegrond. De tekening wordt automatisch in 5 gelijke delen gesplitst.</p>
 
       <div class="field">
         <label>Hoofdplattegrond</label>
@@ -222,20 +585,20 @@
   </main>
 </div>
 
-<!-- DEEL MODAL -->
+<!-- ===== DEEL MODAL ===== -->
 <div class="modal" id="partModal">
-  <div class="modal-panel">
-    <button class="modal-close" type="button" onclick="closePartModal()">×</button>
-    <div class="modal-title" id="modalTitle">Deel 1</div>
-    <div class="modal-subtitle">Klik op de tekening om een punt te plaatsen of te selecteren.</div>
+  <div class="modal-panel wide">
+    <button class="modal-close dark" onclick="closePartModal()">×</button>
+    <div class="modal-title dark" id="modalTitle">Deel 1</div>
+    <div class="modal-sub dark">Klik op de tekening om een punt te plaatsen of te selecteren.</div>
 
     <div class="zoom-toolbar">
-      <button class="mini-btn" type="button" onclick="zoomBy(1.15)">+</button>
-      <button class="mini-btn" type="button" onclick="zoomBy(1/1.15)">−</button>
-      <button class="mini-btn" type="button" onclick="resetView()">Reset</button>
-      <button class="mini-btn" type="button" onclick="fitView()">Passend</button>
-      <button class="mini-btn" type="button" onclick="undoHistory()">Undo</button>
-      <button class="mini-btn" type="button" onclick="redoHistory()">Redo</button>
+      <button class="mini-btn" onclick="zoomBy(1.15)">+</button>
+      <button class="mini-btn" onclick="zoomBy(1/1.15)">−</button>
+      <button class="mini-btn" onclick="resetView()">Reset</button>
+      <button class="mini-btn" onclick="fitView()">Passend</button>
+      <button class="mini-btn" onclick="undoHistory()">Undo</button>
+      <button class="mini-btn" onclick="redoHistory()">Redo</button>
       <span class="zoom-pill" id="zoomPercentLabel">Zoom 100%</span>
       <label class="toggle-chip"><input type="checkbox" id="gridToggle"> Raster</label>
       <label class="toggle-chip"><input type="checkbox" id="snapToggle"> Snap</label>
@@ -249,130 +612,100 @@
 
     <div class="point-form">
       <div class="point-box" id="modalPointInfo">Nog geen punt geselecteerd</div>
-
-      <div class="field">
-        <label>Naam punt</label>
-        <input type="text" id="pointName" placeholder="Bijv. Inlaat Noord 01">
-      </div>
-      <div class="field">
-        <label>Collega</label>
-        <input type="text" id="pointAssignedTo" placeholder="Bijv. Henry">
-      </div>
-      <div class="field">
-        <label>Laatste wijziging door</label>
-        <input type="text" id="pointUpdatedBy" placeholder="Bijv. Diederik">
-      </div>
-      <div class="field">
-        <label>Status</label>
-        <select id="pointStatus">
+      <div class="field"><label>Naam punt</label><input type="text" id="pointName" placeholder="Bijv. Inlaat Noord 01" class="light"></div>
+      <div class="field"><label>Collega</label><input type="text" id="pointAssignedTo" placeholder="Bijv. Henry" class="light"></div>
+      <div class="field"><label>Laatste wijziging door</label><input type="text" id="pointUpdatedBy" placeholder="Bijv. Diederik" class="light"></div>
+      <div class="field"><label>Status</label>
+        <select id="pointStatus" class="light">
           <option value="open">Open</option>
           <option value="done">Klaar</option>
         </select>
       </div>
-      <div class="field">
-        <label>Interne notitie</label>
-        <textarea id="pointInternalNote" placeholder="Interne notitie voor dit punt"></textarea>
-      </div>
+      <div class="field"><label>Interne notitie</label><textarea id="pointInternalNote" placeholder="Interne notitie" class="light"></textarea></div>
       <div class="field">
         <label>Opmerking toevoegen</label>
-        <textarea id="pointCommentInput" placeholder="Voeg hier een opmerking toe"></textarea>
-        <div style="margin-top:10px;">
-          <button class="mini-btn" type="button" onclick="addDraftComment()">Toevoegen</button>
-        </div>
+        <textarea id="pointCommentInput" placeholder="Voeg een opmerking toe" class="light"></textarea>
+        <div style="margin-top:10px;"><button class="mini-btn" onclick="addDraftComment()">Toevoegen</button></div>
         <div class="comment-list" id="draftCommentsList"></div>
       </div>
 
       <div class="tabs-row">
-        <button class="tab-btn active" type="button" onclick="switchPhaseTab('start')">Start</button>
-        <button class="tab-btn" type="button" onclick="switchPhaseTab('middle')">Midden</button>
-        <button class="tab-btn" type="button" onclick="switchPhaseTab('end')">Eind</button>
+        <button class="tab-btn active" onclick="switchPhaseTab('start')">Start</button>
+        <button class="tab-btn" onclick="switchPhaseTab('middle')">Midden</button>
+        <button class="tab-btn" onclick="switchPhaseTab('end')">Eind</button>
       </div>
 
       <div class="phase-panel active" id="phasePanel-start">
         <div class="phase-date" id="phaseDate-start">Datum: nog niet ingevuld</div>
-        <div class="field">
-          <label>Foto's Start</label>
+        <div class="field"><label>Foto's Start</label>
           <label class="photo-btn" for="phaseUpload-start">Foto's uploaden</label>
           <input class="file-input" type="file" id="phaseUpload-start" accept="image/*" multiple>
           <div class="empty-gallery" id="empty-start">Nog geen foto's</div>
           <div class="gallery-grid hidden" id="gallery-start"></div>
         </div>
-        <div class="field">
-          <label>Opmerking Start</label>
-          <textarea id="phaseRemark-start" placeholder="Opmerking startfase"></textarea>
-        </div>
+        <div class="field"><label>Opmerking Start</label><textarea id="phaseRemark-start" placeholder="Opmerking startfase"></textarea></div>
       </div>
 
       <div class="phase-panel" id="phasePanel-middle">
         <div class="phase-date" id="phaseDate-middle">Datum: nog niet ingevuld</div>
-        <div class="field">
-          <label>Foto's Midden</label>
+        <div class="field"><label>Foto's Midden</label>
           <label class="photo-btn" for="phaseUpload-middle">Foto's uploaden</label>
           <input class="file-input" type="file" id="phaseUpload-middle" accept="image/*" multiple>
           <div class="empty-gallery" id="empty-middle">Nog geen foto's</div>
           <div class="gallery-grid hidden" id="gallery-middle"></div>
         </div>
-        <div class="field">
-          <label>Opmerking Midden</label>
-          <textarea id="phaseRemark-middle" placeholder="Opmerking middenfase"></textarea>
-        </div>
+        <div class="field"><label>Opmerking Midden</label><textarea id="phaseRemark-middle" placeholder="Opmerking middenfase"></textarea></div>
       </div>
 
       <div class="phase-panel" id="phasePanel-end">
         <div class="phase-date" id="phaseDate-end">Datum: nog niet ingevuld</div>
-        <div class="field">
-          <label>Foto's Eind</label>
+        <div class="field"><label>Foto's Eind</label>
           <label class="photo-btn" for="phaseUpload-end">Foto's uploaden</label>
           <input class="file-input" type="file" id="phaseUpload-end" accept="image/*" multiple>
           <div class="empty-gallery" id="empty-end">Nog geen foto's</div>
           <div class="gallery-grid hidden" id="gallery-end"></div>
         </div>
-        <div class="field">
-          <label>Opmerking Eind</label>
-          <textarea id="phaseRemark-end" placeholder="Opmerking eindfase"></textarea>
-        </div>
+        <div class="field"><label>Opmerking Eind</label><textarea id="phaseRemark-end" placeholder="Opmerking eindfase"></textarea></div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn btn-light" type="button" onclick="resetDraft()">Nieuw punt</button>
-        <button class="btn btn-primary" type="button" onclick="saveDraftToProject()">Opslaan</button>
-        <button class="btn btn-danger" type="button" onclick="deleteSelectedPoint()">Verwijderen</button>
-        <button class="btn btn-secondary" type="button" onclick="closePartModal()">Sluiten</button>
+        <button class="btn btn-light" onclick="resetDraft()">Nieuw punt</button>
+        <button class="btn btn-primary" onclick="saveDraftToProject()">Opslaan</button>
+        <button class="btn btn-red" onclick="deleteSelectedPoint()">Verwijderen</button>
+        <button class="btn btn-secondary" onclick="closePartModal()">Sluiten</button>
       </div>
       <div id="saveMessage" class="save-message hidden">Opgeslagen ✓</div>
     </div>
 
     <div class="saved-list">
       <div class="saved-list-head" id="savedListHead">Opgeslagen punten</div>
-      <div class="saved-list-body" id="savedItemsContainer">
-        <div class="saved-empty">Nog geen opgeslagen punten.</div>
-      </div>
+      <div class="saved-list-body" id="savedItemsContainer"><div class="saved-empty">Nog geen punten.</div></div>
     </div>
   </div>
 </div>
 
-<!-- HELP MODAL -->
+<!-- ===== HELP MODAL ===== -->
 <div class="modal" id="helpModal">
-  <div class="modal-panel" style="max-width:700px;">
-    <button class="modal-close" type="button" onclick="document.getElementById('helpModal').classList.remove('open')">×</button>
+  <div class="modal-panel" style="max-width:660px;">
+    <button class="modal-close" onclick="document.getElementById('helpModal').classList.remove('open')">×</button>
     <div class="modal-title">Sneltoetsen</div>
-    <div class="help-list">
-      <div class="help-item"><strong>Klik</strong> Punt plaatsen / selecteren</div>
-      <div class="help-item"><strong>Scroll</strong> Inzoomen / uitzoomen</div>
+    <div class="help-grid">
+      <div class="help-item"><strong>Klik</strong> Punt plaatsen/selecteren</div>
+      <div class="help-item"><strong>Scroll</strong> Inzoomen/uitzoomen</div>
       <div class="help-item"><strong>Sleep</strong> Canvas bewegen</div>
-      <div class="help-item"><strong>Delete</strong> Geselecteerd punt verwijderen</div>
+      <div class="help-item"><strong>Delete</strong> Punt verwijderen</div>
       <div class="help-item"><strong>Ctrl+Z</strong> Undo</div>
       <div class="help-item"><strong>Ctrl+Y</strong> Redo</div>
       <div class="help-item"><strong>Pijltjes</strong> Punt verplaatsen</div>
       <div class="help-item"><strong>Escape</strong> Selectie opheffen</div>
     </div>
     <div style="margin-top:18px;">
-      <button class="btn btn-light" onclick="document.getElementById('helpModal').classList.remove('open')">Sluiten</button>
+      <button class="btn btn-dark" onclick="document.getElementById('helpModal').classList.remove('open')">Sluiten</button>
     </div>
   </div>
 </div>
 
-<!-- LIGHTBOX -->
+<!-- ===== LIGHTBOX ===== -->
 <div class="lightbox" id="lightbox">
   <div class="lightbox-inner">
     <img class="lightbox-image" id="lightboxImage" src="" alt="">
@@ -384,7 +717,7 @@
 </div>
 
 <script>
-// ===================== STATE =====================
+const TOTAL_PARTS = 5;
 let projects = JSON.parse(localStorage.getItem('bouwProjects') || '[]');
 let currentProjectIndex = -1;
 let currentPartIndex = 0;
@@ -392,123 +725,286 @@ let selectedPointId = null;
 let draftComments = [];
 let draftPhasePhotos = { start: [], middle: [], end: [] };
 let undoStack = [], redoStack = [];
+let editingProjectIndex = -1;
+let newProjectPhoto = null;
 
-// Canvas
 let canvasImg = null;
 let zoom = 1, panX = 0, panY = 0;
 let isPanning = false, panStartX = 0, panStartY = 0;
-let lastPanX = 0, lastPanY = 0;
+let clickStartX = 0, clickStartY = 0, didPan = false;
+let lightboxPhotos = [], lightboxIndex = 0;
 
-// Lightbox
-let lightboxPhotos = [];
-let lightboxIndex = 0;
-
-// ===================== INIT =====================
+// ===== INIT =====
 function init() {
   renderDashboard();
   document.getElementById('mainPlanUpload').addEventListener('change', handleMainPlanUpload);
   document.getElementById('importProjectInput').addEventListener('change', handleImportProject);
-  ['start','middle','end'].forEach(phase => {
-    document.getElementById('phaseUpload-' + phase).addEventListener('change', e => handlePhaseUpload(e, phase));
-  });
+  document.getElementById('projectPhotoInput').addEventListener('change', handleProjectPhotoSelect);
+  ['start','middle','end'].forEach(ph =>
+    document.getElementById('phaseUpload-' + ph).addEventListener('change', e => handlePhaseUpload(e, ph))
+  );
   document.getElementById('gridToggle').addEventListener('change', drawCanvas);
-  document.getElementById('snapToggle').addEventListener('change', drawCanvas);
   document.getElementById('showMarkersToggle').addEventListener('change', drawCanvas);
+
+  // Sluit dropdown bij klik buiten
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.card-menu-btn') && !e.target.closest('.card-dropdown')) {
+      document.querySelectorAll('.card-dropdown.open').forEach(d => d.classList.remove('open'));
+    }
+  });
 }
 
-// ===================== DASHBOARD =====================
+// ===== DASHBOARD =====
 function renderDashboard() {
-  const grid = document.getElementById('projectGrid');
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   const filtered = projects.filter(p => p.name.toLowerCase().includes(q) || (p.location||'').toLowerCase().includes(q));
-  if (filtered.length === 0) {
-    grid.innerHTML = '<div style="color:#6b7280; padding:20px;">Geen projecten gevonden.</div>';
+
+  // Stats
+  const totalPoints = projects.reduce((a, p) => a + p.parts.reduce((b, pt) => b + (pt.points||[]).length, 0), 0);
+  const donePoints = projects.reduce((a, p) => a + p.parts.reduce((b, pt) => b + (pt.points||[]).filter(x => x.status==='done').length, 0), 0);
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat-pill"><span class="stat-dot"></span>${projects.length} project${projects.length !== 1 ? 'en' : ''}</div>
+    <div class="stat-pill"><span class="stat-dot orange"></span>${totalPoints} punt${totalPoints !== 1 ? 'en' : ''} totaal</div>
+    <div class="stat-pill"><span class="stat-dot green"></span>${donePoints} afgerond</div>
+  `;
+
+  const grid = document.getElementById('projectGrid');
+  if (!filtered.length) {
+    grid.innerHTML = `<div style="color:rgba(255,255,255,0.4);padding:20px;grid-column:1/-1;">Geen projecten gevonden.</div>`;
     return;
   }
-  grid.innerHTML = filtered.map((p, i) => {
-    const realIndex = projects.indexOf(p);
-    const thumb = p.mainPlan ? `<img class="project-image" src="${p.mainPlan}" alt="">` : `<div class="project-image" style="background:#dce6ef;display:flex;align-items:center;justify-content:center;color:#6b7280;">Geen foto</div>`;
-    return `<div class="project-card" onclick="openProject(${realIndex})">
-      ${thumb}
-      <div class="project-info">
-        <div class="project-title">${p.name}</div>
-        <div class="project-subtitle">${p.location || ''}</div>
-        <div class="project-role">${p.role || ''}</div>
-      </div>
-    </div>`;
+
+  grid.innerHTML = filtered.map(p => {
+    const ri = projects.indexOf(p);
+    const totalPts = p.parts.reduce((a, pt) => a + (pt.points||[]).length, 0);
+    const imgHtml = p.photo
+      ? `<img class="project-card-img" src="${p.photo}" alt="" onclick="openProject(${ri})">`
+      : `<div class="project-card-img-placeholder" onclick="openProject(${ri})">🏗️</div>`;
+    return `
+      <div class="project-card">
+        ${imgHtml}
+        <button class="card-menu-btn" onclick="toggleCardMenu(event, ${ri})">⋮</button>
+        <div class="card-dropdown" id="cardMenu${ri}">
+          <div class="card-dropdown-item" onclick="openProject(${ri});closeAllMenus()">📂 Openen</div>
+          <div class="card-dropdown-item" onclick="editProject(${ri})">✏️ Bewerken</div>
+          <div class="card-dropdown-item danger" onclick="deleteProject(${ri})">🗑️ Verwijderen</div>
+        </div>
+        <div class="project-card-body" onclick="openProject(${ri})">
+          <div class="project-card-title">${p.name}</div>
+          <div class="project-card-sub">${p.location || 'Geen locatie'}</div>
+          <div class="project-card-footer">
+            <span class="project-card-points">${totalPts} punt${totalPts !== 1 ? 'en' : ''}</span>
+            <span class="project-card-role">${p.role || ''}</span>
+          </div>
+        </div>
+      </div>`;
   }).join('');
 }
 
 function filterProjects() { renderDashboard(); }
 
-function openNewProjectForm() {
-  const name = prompt('Projectnaam:');
-  if (!name) return;
-  const location = prompt('Locatie (optioneel):') || '';
-  const role = prompt('Rol (optioneel):') || '';
-  const p = { name, location, role, mainPlan: null, parts: [{},{},{},{},{}] };
-  projects.push(p);
+function toggleCardMenu(e, index) {
+  e.stopPropagation();
+  closeAllMenus();
+  document.getElementById('cardMenu' + index)?.classList.toggle('open');
+}
+
+function closeAllMenus() {
+  document.querySelectorAll('.card-dropdown.open').forEach(d => d.classList.remove('open'));
+}
+
+// ===== PROJECT FORM MODAL =====
+function openNewProjectModal() {
+  editingProjectIndex = -1;
+  newProjectPhoto = null;
+  document.getElementById('projectFormTitle').textContent = 'Nieuw project';
+  document.getElementById('projectFormSub').textContent = 'Vul de gegevens in en upload een projectfoto.';
+  document.getElementById('newProjectName').value = '';
+  document.getElementById('newProjectLocation').value = '';
+  document.getElementById('newProjectRole').value = '';
+  document.getElementById('photoPreviewWrap').style.display = 'none';
+  document.getElementById('photoUploadArea').style.display = 'block';
+  document.getElementById('projectFormModal').classList.add('open');
+}
+
+function editProject(index) {
+  closeAllMenus();
+  editingProjectIndex = index;
+  const p = projects[index];
+  newProjectPhoto = p.photo || null;
+  document.getElementById('projectFormTitle').textContent = 'Project bewerken';
+  document.getElementById('projectFormSub').textContent = 'Wijzig naam, locatie of foto.';
+  document.getElementById('newProjectName').value = p.name || '';
+  document.getElementById('newProjectLocation').value = p.location || '';
+  document.getElementById('newProjectRole').value = p.role || '';
+  if (p.photo) {
+    document.getElementById('photoPreviewImg').src = p.photo;
+    document.getElementById('photoPreviewWrap').style.display = 'block';
+    document.getElementById('photoUploadArea').style.display = 'none';
+  } else {
+    document.getElementById('photoPreviewWrap').style.display = 'none';
+    document.getElementById('photoUploadArea').style.display = 'block';
+  }
+  document.getElementById('projectFormModal').classList.add('open');
+}
+
+function closeProjectFormModal() {
+  document.getElementById('projectFormModal').classList.remove('open');
+}
+
+function handleProjectPhotoSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    newProjectPhoto = ev.target.result;
+    document.getElementById('photoPreviewImg').src = newProjectPhoto;
+    document.getElementById('photoPreviewWrap').style.display = 'block';
+    document.getElementById('photoUploadArea').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function saveProjectForm() {
+  const name = document.getElementById('newProjectName').value.trim();
+  if (!name) { alert('Vul een projectnaam in.'); return; }
+  const location = document.getElementById('newProjectLocation').value.trim();
+  const role = document.getElementById('newProjectRole').value.trim();
+
+  if (editingProjectIndex >= 0) {
+    projects[editingProjectIndex].name = name;
+    projects[editingProjectIndex].location = location;
+    projects[editingProjectIndex].role = role;
+    if (newProjectPhoto) projects[editingProjectIndex].photo = newProjectPhoto;
+  } else {
+    const parts = Array.from({ length: TOTAL_PARTS }, () => ({ points: [] }));
+    projects.push({ name, location, role, photo: newProjectPhoto, mainPlan: null, parts });
+  }
+
+  saveProjects();
+  closeProjectFormModal();
+  renderDashboard();
+}
+
+function deleteProject(index) {
+  closeAllMenus();
+  const p = projects[index];
+  if (!confirm(`Project "${p.name}" definitief verwijderen?`)) return;
+  projects.splice(index, 1);
   saveProjects();
   renderDashboard();
 }
 
-// ===================== PROJECT PAGINA =====================
+// ===== PROJECT APP =====
 function openProject(index) {
   currentProjectIndex = index;
   const p = projects[index];
-  document.getElementById('projectsPage').classList.add('hidden');
+  if (!p.parts || p.parts.length < TOTAL_PARTS) {
+    p.parts = Array.from({ length: TOTAL_PARTS }, (_, i) => p.parts?.[i] || { points: [] });
+    saveProjects();
+  }
+  document.getElementById('dashboardPage').classList.add('hidden');
   document.getElementById('projectPage').classList.remove('hidden');
   document.getElementById('sidebarProjectName').textContent = p.name;
   document.getElementById('contentProjectTitle').textContent = p.name;
   renderSidebarMenu();
   renderSplitGrid();
-  if (p.mainPlan) {
-    showMainPlan(p.mainPlan);
+  if (p.mainPlan) showMainPlan(p.mainPlan);
+  else {
+    document.getElementById('mainPlanCanvas').style.display = 'none';
+    document.getElementById('mainPlanPlaceholder').classList.remove('hidden');
   }
 }
 
 function goBackToProjects() {
   document.getElementById('projectPage').classList.add('hidden');
-  document.getElementById('projectsPage').classList.remove('hidden');
+  document.getElementById('dashboardPage').classList.remove('hidden');
   renderDashboard();
 }
 
 function renderSidebarMenu() {
   const p = projects[currentProjectIndex];
-  const menu = document.getElementById('sidebarMenu');
-  menu.innerHTML = (p.parts || []).map((part, i) => {
+  document.getElementById('sidebarMenu').innerHTML = p.parts.map((part, i) => {
     const count = (part.points || []).length;
-    return `<div class="menu-item ${i === currentPartIndex ? 'active' : ''}" onclick="currentPartIndex=${i}; renderSidebarMenu(); openPartModal(${i})">
+    return `<div class="menu-item ${i === currentPartIndex ? 'active' : ''}" onclick="currentPartIndex=${i};renderSidebarMenu();openPartModal(${i})">
       <span>Deel ${i+1}</span><span class="menu-count">(${count})</span>
     </div>`;
   }).join('');
 }
 
+// ===== SPLIT GRID =====
 function renderSplitGrid() {
   const p = projects[currentProjectIndex];
-  const grid = document.getElementById('splitGrid');
-  grid.innerHTML = (p.parts || []).map((part, i) => {
+  document.getElementById('splitGrid').innerHTML = p.parts.map((part, i) => {
     const count = (part.points || []).length;
     return `<div class="split-card" onclick="openPartModal(${i})">
-      <div class="split-head"><span>Deel ${i+1}</span><span class="badge-count">${count} punten</span></div>
-      <div class="split-thumb-wrap"><canvas class="split-thumb" id="thumb${i}"></canvas></div>
+      <div class="split-head"><span>Deel ${i+1}</span><span class="badge-count">${count} punt${count!==1?'en':''}</span></div>
+      <canvas class="split-thumb" id="thumb${i}"></canvas>
     </div>`;
   }).join('');
-  setTimeout(() => {
-    (p.parts || []).forEach((_, i) => drawThumb(i));
-  }, 50);
+  setTimeout(() => p.parts.forEach((_, i) => drawThumb(i)), 60);
 }
 
-// ===================== MAIN PLAN =====================
+function drawThumb(partIndex) {
+  const canvas = document.getElementById('thumb' + partIndex);
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const dW = canvas.offsetWidth || 220;
+  const dH = canvas.offsetHeight || 200;
+  canvas.width = dW * dpr;
+  canvas.height = dH * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, dW, dH);
+
+  const p = projects[currentProjectIndex];
+  const points = p.parts[partIndex].points || [];
+
+  function drawPts(segX, scale, offX, offY) {
+    points.forEach(pt => {
+      const lx = offX + (pt.x - segX) * scale;
+      const ly = offY + pt.y * scale;
+      ctx.beginPath(); ctx.arc(lx, ly, 8, 0, Math.PI*2);
+      ctx.fillStyle = pt.status === 'done' ? '#22c55e' : '#ef4444';
+      ctx.fill();
+      ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = 'white'; ctx.font = 'bold 8px Arial';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('✕', lx, ly);
+    });
+  }
+
+  if (!p.mainPlan) {
+    ctx.fillStyle = '#f1f5f9'; ctx.fillRect(0, 0, dW, dH);
+    ctx.fillStyle = '#94a3b8'; ctx.font = '13px Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Deel ' + (partIndex + 1), dW/2, dH/2);
+    return;
+  }
+
+  const img = new Image();
+  img.onload = () => {
+    const segW = img.naturalWidth / TOTAL_PARTS;
+    const segX = segW * partIndex;
+    const segH = img.naturalHeight;
+    const scale = Math.min(dW / segW, dH / segH);
+    const drawW = segW * scale, drawH = segH * scale;
+    const offX = (dW - drawW) / 2, offY = (dH - drawH) / 2;
+    ctx.drawImage(img, segX, 0, segW, segH, offX, offY, drawW, drawH);
+    drawPts(segX, scale, offX, offY);
+  };
+  img.src = p.mainPlan;
+}
+
+// ===== MAIN PLAN =====
 function handleMainPlanUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
     projects[currentProjectIndex].mainPlan = ev.target.result;
-    saveProjects();
-    showMainPlan(ev.target.result);
-    renderSplitGrid();
+    saveProjects(); showMainPlan(ev.target.result); renderSplitGrid();
   };
   reader.readAsDataURL(file);
 }
@@ -518,8 +1014,7 @@ function showMainPlan(src) {
   const ctx = canvas.getContext('2d');
   const img = new Image();
   img.onload = () => {
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
+    canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
     ctx.drawImage(img, 0, 0);
     document.getElementById('mainPlanPlaceholder').classList.add('hidden');
     canvas.style.display = 'block';
@@ -527,404 +1022,223 @@ function showMainPlan(src) {
   img.src = src;
 }
 
-// ===================== THUMBNAILS =====================
-function drawThumb(partIndex) {
-  const canvas = document.getElementById('thumb' + partIndex);
-  if (!canvas) return;
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = canvas.offsetWidth * dpr;
-  canvas.height = canvas.offsetHeight * dpr;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  const w = canvas.offsetWidth, h = canvas.offsetHeight;
-  ctx.clearRect(0, 0, w, h);
-  const p = projects[currentProjectIndex];
-  const src = p.mainPlan;
-  const part = p.parts[partIndex];
-  const points = part.points || [];
-
-  function drawPoints(scale, offX, offY, iW, iH) {
-    points.forEach(pt => {
-      const x = offX + pt.x * scale;
-      const y = offY + pt.y * scale;
-      ctx.beginPath();
-      ctx.arc(x, y, 8, 0, Math.PI * 2);
-      ctx.fillStyle = pt.status === 'done' ? '#22c55e' : '#ef4444';
-      ctx.fill();
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.fillStyle = 'white';
-      ctx.font = 'bold 9px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('✕', x, y);
-    });
-  }
-
-  if (src) {
-    const img = new Image();
-    img.onload = () => {
-      const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight);
-      const iW = img.naturalWidth * scale, iH = img.naturalHeight * scale;
-      const offX = (w - iW) / 2, offY = (h - iH) / 2;
-      ctx.drawImage(img, offX, offY, iW, iH);
-      drawPoints(scale, offX, offY, iW, iH);
-    };
-    img.src = src;
-  } else {
-    ctx.fillStyle = '#f1f5f9';
-    ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '14px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Geen tekening', w/2, h/2);
-    drawPoints(1, 0, 0, w, h);
-  }
-}
-
-// ===================== DEEL MODAL =====================
+// ===== DEEL MODAL =====
 function openPartModal(partIndex) {
   currentPartIndex = partIndex;
   selectedPointId = null;
+  undoStack = []; redoStack = [];
   resetDraft();
-  undoStack = [];
-  redoStack = [];
   document.getElementById('modalTitle').textContent = 'Deel ' + (partIndex + 1);
   document.getElementById('savedListHead').textContent = 'Opgeslagen punten in deel ' + (partIndex + 1);
   document.getElementById('partModal').classList.add('open');
-  renderSavedItems();
-  initCanvas();
-  renderSidebarMenu();
+  renderSavedItems(); initCanvas(); renderSidebarMenu();
 }
 
 function closePartModal() {
   document.getElementById('partModal').classList.remove('open');
-  renderSplitGrid();
-  renderSidebarMenu();
+  renderSplitGrid(); renderSidebarMenu();
 }
 
-// ===================== CANVAS =====================
+// ===== CANVAS =====
+function getSegment() {
+  if (!canvasImg) return { segX: 0, segW: 800, segH: 600 };
+  return {
+    segX: (canvasImg.naturalWidth / TOTAL_PARTS) * currentPartIndex,
+    segW: canvasImg.naturalWidth / TOTAL_PARTS,
+    segH: canvasImg.naturalHeight
+  };
+}
+
 function initCanvas() {
   const canvas = document.getElementById('zoomCanvas');
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = canvas.offsetWidth * dpr;
-  canvas.height = canvas.offsetHeight * dpr;
   zoom = 1; panX = 0; panY = 0;
   const p = projects[currentProjectIndex];
   if (p.mainPlan) {
     canvasImg = new Image();
-    canvasImg.onload = () => {
-      fitView();
-      drawCanvas();
-    };
+    canvasImg.onload = fitView;
     canvasImg.src = p.mainPlan;
-  } else {
-    canvasImg = null;
-    drawCanvas();
-  }
+  } else { canvasImg = null; drawCanvas(); }
   canvas.onmousedown = onCanvasMouseDown;
   canvas.onmousemove = onCanvasMouseMove;
-  canvas.onmouseup = onCanvasMouseUp;
-  canvas.onwheel = onCanvasWheel;
-  canvas.onkeydown = onCanvasKeyDown;
+  canvas.onmouseup   = onCanvasMouseUp;
+  canvas.onwheel     = onCanvasWheel;
+  canvas.onkeydown   = onCanvasKeyDown;
   canvas.ontouchstart = onTouchStart;
-  canvas.ontouchmove = onTouchMove;
-  canvas.ontouchend = onTouchEnd;
+  canvas.ontouchmove  = onTouchMove;
+  canvas.ontouchend   = onTouchEnd;
 }
 
 function drawCanvas() {
   const canvas = document.getElementById('zoomCanvas');
   if (!canvas) return;
   const dpr = window.devicePixelRatio || 1;
-  const displayW = canvas.offsetWidth, displayH = canvas.offsetHeight;
-  canvas.width = displayW * dpr;
-  canvas.height = displayH * dpr;
+  const dW = canvas.offsetWidth, dH = canvas.offsetHeight;
+  canvas.width = dW * dpr; canvas.height = dH * dpr;
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
-  ctx.clearRect(0, 0, displayW, displayH);
+  ctx.clearRect(0, 0, dW, dH);
+  ctx.save(); ctx.translate(panX, panY); ctx.scale(zoom, zoom);
 
-  ctx.save();
-  ctx.translate(panX, panY);
-  ctx.scale(zoom, zoom);
+  const { segX, segW, segH } = getSegment();
+  if (canvasImg) ctx.drawImage(canvasImg, segX, 0, segW, segH, 0, 0, segW, segH);
+  else { ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, 800, 600); }
 
-  if (canvasImg) {
-    ctx.drawImage(canvasImg, 0, 0);
-  } else {
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillRect(0, 0, displayW / zoom, displayH / zoom);
+  if (document.getElementById('gridToggle').checked) drawGrid(ctx, dW, dH);
+
+  if (document.getElementById('showMarkersToggle').checked) {
+    (projects[currentProjectIndex].parts[currentPartIndex].points || []).forEach(pt => {
+      drawMarker(ctx, pt.x - segX, pt.y, pt);
+    });
   }
-
-  if (document.getElementById('gridToggle').checked) {
-    drawGrid(ctx, displayW, displayH);
-  }
-
-  const p = projects[currentProjectIndex];
-  const points = p.parts[currentPartIndex].points || [];
-  const showMarkers = document.getElementById('showMarkersToggle').checked;
-
-  if (showMarkers) {
-    points.forEach(pt => drawMarker(ctx, pt));
-  }
-
   ctx.restore();
   document.getElementById('zoomPercentLabel').textContent = 'Zoom ' + Math.round(zoom * 100) + '%';
 }
 
-function drawGrid(ctx, displayW, displayH) {
+function drawGrid(ctx, dW, dH) {
   const step = 50;
-  ctx.strokeStyle = 'rgba(100,149,200,0.18)';
-  ctx.lineWidth = 0.5 / zoom;
-  const startX = Math.floor(-panX / zoom / step) * step;
-  const startY = Math.floor(-panY / zoom / step) * step;
-  const endX = startX + (displayW / zoom) + step * 2;
-  const endY = startY + (displayH / zoom) + step * 2;
-  for (let x = startX; x < endX; x += step) {
-    ctx.beginPath(); ctx.moveTo(x, startY); ctx.lineTo(x, endY); ctx.stroke();
-  }
-  for (let y = startY; y < endY; y += step) {
-    ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
-  }
+  ctx.strokeStyle = 'rgba(100,149,200,0.18)'; ctx.lineWidth = 0.5 / zoom;
+  const sx = Math.floor(-panX / zoom / step) * step, sy = Math.floor(-panY / zoom / step) * step;
+  const ex = sx + dW / zoom + step * 2, ey = sy + dH / zoom + step * 2;
+  for (let x = sx; x < ex; x += step) { ctx.beginPath(); ctx.moveTo(x, sy); ctx.lineTo(x, ey); ctx.stroke(); }
+  for (let y = sy; y < ey; y += step) { ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(ex, y); ctx.stroke(); }
 }
 
-function drawMarker(ctx, pt) {
-  const r = 12 / zoom;
-  const isSelected = pt.id === selectedPointId;
-  ctx.beginPath();
-  ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
+function drawMarker(ctx, lx, ly, pt) {
+  const r = 12 / zoom, sel = pt.id === selectedPointId;
+  ctx.beginPath(); ctx.arc(lx, ly, r, 0, Math.PI*2);
   ctx.fillStyle = pt.status === 'done' ? '#22c55e' : '#ef4444';
   ctx.fill();
-  if (isSelected) {
-    ctx.strokeStyle = '#1f7ae0';
-    ctx.lineWidth = 3 / zoom;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(pt.x, pt.y, r + 5 / zoom, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(31,122,224,0.4)';
-    ctx.lineWidth = 2 / zoom;
-    ctx.stroke();
-  } else {
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 2 / zoom;
-    ctx.stroke();
-  }
-  ctx.fillStyle = 'white';
-  ctx.font = `bold ${Math.max(9, 11 / zoom)}px Arial`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('✕', pt.x, pt.y);
-
+  if (sel) {
+    ctx.strokeStyle = '#1f7ae0'; ctx.lineWidth = 3 / zoom; ctx.stroke();
+    ctx.beginPath(); ctx.arc(lx, ly, r + 5/zoom, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(31,122,224,0.35)'; ctx.lineWidth = 2/zoom; ctx.stroke();
+  } else { ctx.strokeStyle = 'white'; ctx.lineWidth = 2/zoom; ctx.stroke(); }
+  ctx.fillStyle = 'white'; ctx.font = `bold ${Math.max(9, 11/zoom)}px Arial`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('✕', lx, ly);
   if (pt.name) {
-    ctx.fillStyle = '#1f2937';
-    ctx.font = `${Math.max(8, 10 / zoom)}px Arial`;
-    ctx.textAlign = 'left';
-    ctx.fillText(pt.name, pt.x + r + 3 / zoom, pt.y);
+    ctx.fillStyle = '#1f2937'; ctx.font = `${Math.max(8, 10/zoom)}px Arial`;
+    ctx.textAlign = 'left'; ctx.fillText(pt.name, lx + r + 3/zoom, ly);
   }
 }
 
-function getCanvasCoords(canvas, e) {
+function getSegCoords(canvas, e) {
   const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  const cx = (e.clientX - rect.left);
-  const cy = (e.clientY - rect.top);
-  return {
-    x: (cx - panX) / zoom,
-    y: (cy - panY) / zoom
-  };
+  return { lx: (e.clientX - rect.left - panX) / zoom, ly: (e.clientY - rect.top - panY) / zoom };
 }
-
-let clickStartX = 0, clickStartY = 0, didPan = false;
+function localToFull(lx, ly) { return { x: lx + getSegment().segX, y: ly }; }
+function fullToLocal(x, y)   { return { lx: x - getSegment().segX, ly: y }; }
 
 function onCanvasMouseDown(e) {
-  if (e.button === 1 || e.altKey) {
-    isPanning = true;
-    panStartX = e.clientX - panX;
-    panStartY = e.clientY - panY;
-    return;
-  }
-  clickStartX = e.clientX;
-  clickStartY = e.clientY;
-  didPan = false;
-  isPanning = true;
-  panStartX = e.clientX - panX;
-  panStartY = e.clientY - panY;
+  clickStartX = e.clientX; clickStartY = e.clientY; didPan = false;
+  isPanning = true; panStartX = e.clientX - panX; panStartY = e.clientY - panY;
 }
-
 function onCanvasMouseMove(e) {
   if (!isPanning) return;
-  const dx = Math.abs(e.clientX - clickStartX);
-  const dy = Math.abs(e.clientY - clickStartY);
-  if (dx > 4 || dy > 4) didPan = true;
-  panX = e.clientX - panStartX;
-  panY = e.clientY - panStartY;
-  drawCanvas();
+  if (Math.abs(e.clientX - clickStartX) > 4 || Math.abs(e.clientY - clickStartY) > 4) didPan = true;
+  panX = e.clientX - panStartX; panY = e.clientY - panStartY; drawCanvas();
 }
-
 function onCanvasMouseUp(e) {
   isPanning = false;
   if (didPan) { didPan = false; return; }
   if (!document.getElementById('editModeToggle').checked) return;
   const canvas = document.getElementById('zoomCanvas');
-  const coords = getCanvasCoords(canvas, e);
-  const p = projects[currentProjectIndex];
-  const points = p.parts[currentPartIndex].points || [];
+  const { lx, ly } = getSegCoords(canvas, e);
   const snap = document.getElementById('snapToggle').checked;
-  const sx = snap ? Math.round(coords.x / 50) * 50 : coords.x;
-  const sy = snap ? Math.round(coords.y / 50) * 50 : coords.y;
-  const hitRadius = 16 / zoom;
-  const hit = points.find(pt => Math.hypot(pt.x - sx, pt.y - sy) < hitRadius);
-  if (hit) {
-    selectPoint(hit.id);
-  } else {
-    placeNewPoint(sx, sy);
-  }
+  const sx = snap ? Math.round(lx/50)*50 : lx;
+  const sy = snap ? Math.round(ly/50)*50 : ly;
+  const points = projects[currentProjectIndex].parts[currentPartIndex].points || [];
+  const hitR = 16 / zoom;
+  const hit = points.find(pt => { const { lx: plx, ly: ply } = fullToLocal(pt.x, pt.y); return Math.hypot(plx-sx, ply-sy) < hitR; });
+  if (hit) selectPoint(hit.id);
+  else { const f = localToFull(sx, sy); placeNewPoint(f.x, f.y); }
 }
-
 function onCanvasWheel(e) {
   e.preventDefault();
-  const canvas = document.getElementById('zoomCanvas');
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
-  const delta = e.deltaY > 0 ? 1/1.1 : 1.1;
-  const newZoom = Math.min(Math.max(zoom * delta, 0.1), 10);
-  panX = mx - (mx - panX) * (newZoom / zoom);
-  panY = my - (my - panY) * (newZoom / zoom);
-  zoom = newZoom;
-  drawCanvas();
+  const rect = document.getElementById('zoomCanvas').getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const f = e.deltaY > 0 ? 1/1.1 : 1.1;
+  const nz = Math.min(Math.max(zoom * f, 0.1), 10);
+  panX = mx - (mx - panX) * (nz/zoom); panY = my - (my - panY) * (nz/zoom); zoom = nz; drawCanvas();
 }
-
-// Touch
 let lastTouchDist = 0;
 function onTouchStart(e) {
-  if (e.touches.length === 2) {
-    lastTouchDist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-  } else if (e.touches.length === 1) {
-    isPanning = true;
-    panStartX = e.touches[0].clientX - panX;
-    panStartY = e.touches[0].clientY - panY;
-    clickStartX = e.touches[0].clientX;
-    clickStartY = e.touches[0].clientY;
-    didPan = false;
-  }
+  if (e.touches.length === 2) lastTouchDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+  else { isPanning = true; panStartX = e.touches[0].clientX-panX; panStartY = e.touches[0].clientY-panY; clickStartX = e.touches[0].clientX; clickStartY = e.touches[0].clientY; didPan = false; }
 }
 function onTouchMove(e) {
   e.preventDefault();
   if (e.touches.length === 2) {
-    const dist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-    const delta = dist / lastTouchDist;
-    zoom = Math.min(Math.max(zoom * delta, 0.1), 10);
-    lastTouchDist = dist;
-    drawCanvas();
-  } else if (e.touches.length === 1 && isPanning) {
-    const dx = Math.abs(e.touches[0].clientX - clickStartX);
-    const dy = Math.abs(e.touches[0].clientY - clickStartY);
-    if (dx > 6 || dy > 6) didPan = true;
-    panX = e.touches[0].clientX - panStartX;
-    panY = e.touches[0].clientY - panStartY;
-    drawCanvas();
+    const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    zoom = Math.min(Math.max(zoom*(d/lastTouchDist),0.1),10); lastTouchDist = d; drawCanvas();
+  } else if (isPanning) {
+    if (Math.abs(e.touches[0].clientX-clickStartX)>6) didPan = true;
+    panX = e.touches[0].clientX-panStartX; panY = e.touches[0].clientY-panStartY; drawCanvas();
   }
 }
-function onTouchEnd(e) {
-  isPanning = false;
-}
-
+function onTouchEnd() { isPanning = false; }
 function onCanvasKeyDown(e) {
+  if ((e.ctrlKey||e.metaKey) && e.key==='z') { undoHistory(); return; }
+  if ((e.ctrlKey||e.metaKey) && e.key==='y') { redoHistory(); return; }
   if (!selectedPointId) return;
-  const p = projects[currentProjectIndex];
-  const points = p.parts[currentPartIndex].points || [];
-  const pt = points.find(p => p.id === selectedPointId);
+  const pt = (projects[currentProjectIndex].parts[currentPartIndex].points||[]).find(p=>p.id===selectedPointId);
   if (!pt) return;
   const step = e.shiftKey ? 10 : 1;
-  let moved = false;
-  if (e.key === 'ArrowLeft') { pt.x -= step; moved = true; }
-  if (e.key === 'ArrowRight') { pt.x += step; moved = true; }
-  if (e.key === 'ArrowUp') { pt.y -= step; moved = true; }
-  if (e.key === 'ArrowDown') { pt.y += step; moved = true; }
-  if (e.key === 'Delete' || e.key === 'Backspace') { deleteSelectedPoint(); return; }
-  if (e.key === 'Escape') { selectedPointId = null; drawCanvas(); return; }
-  if (moved) { e.preventDefault(); saveProjects(); drawCanvas(); }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { undoHistory(); }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'y') { redoHistory(); }
+  if (e.key==='ArrowLeft'){pt.x-=step;e.preventDefault();}
+  else if(e.key==='ArrowRight'){pt.x+=step;e.preventDefault();}
+  else if(e.key==='ArrowUp'){pt.y-=step;e.preventDefault();}
+  else if(e.key==='ArrowDown'){pt.y+=step;e.preventDefault();}
+  else if(e.key==='Delete'||e.key==='Backspace'){deleteSelectedPoint();return;}
+  else if(e.key==='Escape'){selectedPointId=null;drawCanvas();return;}
+  saveProjects(); drawCanvas();
 }
 
-// ===================== ZOOM FUNCTIES =====================
-function zoomBy(factor) {
-  const canvas = document.getElementById('zoomCanvas');
-  const cx = canvas.offsetWidth / 2, cy = canvas.offsetHeight / 2;
-  const newZoom = Math.min(Math.max(zoom * factor, 0.1), 10);
-  panX = cx - (cx - panX) * (newZoom / zoom);
-  panY = cy - (cy - panY) * (newZoom / zoom);
-  zoom = newZoom;
-  drawCanvas();
+function zoomBy(f) {
+  const c = document.getElementById('zoomCanvas');
+  const cx = c.offsetWidth/2, cy = c.offsetHeight/2;
+  const nz = Math.min(Math.max(zoom*f,0.1),10);
+  panX = cx-(cx-panX)*(nz/zoom); panY = cy-(cy-panY)*(nz/zoom); zoom = nz; drawCanvas();
 }
-
-function resetView() { zoom = 1; panX = 0; panY = 0; drawCanvas(); }
-
+function resetView() { zoom=1; panX=0; panY=0; drawCanvas(); }
 function fitView() {
-  const canvas = document.getElementById('zoomCanvas');
-  const w = canvas.offsetWidth, h = canvas.offsetHeight;
-  if (canvasImg) {
-    const scaleX = w / canvasImg.naturalWidth;
-    const scaleY = h / canvasImg.naturalHeight;
-    zoom = Math.min(scaleX, scaleY) * 0.95;
-    panX = (w - canvasImg.naturalWidth * zoom) / 2;
-    panY = (h - canvasImg.naturalHeight * zoom) / 2;
-  } else {
-    zoom = 1; panX = 0; panY = 0;
-  }
+  const c = document.getElementById('zoomCanvas');
+  const { segW, segH } = getSegment();
+  zoom = Math.min(c.offsetWidth/segW, c.offsetHeight/segH) * 0.95;
+  panX = (c.offsetWidth - segW*zoom)/2;
+  panY = (c.offsetHeight - segH*zoom)/2;
   drawCanvas();
 }
 
-// ===================== PUNTEN =====================
+// ===== PUNTEN =====
 function placeNewPoint(x, y) {
   pushUndo();
   const p = projects[currentProjectIndex];
   if (!p.parts[currentPartIndex].points) p.parts[currentPartIndex].points = [];
   const id = 'pt_' + Date.now();
   p.parts[currentPartIndex].points.push({
-    id, x, y, name: '', assignedTo: '', updatedBy: '', status: 'open',
-    internalNote: '', comments: [],
-    phases: { start: { photos: [], remark: '', date: '' }, middle: { photos: [], remark: '', date: '' }, end: { photos: [], remark: '', date: '' } }
+    id, x, y, name:'', assignedTo:'', updatedBy:'', status:'open', internalNote:'', comments:[],
+    phases:{ start:{photos:[],remark:'',date:''}, middle:{photos:[],remark:'',date:''}, end:{photos:[],remark:'',date:''} }
   });
-  saveProjects();
-  selectPoint(id);
-  drawCanvas();
-  renderSavedItems();
+  saveProjects(); selectPoint(id); drawCanvas(); renderSavedItems();
 }
 
 function selectPoint(id) {
   selectedPointId = id;
-  const p = projects[currentProjectIndex];
-  const points = p.parts[currentPartIndex].points || [];
-  const pt = points.find(p => p.id === id);
+  const pt = (projects[currentProjectIndex].parts[currentPartIndex].points||[]).find(p=>p.id===id);
   if (!pt) return;
-  document.getElementById('pointName').value = pt.name || '';
-  document.getElementById('pointAssignedTo').value = pt.assignedTo || '';
-  document.getElementById('pointUpdatedBy').value = pt.updatedBy || '';
-  document.getElementById('pointStatus').value = pt.status || 'open';
-  document.getElementById('pointInternalNote').value = pt.internalNote || '';
-  draftComments = [...(pt.comments || [])];
-  draftPhasePhotos = {
-    start: [...(pt.phases?.start?.photos || [])],
-    middle: [...(pt.phases?.middle?.photos || [])],
-    end: [...(pt.phases?.end?.photos || [])]
-  };
-  document.getElementById('modalPointInfo').textContent = `Geselecteerd: ${pt.name || '(naamloos)'} — X: ${Math.round(pt.x)}, Y: ${Math.round(pt.y)}`;
-  ['start','middle','end'].forEach(phase => {
-    const date = pt.phases?.[phase]?.date || '';
-    document.getElementById('phaseDate-' + phase).textContent = 'Datum: ' + (date || 'nog niet ingevuld');
-    document.getElementById('phaseRemark-' + phase).value = pt.phases?.[phase]?.remark || '';
+  document.getElementById('pointName').value = pt.name||'';
+  document.getElementById('pointAssignedTo').value = pt.assignedTo||'';
+  document.getElementById('pointUpdatedBy').value = pt.updatedBy||'';
+  document.getElementById('pointStatus').value = pt.status||'open';
+  document.getElementById('pointInternalNote').value = pt.internalNote||'';
+  draftComments = [...(pt.comments||[])];
+  draftPhasePhotos = { start:[...(pt.phases?.start?.photos||[])], middle:[...(pt.phases?.middle?.photos||[])], end:[...(pt.phases?.end?.photos||[])] };
+  const { lx, ly } = fullToLocal(pt.x, pt.y);
+  document.getElementById('modalPointInfo').textContent = `Geselecteerd: ${pt.name||'(naamloos)'} — X: ${Math.round(lx)}, Y: ${Math.round(ly)}`;
+  ['start','middle','end'].forEach(ph => {
+    document.getElementById('phaseDate-'+ph).textContent = 'Datum: ' + (pt.phases?.[ph]?.date||'nog niet ingevuld');
+    document.getElementById('phaseRemark-'+ph).value = pt.phases?.[ph]?.remark||'';
   });
-  renderDraftComments();
-  renderDraftGalleries();
-  drawCanvas();
+  renderDraftComments(); renderDraftGalleries(); drawCanvas();
 }
 
 function deleteSelectedPoint() {
@@ -932,294 +1246,193 @@ function deleteSelectedPoint() {
   if (!confirm('Punt verwijderen?')) return;
   pushUndo();
   const p = projects[currentProjectIndex];
-  p.parts[currentPartIndex].points = (p.parts[currentPartIndex].points || []).filter(pt => pt.id !== selectedPointId);
-  selectedPointId = null;
-  saveProjects();
-  drawCanvas();
-  renderSavedItems();
-  resetDraft();
+  p.parts[currentPartIndex].points = (p.parts[currentPartIndex].points||[]).filter(pt=>pt.id!==selectedPointId);
+  selectedPointId = null; saveProjects(); drawCanvas(); renderSavedItems(); resetDraft();
 }
 
 function resetDraft() {
-  selectedPointId = null;
-  draftComments = [];
-  draftPhasePhotos = { start: [], middle: [], end: [] };
-  document.getElementById('pointName').value = '';
-  document.getElementById('pointAssignedTo').value = '';
-  document.getElementById('pointUpdatedBy').value = '';
+  selectedPointId = null; draftComments = []; draftPhasePhotos = {start:[],middle:[],end:[]};
+  ['pointName','pointAssignedTo','pointUpdatedBy','pointCommentInput','pointInternalNote'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('pointStatus').value = 'open';
-  document.getElementById('pointInternalNote').value = '';
-  document.getElementById('pointCommentInput').value = '';
   document.getElementById('modalPointInfo').textContent = 'Nog geen punt geselecteerd';
-  ['start','middle','end'].forEach(phase => {
-    document.getElementById('phaseDate-' + phase).textContent = 'Datum: nog niet ingevuld';
-    document.getElementById('phaseRemark-' + phase).value = '';
-    document.getElementById('gallery-' + phase).innerHTML = '';
-    document.getElementById('gallery-' + phase).classList.add('hidden');
-    document.getElementById('empty-' + phase).classList.remove('hidden');
+  ['start','middle','end'].forEach(ph=>{
+    document.getElementById('phaseDate-'+ph).textContent='Datum: nog niet ingevuld';
+    document.getElementById('phaseRemark-'+ph).value='';
+    document.getElementById('gallery-'+ph).innerHTML='';
+    document.getElementById('gallery-'+ph).classList.add('hidden');
+    document.getElementById('empty-'+ph).classList.remove('hidden');
   });
-  renderDraftComments();
-  drawCanvas();
+  renderDraftComments(); drawCanvas();
 }
 
 function saveDraftToProject() {
-  if (!selectedPointId) {
-    alert('Selecteer eerst een punt op de tekening.');
-    return;
-  }
-  const p = projects[currentProjectIndex];
-  const points = p.parts[currentPartIndex].points || [];
-  const pt = points.find(p => p.id === selectedPointId);
+  if (!selectedPointId) { alert('Selecteer eerst een punt.'); return; }
+  const pt = (projects[currentProjectIndex].parts[currentPartIndex].points||[]).find(p=>p.id===selectedPointId);
   if (!pt) return;
-  pt.name = document.getElementById('pointName').value;
-  pt.assignedTo = document.getElementById('pointAssignedTo').value;
-  pt.updatedBy = document.getElementById('pointUpdatedBy').value;
-  pt.status = document.getElementById('pointStatus').value;
-  pt.internalNote = document.getElementById('pointInternalNote').value;
-  pt.comments = [...draftComments];
-  const now = new Date().toLocaleDateString('nl-NL');
-  ['start','middle','end'].forEach(phase => {
-    if (!pt.phases) pt.phases = {};
-    if (!pt.phases[phase]) pt.phases[phase] = {};
-    pt.phases[phase].photos = [...draftPhasePhotos[phase]];
-    pt.phases[phase].remark = document.getElementById('phaseRemark-' + phase).value;
-    if (draftPhasePhotos[phase].length > 0 && !pt.phases[phase].date) {
-      pt.phases[phase].date = now;
-      document.getElementById('phaseDate-' + phase).textContent = 'Datum: ' + now;
+  pt.name=document.getElementById('pointName').value;
+  pt.assignedTo=document.getElementById('pointAssignedTo').value;
+  pt.updatedBy=document.getElementById('pointUpdatedBy').value;
+  pt.status=document.getElementById('pointStatus').value;
+  pt.internalNote=document.getElementById('pointInternalNote').value;
+  pt.comments=[...draftComments];
+  const now=new Date().toLocaleDateString('nl-NL');
+  ['start','middle','end'].forEach(ph=>{
+    if(!pt.phases[ph]) pt.phases[ph]={};
+    pt.phases[ph].photos=[...draftPhasePhotos[ph]];
+    pt.phases[ph].remark=document.getElementById('phaseRemark-'+ph).value;
+    if(draftPhasePhotos[ph].length>0&&!pt.phases[ph].date){
+      pt.phases[ph].date=now;
+      document.getElementById('phaseDate-'+ph).textContent='Datum: '+now;
     }
   });
-  saveProjects();
-  drawCanvas();
-  renderSavedItems();
-  renderSidebarMenu();
-  const msg = document.getElementById('saveMessage');
-  msg.classList.remove('hidden');
-  setTimeout(() => msg.classList.add('hidden'), 2000);
+  saveProjects(); drawCanvas(); renderSavedItems(); renderSidebarMenu();
+  const msg=document.getElementById('saveMessage');
+  msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),2000);
 }
 
-// ===================== OPMERKINGEN =====================
+// ===== OPMERKINGEN =====
 function addDraftComment() {
-  const input = document.getElementById('pointCommentInput');
-  const text = input.value.trim();
-  if (!text) return;
-  draftComments.push({ text, date: new Date().toLocaleString('nl-NL') });
-  input.value = '';
+  const txt=document.getElementById('pointCommentInput').value.trim();
+  if(!txt) return;
+  draftComments.push({text:txt,date:new Date().toLocaleString('nl-NL')});
+  document.getElementById('pointCommentInput').value='';
   renderDraftComments();
 }
-
 function renderDraftComments() {
-  const list = document.getElementById('draftCommentsList');
-  if (draftComments.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = draftComments.map((c, i) =>
-    `<div class="comment-item"><strong>${c.date}</strong><br>${c.text}
-    <button class="mini-btn" style="margin-left:8px; float:right;" onclick="removeDraftComment(${i})">×</button></div>`
+  document.getElementById('draftCommentsList').innerHTML=draftComments.map((c,i)=>
+    `<div class="comment-item"><strong>${c.date}</strong><br>${c.text}<button class="mini-btn" style="float:right;" onclick="removeDraftComment(${i})">×</button></div>`
   ).join('');
 }
+function removeDraftComment(i) { draftComments.splice(i,1); renderDraftComments(); }
 
-function removeDraftComment(i) {
-  draftComments.splice(i, 1);
-  renderDraftComments();
-}
-
-// ===================== FASE FOTO'S =====================
+// ===== FASE FOTO'S =====
 function handlePhaseUpload(e, phase) {
-  const files = Array.from(e.target.files);
-  if (!files.length) return;
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      draftPhasePhotos[phase].push(ev.target.result);
-      renderDraftGalleries();
-    };
-    reader.readAsDataURL(file);
+  Array.from(e.target.files).forEach(file=>{
+    const r=new FileReader();
+    r.onload=ev=>{draftPhasePhotos[phase].push(ev.target.result);renderDraftGalleries();};
+    r.readAsDataURL(file);
   });
-  e.target.value = '';
+  e.target.value='';
 }
-
 function renderDraftGalleries() {
-  ['start','middle','end'].forEach(phase => {
-    const photos = draftPhasePhotos[phase];
-    const empty = document.getElementById('empty-' + phase);
-    const gallery = document.getElementById('gallery-' + phase);
-    if (photos.length === 0) {
-      empty.classList.remove('hidden');
-      gallery.classList.add('hidden');
-      gallery.innerHTML = '';
-      return;
-    }
-    empty.classList.add('hidden');
-    gallery.classList.remove('hidden');
-    gallery.innerHTML = photos.map((src, i) =>
-      `<div class="gallery-item" onclick="openLightbox(draftPhasePhotos['${phase}'], ${i})">
-        <img src="${src}" alt="foto ${i+1}">
-        <button class="gallery-remove" onclick="event.stopPropagation(); removeDraftPhoto('${phase}', ${i})">×</button>
+  ['start','middle','end'].forEach(ph=>{
+    const photos=draftPhasePhotos[ph];
+    const empty=document.getElementById('empty-'+ph);
+    const gallery=document.getElementById('gallery-'+ph);
+    if(!photos.length){empty.classList.remove('hidden');gallery.classList.add('hidden');gallery.innerHTML='';return;}
+    empty.classList.add('hidden'); gallery.classList.remove('hidden');
+    gallery.innerHTML=photos.map((src,i)=>
+      `<div class="gallery-item" onclick="openLightbox(draftPhasePhotos['${ph}'],${i})">
+        <img src="${src}" alt="">
+        <button class="gallery-remove" onclick="event.stopPropagation();removeDraftPhoto('${ph}',${i})">×</button>
       </div>`
     ).join('');
   });
 }
+function removeDraftPhoto(ph,i) { draftPhasePhotos[ph].splice(i,1); renderDraftGalleries(); }
 
-function removeDraftPhoto(phase, index) {
-  draftPhasePhotos[phase].splice(index, 1);
-  renderDraftGalleries();
-}
-
-// ===================== TABS =====================
+// ===== TABS =====
 function switchPhaseTab(tab) {
-  ['start','middle','end'].forEach(t => {
-    document.getElementById('phasePanel-' + t).classList.toggle('active', t === tab);
-  });
-  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-    btn.classList.toggle('active', ['start','middle','end'][i] === tab);
-  });
+  ['start','middle','end'].forEach(t=>document.getElementById('phasePanel-'+t).classList.toggle('active',t===tab));
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['start','middle','end'][i]===tab));
 }
 
-// ===================== OPGESLAGEN PUNTEN =====================
+// ===== OPGESLAGEN PUNTEN =====
 function renderSavedItems() {
-  const p = projects[currentProjectIndex];
-  const points = (p.parts[currentPartIndex].points || []);
-  const container = document.getElementById('savedItemsContainer');
-  if (points.length === 0) {
-    container.innerHTML = '<div class="saved-empty">Nog geen opgeslagen punten.</div>';
-    return;
-  }
-  container.innerHTML = points.map(pt => {
-    const totalPhotos = ['start','middle','end'].reduce((a, ph) => a + (pt.phases?.[ph]?.photos?.length || 0), 0);
-    return `<div class="saved-item" onclick="selectPoint('${pt.id}')">
+  const points=(projects[currentProjectIndex].parts[currentPartIndex].points||[]);
+  const c=document.getElementById('savedItemsContainer');
+  if(!points.length){c.innerHTML='<div class="saved-empty">Nog geen opgeslagen punten.</div>';return;}
+  c.innerHTML=points.map(pt=>{
+    const tot=['start','middle','end'].reduce((a,ph)=>a+(pt.phases?.[ph]?.photos?.length||0),0);
+    return`<div class="saved-item" onclick="selectPoint('${pt.id}')">
       <div class="saved-item-top">
-        <div class="saved-item-title">
-          ${pt.name || '(naamloos)'}
-          <span class="status-badge ${pt.status === 'done' ? 'status-done' : 'status-open'}">${pt.status === 'done' ? 'Klaar' : 'Open'}</span>
+        <div class="saved-item-title">${pt.name||'(naamloos)'}
+          <span class="status-badge ${pt.status==='done'?'status-done':'status-open'}">${pt.status==='done'?'Klaar':'Open'}</span>
         </div>
-        <span class="saved-photo-count">${totalPhotos} foto('s)</span>
+        <span class="saved-photo-count">${tot} foto('s)</span>
       </div>
-      ${pt.assignedTo ? `<div class="saved-item-meta">Collega: ${pt.assignedTo}</div>` : ''}
-      ${pt.internalNote ? `<div class="saved-item-text">${pt.internalNote}</div>` : ''}
+      ${pt.assignedTo?`<div class="saved-item-meta">Collega: ${pt.assignedTo}</div>`:''}
+      ${pt.internalNote?`<div class="saved-item-text">${pt.internalNote}</div>`:''}
     </div>`;
   }).join('');
 }
 
-// ===================== UNDO / REDO =====================
+// ===== UNDO / REDO =====
 function pushUndo() {
-  const p = projects[currentProjectIndex];
-  const snapshot = JSON.stringify(p.parts[currentPartIndex].points || []);
-  undoStack.push(snapshot);
-  if (undoStack.length > 50) undoStack.shift();
-  redoStack = [];
+  undoStack.push(JSON.stringify(projects[currentProjectIndex].parts[currentPartIndex].points||[]));
+  if(undoStack.length>50) undoStack.shift(); redoStack=[];
 }
-
 function undoHistory() {
-  if (undoStack.length === 0) return;
-  const p = projects[currentProjectIndex];
-  redoStack.push(JSON.stringify(p.parts[currentPartIndex].points || []));
-  p.parts[currentPartIndex].points = JSON.parse(undoStack.pop());
-  selectedPointId = null;
-  saveProjects(); drawCanvas(); renderSavedItems();
+  if(!undoStack.length) return;
+  redoStack.push(JSON.stringify(projects[currentProjectIndex].parts[currentPartIndex].points||[]));
+  projects[currentProjectIndex].parts[currentPartIndex].points=JSON.parse(undoStack.pop());
+  selectedPointId=null; saveProjects(); drawCanvas(); renderSavedItems();
 }
-
 function redoHistory() {
-  if (redoStack.length === 0) return;
-  const p = projects[currentProjectIndex];
-  undoStack.push(JSON.stringify(p.parts[currentPartIndex].points || []));
-  p.parts[currentPartIndex].points = JSON.parse(redoStack.pop());
-  selectedPointId = null;
-  saveProjects(); drawCanvas(); renderSavedItems();
+  if(!redoStack.length) return;
+  undoStack.push(JSON.stringify(projects[currentProjectIndex].parts[currentPartIndex].points||[]));
+  projects[currentProjectIndex].parts[currentPartIndex].points=JSON.parse(redoStack.pop());
+  selectedPointId=null; saveProjects(); drawCanvas(); renderSavedItems();
 }
 
-// ===================== LIGHTBOX =====================
-function openLightbox(photos, index) {
-  lightboxPhotos = photos;
-  lightboxIndex = index;
-  document.getElementById('lightboxImage').src = photos[index];
-  document.getElementById('lightboxCounter').textContent = (index + 1) + ' / ' + photos.length;
+// ===== LIGHTBOX =====
+function openLightbox(photos,index) {
+  lightboxPhotos=photos; lightboxIndex=index;
+  document.getElementById('lightboxImage').src=photos[index];
+  document.getElementById('lightboxCounter').textContent=(index+1)+' / '+photos.length;
   document.getElementById('lightbox').classList.add('open');
 }
-
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-}
-
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 function lightboxNav(dir) {
-  lightboxIndex = (lightboxIndex + dir + lightboxPhotos.length) % lightboxPhotos.length;
-  document.getElementById('lightboxImage').src = lightboxPhotos[lightboxIndex];
-  document.getElementById('lightboxCounter').textContent = (lightboxIndex + 1) + ' / ' + lightboxPhotos.length;
+  lightboxIndex=(lightboxIndex+dir+lightboxPhotos.length)%lightboxPhotos.length;
+  document.getElementById('lightboxImage').src=lightboxPhotos[lightboxIndex];
+  document.getElementById('lightboxCounter').textContent=(lightboxIndex+1)+' / '+lightboxPhotos.length;
 }
 
-// ===================== EXPORT / IMPORT =====================
+// ===== EXPORT / IMPORT =====
 function exportProjectData() {
-  const p = projects[currentProjectIndex];
-  const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = (p.name || 'project') + '.json';
-  a.click();
+  const p=projects[currentProjectIndex];
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(p,null,2)],{type:'application/json'}));
+  a.download=(p.name||'project')+'.json'; a.click();
 }
-
 function handleImportProject(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      projects.push(data);
-      saveProjects();
-      renderDashboard();
-      alert('Project geïmporteerd: ' + data.name);
-    } catch (err) {
-      alert('Fout bij importeren: ongeldig bestand.');
-    }
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{const d=JSON.parse(ev.target.result);projects.push(d);saveProjects();renderDashboard();alert('Geïmporteerd: '+d.name);}
+    catch{alert('Ongeldig bestand.');}
   };
-  reader.readAsText(file);
-  e.target.value = '';
+  r.readAsText(file); e.target.value='';
 }
 
-// ===================== PDF RAPPORT =====================
+// ===== PDF =====
 function exportPdfReport() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  const p = projects[currentProjectIndex];
-  doc.setFontSize(22);
-  doc.setTextColor(23, 50, 77);
-  doc.text(p.name || 'Project', 14, 22);
-  doc.setFontSize(12);
-  doc.setTextColor(100);
-  doc.text('Locatie: ' + (p.location || '-'), 14, 32);
-  doc.text('Datum rapport: ' + new Date().toLocaleDateString('nl-NL'), 14, 40);
-
-  let y = 52;
-  (p.parts || []).forEach((part, pi) => {
-    const points = part.points || [];
-    if (points.length === 0) return;
-    doc.setFontSize(14);
-    doc.setTextColor(23, 50, 77);
-    doc.text('Deel ' + (pi + 1), 14, y);
-    y += 8;
-    doc.autoTable({
-      startY: y,
-      head: [['Naam', 'Collega', 'Status', 'Notitie']],
-      body: points.map(pt => [pt.name || '-', pt.assignedTo || '-', pt.status === 'done' ? 'Klaar' : 'Open', pt.internalNote || '-']),
-      styles: { fontSize: 10, cellPadding: 3 },
-      headStyles: { fillColor: [31, 122, 224] },
-      margin: { left: 14, right: 14 }
-    });
-    y = doc.lastAutoTable.finalY + 12;
-    if (y > 260) { doc.addPage(); y = 20; }
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const p=projects[currentProjectIndex];
+  doc.setFontSize(22);doc.setTextColor(23,50,77);doc.text(p.name||'Project',14,22);
+  doc.setFontSize(12);doc.setTextColor(100);
+  doc.text('Locatie: '+(p.location||'-'),14,32);
+  doc.text('Datum: '+new Date().toLocaleDateString('nl-NL'),14,40);
+  let y=52;
+  p.parts.forEach((part,pi)=>{
+    const pts=part.points||[]; if(!pts.length) return;
+    doc.setFontSize(14);doc.setTextColor(23,50,77);doc.text('Deel '+(pi+1),14,y);y+=8;
+    doc.autoTable({startY:y,head:[['Naam','Collega','Status','Notitie']],
+      body:pts.map(pt=>[pt.name||'-',pt.assignedTo||'-',pt.status==='done'?'Klaar':'Open',pt.internalNote||'-']),
+      styles:{fontSize:10,cellPadding:3},headStyles:{fillColor:[31,122,224]},margin:{left:14,right:14}});
+    y=doc.lastAutoTable.finalY+12; if(y>260){doc.addPage();y=20;}
   });
-
-  doc.save((p.name || 'rapport') + '_rapport.pdf');
+  doc.save((p.name||'rapport')+'_rapport.pdf');
 }
 
-// ===================== HELP MODAL =====================
-function openHelpModal() {
-  document.getElementById('helpModal').classList.add('open');
-}
+// ===== HELP =====
+function openHelpModal() { document.getElementById('helpModal').classList.add('open'); }
 
-// ===================== OPSLAAN =====================
-function saveProjects() {
-  localStorage.setItem('bouwProjects', JSON.stringify(projects));
-}
+// ===== OPSLAAN =====
+function saveProjects() { localStorage.setItem('bouwProjects',JSON.stringify(projects)); }
 
-// ===================== START =====================
 window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
