@@ -4,265 +4,139 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ed controls</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; background: #e8eef5; color: #1f2937; min-height: 100vh; }
     .hidden { display: none !important; }
 
-    /* ===== DASHBOARD ===== */
     .dashboard { min-height: 100vh; background: linear-gradient(160deg, #1a3a5c 0%, #2d6a9f 40%, #1e4d78 100%); }
-
-    .dash-topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 32px;
-      background: rgba(255,255,255,0.10);
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-    }
+    .dash-topbar { display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; background: rgba(255,255,255,0.10); border-bottom: 1px solid rgba(255,255,255,0.15); }
     .dash-logo { font-size: 26px; font-weight: 900; color: white; }
     .dash-logo span { color: #7dd3fc; }
-
     .dash-body { padding: 32px; }
-
     .dash-hero { text-align: center; padding: 32px 20px 40px; }
     .dash-hero h1 { font-size: 38px; font-weight: 900; color: white; margin-bottom: 10px; }
     .dash-hero h1 span { color: #7dd3fc; }
     .dash-hero p { color: rgba(255,255,255,0.70); font-size: 16px; margin: 0 auto 28px; max-width: 460px; line-height: 1.6; }
-
     .dash-stats { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 40px; }
-    .stat-pill {
-      background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28);
-      border-radius: 999px; padding: 12px 22px; color: white;
-      font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 9px;
-    }
+    .stat-pill { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28); border-radius: 999px; padding: 12px 22px; color: white; font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 9px; }
     .stat-dot { width: 11px; height: 11px; border-radius: 50%; background: #7dd3fc; display: inline-block; }
     .stat-dot.green { background: #4ade80; }
     .stat-dot.orange { background: #fbbf24; }
-
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
     .section-title { font-size: 20px; font-weight: bold; color: white; }
+    .project-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 22px; }
 
-    .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 22px; }
-
-    .project-card {
-      background: white; border-radius: 18px; overflow: hidden;
-      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative;
-    }
+    .project-card { background: white; border-radius: 18px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; }
     .project-card:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(0,0,0,0.22); }
     .project-card-img { width: 100%; height: 190px; object-fit: cover; display: block; }
-    .project-card-img-placeholder {
-      width: 100%; height: 190px;
-      background: linear-gradient(135deg,#dbeafe,#bfdbfe);
-      display: flex; align-items: center; justify-content: center; font-size: 52px; color: #93c5fd;
-    }
+    .project-card-img-placeholder { width: 100%; height: 190px; background: linear-gradient(135deg,#dbeafe,#bfdbfe); display: flex; align-items: center; justify-content: center; font-size: 52px; color: #93c5fd; }
     .project-card-body { padding: 16px 18px 18px; }
     .project-card-title { font-size: 17px; font-weight: bold; color: #1e3a5f; margin-bottom: 5px; }
     .project-card-sub { color: #64748b; font-size: 13px; margin-bottom: 12px; }
     .project-card-footer { display: flex; align-items: center; justify-content: space-between; }
     .project-card-points { background: #eff6ff; color: #1d4ed8; border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: bold; border: 1px solid #bfdbfe; }
 
-    .card-menu-btn {
-      position: absolute; top: 10px; right: 10px;
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(15,23,42,0.55); border: 1px solid rgba(255,255,255,0.3);
-      color: white; font-size: 18px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; z-index: 10;
-    }
-    .card-dropdown {
-      position: absolute; top: 50px; right: 10px;
-      background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 7px;
-      z-index: 100; min-width: 170px; box-shadow: 0 10px 28px rgba(0,0,0,0.18); display: none;
-    }
+    .card-menu-btn { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(15,23,42,0.55); border: 1px solid rgba(255,255,255,0.3); color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+    .card-dropdown { position: absolute; top: 50px; right: 10px; background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 7px; z-index: 100; min-width: 170px; box-shadow: 0 10px 28px rgba(0,0,0,0.18); display: none; }
     .card-dropdown.open { display: block; }
     .card-dropdown-item { padding: 11px 14px; color: #1e293b; font-size: 15px; border-radius: 9px; cursor: pointer; display: flex; align-items: center; gap: 9px; }
     .card-dropdown-item:hover { background: #f1f5f9; }
     .card-dropdown-item.danger { color: #dc2626; }
     .card-dropdown-item.danger:hover { background: #fef2f2; }
 
-    .btn-new-project {
-      background: white; color: #1e3a5f; border: none; border-radius: 14px;
-      padding: 14px 24px; font-size: 16px; font-weight: bold; cursor: pointer;
-      display: flex; align-items: center; gap: 9px;
-      box-shadow: 0 3px 14px rgba(0,0,0,0.15); transition: transform 0.15s;
-    }
+    .btn-new-project { background: white; color: #1e3a5f; border: none; border-radius: 14px; padding: 14px 24px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 9px; box-shadow: 0 3px 14px rgba(0,0,0,0.15); transition: transform 0.15s; }
     .btn-new-project:hover { transform: translateY(-1px); }
 
-    /* ===== MODALS ===== */
-    .modal {
-      position: fixed; inset: 0; background: rgba(15,23,42,0.72);
-      display: none; align-items: center; justify-content: center;
-      padding: 22px; z-index: 9000; backdrop-filter: blur(3px);
-    }
+    .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.72); display: none; align-items: center; justify-content: center; padding: 22px; z-index: 9000; backdrop-filter: blur(3px); }
     .modal.open { display: flex; }
 
-    /* Licht formulier modal */
-    .mpanel {
-      width: min(520px,100%); background: white; border-radius: 20px;
-      padding: 30px; position: relative; box-shadow: 0 24px 50px rgba(0,0,0,0.25);
-    }
-    .mpanel-close {
-      position: absolute; top: 14px; right: 14px;
-      background: #f1f5f9; border: none; width: 38px; height: 38px;
-      border-radius: 50%; color: #475569; font-size: 20px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .mpanel { width: min(520px,100%); background: white; border-radius: 20px; padding: 30px; position: relative; box-shadow: 0 24px 50px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+    .mpanel-close { position: absolute; top: 14px; right: 14px; background: #f1f5f9; border: none; width: 38px; height: 38px; border-radius: 50%; color: #475569; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .mpanel-title { font-size: 22px; font-weight: bold; color: #1e3a5f; margin-bottom: 5px; }
     .mpanel-sub { color: #64748b; font-size: 14px; margin-bottom: 22px; }
 
     .fld { margin-bottom: 18px; }
     .fld label { display: block; font-weight: 700; font-size: 14px; color: #374151; margin-bottom: 8px; }
-    .fld input[type="text"], .fld select, .fld textarea {
-      width: 100%; background: #f8fafc; border: 1.5px solid #e2e8f0;
-      border-radius: 12px; padding: 14px 15px; color: #1f2937;
-      font-size: 16px; font-family: Arial, sans-serif; outline: none;
-      transition: border-color 0.15s;
-    }
+    .fld input[type="text"], .fld select, .fld textarea { width: 100%; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px 15px; color: #1f2937; font-size: 16px; font-family: Arial, sans-serif; outline: none; transition: border-color 0.15s; }
     .fld input:focus, .fld select:focus, .fld textarea:focus { border-color: #3b82f6; background: white; }
     .fld textarea { min-height: 90px; resize: vertical; }
 
-    .photo-upload-area {
-      border: 2px dashed #cbd5e1; border-radius: 14px; padding: 30px 20px;
-      text-align: center; cursor: pointer; background: #f8fafc;
-      transition: border-color 0.2s, background 0.2s; margin-bottom: 18px;
-    }
+    .photo-upload-area { border: 2px dashed #cbd5e1; border-radius: 14px; padding: 30px 20px; text-align: center; cursor: pointer; background: #f8fafc; transition: border-color 0.2s, background 0.2s; margin-bottom: 18px; }
     .photo-upload-area:hover { border-color: #3b82f6; background: #eff6ff; }
     .pua-icon { font-size: 36px; margin-bottom: 9px; }
     .pua-text { color: #64748b; font-size: 14px; }
-    .photo-preview-wrap {
-      width: 100%; height: 175px; border-radius: 12px; overflow: hidden;
-      margin-bottom: 18px; display: none; position: relative; border: 1px solid #e2e8f0;
-    }
+    .photo-preview-wrap { width: 100%; height: 175px; border-radius: 12px; overflow: hidden; margin-bottom: 18px; display: none; position: relative; border: 1px solid #e2e8f0; }
     .photo-preview-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .photo-change-btn {
-      position: absolute; bottom: 10px; right: 10px;
-      background: rgba(15,23,42,0.75); color: white; border: none;
-      border-radius: 9px; padding: 8px 13px; font-size: 13px; font-weight: bold; cursor: pointer;
-    }
+    .photo-change-btn { position: absolute; bottom: 10px; right: 10px; background: rgba(15,23,42,0.75); color: white; border: none; border-radius: 9px; padding: 8px 13px; font-size: 13px; font-weight: bold; cursor: pointer; }
 
     .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
     .btn { border: none; border-radius: 12px; padding: 14px 22px; font-size: 15px; font-weight: bold; cursor: pointer; transition: opacity 0.15s, transform 0.12s; }
     .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-blue { background: #2563eb; color: white; }
-    .btn-gray { background: #475569; color: white; }
-    .btn-red  { background: #dc2626; color: white; }
+    .btn-blue  { background: #2563eb; color: white; }
+    .btn-gray  { background: #475569; color: white; }
+    .btn-red   { background: #dc2626; color: white; }
     .btn-white { background: white; border: 1.5px solid #d1d5db; color: #374151; }
     .btn-green { background: #16a34a; color: white; }
     .file-input { display: none; }
     .upload-lbl { display: inline-block; background: #2563eb; color: white; padding: 13px 20px; border-radius: 12px; font-weight: bold; font-size: 15px; cursor: pointer; }
     .upload-lbl-sm { display: inline-block; background: #1e3a5f; color: white; padding: 10px 15px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
 
-    /* ===== PROJECT PAGINA ===== */
-    .project-app { display: flex; min-height: 100vh; }
+    /* Foutmelding */
+    .err-msg { background: #fef2f2; border: 1.5px solid #fca5a5; color: #dc2626; border-radius: 12px; padding: 12px 16px; font-size: 14px; font-weight: bold; margin-top: 12px; }
 
-    .sidebar {
-      width: 260px; background: #1e3a5f; color: white;
-      padding: 22px 16px 28px; border-right: 1px solid rgba(255,255,255,0.08);
-      display: flex; flex-direction: column; gap: 4px;
-    }
+    .project-app { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: #1e3a5f; color: white; padding: 22px 16px 28px; border-right: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 4px; }
     .sb-logo { font-size: 22px; font-weight: 900; color: white; margin-bottom: 4px; }
     .sb-logo span { color: #7dd3fc; }
     .sb-proj { font-size: 15px; font-weight: bold; color: white; margin: 14px 0 6px; line-height: 1.4; }
     .sb-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.4); margin-top: 16px; margin-bottom: 6px; }
-    .sb-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 13px; border-radius: 11px; cursor: pointer;
-      font-size: 15px; color: rgba(255,255,255,0.75);
-      transition: background 0.14s, color 0.14s;
-    }
+    .sb-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 13px; border-radius: 11px; cursor: pointer; font-size: 15px; color: rgba(255,255,255,0.75); transition: background 0.14s, color 0.14s; }
     .sb-item:hover, .sb-item.active { background: rgba(125,211,252,0.15); color: white; }
     .sb-count { color: rgba(255,255,255,0.35); font-size: 13px; }
 
     .project-main { flex: 1; padding: 28px; background: #eef3f8; overflow: auto; }
-
-    .top-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 14px; flex-wrap: wrap; margin-bottom: 22px;
-    }
-
-    .content-card {
-      background: white; border-radius: 18px; padding: 26px;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.06); margin-bottom: 22px;
-    }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
+    .content-card { background: white; border-radius: 18px; padding: 26px; box-shadow: 0 6px 24px rgba(0,0,0,0.06); margin-bottom: 22px; }
     .content-card h2 { font-size: 24px; font-weight: bold; color: #1e3a5f; margin-bottom: 8px; }
     .content-card p { color: #64748b; font-size: 15px; line-height: 1.6; margin-bottom: 18px; }
-
     .plan-preview { margin-top: 14px; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; background: #f8fafc; }
     .plan-canvas { width: 100%; max-height: 320px; height: 320px; display: none; background: white; }
     .plan-placeholder { padding: 40px 20px; text-align: center; color: #94a3b8; font-size: 15px; }
 
-    /* Split grid */
     .split-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 16px; margin-top: 24px; }
-    .split-card {
-      background: white; border: 2px solid #e2e8f0; border-radius: 16px;
-      overflow: hidden; cursor: pointer;
-      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
-      box-shadow: 0 3px 14px rgba(0,0,0,0.06);
-    }
+    .split-card { background: white; border: 2px solid #e2e8f0; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; box-shadow: 0 3px 14px rgba(0,0,0,0.06); }
     .split-card:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.12); border-color: #3b82f6; }
-    .split-head {
-      padding: 13px 15px; background: #f0f7ff; border-bottom: 2px solid #e2e8f0;
-      font-weight: bold; color: #1e3a5f; font-size: 15px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    .split-head { padding: 13px 15px; background: #f0f7ff; border-bottom: 2px solid #e2e8f0; font-weight: bold; color: #1e3a5f; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
     canvas.split-thumb { width: 100%; height: 200px; display: block; background: #f8fafc; }
     .badge { background: #eff6ff; color: #1d4ed8; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: bold; border: 1px solid #bfdbfe; }
 
-    /* ===== DEEL MODAL (groot, simpel) ===== */
-    .deel-modal {
-      position: fixed; inset: 0; background: rgba(15,23,42,0.75);
-      display: none; align-items: flex-start; justify-content: center;
-      padding: 16px; z-index: 9000; overflow-y: auto; backdrop-filter: blur(3px);
-    }
+    .deel-modal { position: fixed; inset: 0; background: rgba(15,23,42,0.75); display: none; align-items: flex-start; justify-content: center; padding: 16px; z-index: 9000; overflow-y: auto; backdrop-filter: blur(3px); }
     .deel-modal.open { display: flex; }
-    .deel-panel {
-      width: min(1300px,100%); background: white; border-radius: 20px;
-      padding: 28px; margin: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.3);
-      position: relative;
-    }
-    .deel-close {
-      position: absolute; top: 16px; right: 16px;
-      background: #f1f5f9; border: none; width: 44px; height: 44px;
-      border-radius: 50%; font-size: 22px; color: #475569; cursor: pointer;
-    }
+    .deel-panel { width: min(1300px,100%); background: white; border-radius: 20px; padding: 28px; margin: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.3); position: relative; }
+    .deel-close { position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 22px; color: #475569; cursor: pointer; }
     .deel-title { font-size: 26px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px; }
     .deel-hint { color: #64748b; font-size: 14px; margin-bottom: 18px; }
 
-    /* Canvas met zoom */
-    .canvas-toolbar {
-      display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;
-    }
-    .ctool {
-      background: #f0f7ff; border: 1.5px solid #bfdbfe; border-radius: 10px;
-      padding: 10px 16px; font-size: 15px; font-weight: bold; color: #1e3a5f; cursor: pointer;
-      transition: background 0.13s;
-    }
+    .canvas-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+    .ctool { background: #f0f7ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 10px 16px; font-size: 15px; font-weight: bold; color: #1e3a5f; cursor: pointer; transition: background 0.13s; }
     .ctool:hover { background: #dbeafe; }
     .zoom-lbl { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: bold; color: #1d4ed8; }
 
     .canvas-wrap { border: 2px solid #e2e8f0; border-radius: 16px; overflow: hidden; background: #f8fafc; margin-bottom: 20px; touch-action: none; }
     canvas.main-canvas { width: 100%; height: 460px; display: block; cursor: crosshair; background: white; touch-action: none; }
 
-    /* Punt formulier — groot en duidelijk */
-    .punt-kaart {
-      background: #f0f7ff; border: 2px solid #bfdbfe; border-radius: 18px;
-      padding: 22px; margin-bottom: 20px;
-    }
-    .punt-info {
-      background: white; border: 1.5px solid #e2e8f0; border-radius: 12px;
-      padding: 14px; font-size: 15px; color: #475569; margin-bottom: 18px; line-height: 1.5;
-    }
+    .punt-kaart { background: #f0f7ff; border: 2px solid #bfdbfe; border-radius: 18px; padding: 22px; margin-bottom: 20px; }
+    .punt-info { background: white; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px; font-size: 15px; color: #475569; margin-bottom: 18px; line-height: 1.5; }
     .punt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
     .punt-fld label { display: block; font-weight: 700; font-size: 14px; color: #374151; margin-bottom: 7px; }
-    .punt-fld input, .punt-fld select, .punt-fld textarea {
-      width: 100%; background: white; border: 1.5px solid #e2e8f0;
-      border-radius: 11px; padding: 13px 15px; font-size: 15px;
-      font-family: Arial, sans-serif; color: #1f2937; outline: none;
-    }
+    .punt-fld input, .punt-fld select, .punt-fld textarea { width: 100%; background: white; border: 1.5px solid #e2e8f0; border-radius: 11px; padding: 13px 15px; font-size: 15px; font-family: Arial, sans-serif; color: #1f2937; outline: none; }
     .punt-fld input:focus, .punt-fld select:focus { border-color: #3b82f6; }
     .punt-fld.full { grid-column: 1/-1; }
     .punt-fld textarea { min-height: 80px; resize: vertical; }
 
-    /* Foto upload per punt */
     .foto-sectie { margin-top: 16px; }
     .foto-sectie-title { font-size: 16px; font-weight: bold; color: #1e3a5f; margin-bottom: 10px; }
     .foto-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); gap: 10px; margin-top: 10px; }
@@ -274,23 +148,14 @@
     .acties { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
     .opgeslagen-msg { margin-top: 12px; padding: 12px 16px; background: #f0fdf4; border: 1.5px solid #86efac; color: #15803d; border-radius: 10px; font-size: 15px; font-weight: bold; }
 
-    /* Lijst opgeslagen punten */
     .punten-lijst { border: 1.5px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
     .punten-lijst-header { padding: 15px 18px; background: #f0f7ff; border-bottom: 1.5px solid #e2e8f0; font-size: 16px; font-weight: bold; color: #1e3a5f; }
     .punten-lijst-body { padding: 14px; }
     .punt-leeg { color: #94a3b8; font-size: 14px; padding: 14px; border: 1.5px dashed #e2e8f0; border-radius: 11px; text-align: center; }
-    .punt-rij {
-      display: flex; align-items: center; gap: 14px; padding: 14px 16px;
-      border: 1.5px solid #e2e8f0; border-radius: 13px; background: #fbfdff;
-      margin-bottom: 10px; cursor: pointer; transition: border-color 0.14s;
-    }
+    .punt-rij { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1.5px solid #e2e8f0; border-radius: 13px; background: #fbfdff; margin-bottom: 10px; cursor: pointer; transition: border-color 0.14s; }
     .punt-rij:hover { border-color: #3b82f6; background: #f0f7ff; }
     .punt-rij:last-child { margin-bottom: 0; }
-    .punt-num {
-      width: 40px; height: 40px; border-radius: 50%; background: #ef4444;
-      color: white; font-weight: bold; font-size: 14px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
+    .punt-num { width: 40px; height: 40px; border-radius: 50%; background: #ef4444; color: white; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .punt-num.done { background: #22c55e; }
     .punt-naam { font-weight: bold; color: #1e3a5f; font-size: 15px; }
     .punt-meta { color: #64748b; font-size: 13px; margin-top: 2px; }
@@ -299,10 +164,8 @@
     .s-done { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
     .punt-fotos { color: #2563eb; font-size: 12px; font-weight: bold; margin-left: auto; flex-shrink: 0; }
 
-    /* Autosave */
     .autosave { display: inline-flex; align-items: center; gap: 7px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 999px; padding: 9px 14px; font-size: 13px; font-weight: bold; }
 
-    /* Lightbox */
     .lightbox { position: fixed; inset: 0; background: rgba(8,15,30,0.94); display: none; align-items: center; justify-content: center; z-index: 12000; padding: 22px; }
     .lightbox.open { display: flex; }
     .lb-inner { width: min(1000px,100%); position: relative; display: flex; align-items: center; justify-content: center; }
@@ -315,20 +178,15 @@
     @media (max-width:1200px) { .split-grid { grid-template-columns: repeat(3,1fr); } }
     @media (max-width:900px) { .split-grid { grid-template-columns: repeat(2,1fr); } canvas.split-thumb { height: 160px; } }
     @media (max-width:760px) {
-      .project-app { flex-direction: column; }
-      .sidebar { width: 100%; }
-      .project-main { padding: 16px; }
-      .split-grid { grid-template-columns: 1fr; }
-      .punt-grid { grid-template-columns: 1fr; }
-      canvas.main-canvas { height: 300px; }
-      .dash-hero h1 { font-size: 28px; }
-      .dash-body { padding: 18px; }
+      .project-app { flex-direction: column; } .sidebar { width: 100%; } .project-main { padding: 16px; }
+      .split-grid { grid-template-columns: 1fr; } .punt-grid { grid-template-columns: 1fr; }
+      canvas.main-canvas { height: 300px; } .dash-hero h1 { font-size: 28px; } .dash-body { padding: 18px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ===== DASHBOARD ===== -->
+<!-- DASHBOARD -->
 <div id="dashPage" class="dashboard">
   <div class="dash-topbar">
     <div class="dash-logo">ed <span>controls</span></div>
@@ -341,7 +199,6 @@
       </button>
     </div>
   </div>
-
   <div class="dash-body">
     <div class="dash-hero">
       <h1>Bouw <span>projecten</span><br>overzicht</h1>
@@ -355,7 +212,7 @@
   </div>
 </div>
 
-<!-- ===== PROJECT MODAL ===== -->
+<!-- PROJECT MODAL -->
 <div class="modal" id="projectModal">
   <div class="mpanel">
     <button class="mpanel-close" onclick="closeProjectModal()">×</button>
@@ -365,6 +222,7 @@
     <div class="photo-upload-area" id="puArea" onclick="document.getElementById('projFotoInput').click()">
       <div class="pua-icon">📷</div>
       <div class="pua-text">Tik hier om een foto te kiezen</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:4px;">Foto wordt automatisch verkleind</div>
     </div>
     <input type="file" id="projFotoInput" class="file-input" accept="image/*">
     <div class="photo-preview-wrap" id="puPreview">
@@ -375,6 +233,8 @@
     <div class="fld"><label>Projectnaam *</label><input type="text" id="projNaam" placeholder="Bijv. KNG50 Utrecht"></div>
     <div class="fld"><label>Locatie</label><input type="text" id="projLocatie" placeholder="Bijv. Utrecht centrum"></div>
 
+    <div id="projErrMsg"></div>
+
     <div class="btn-row">
       <button class="btn btn-blue" onclick="saveProject()">✓ Opslaan</button>
       <button class="btn btn-gray" onclick="closeProjectModal()">Annuleren</button>
@@ -382,7 +242,7 @@
   </div>
 </div>
 
-<!-- ===== PROJECT PAGINA ===== -->
+<!-- PROJECT PAGINA -->
 <div id="projPage" class="project-app hidden">
   <aside class="sidebar">
     <div class="sb-logo">ed <span>controls</span></div>
@@ -391,7 +251,6 @@
     <div class="sb-label">Delen</div>
     <div id="sbMenu"></div>
   </aside>
-
   <main class="project-main">
     <div class="top-bar">
       <button class="btn btn-white" onclick="goBack()">← Terug</button>
@@ -400,7 +259,6 @@
         <button class="btn btn-white" onclick="exportPdf()">📄 PDF rapport</button>
       </div>
     </div>
-
     <div class="content-card">
       <h2 id="projPageTitle"></h2>
       <p>Upload de plattegrond. Deze wordt daarna in 5 delen gesplitst.</p>
@@ -415,7 +273,7 @@
   </main>
 </div>
 
-<!-- ===== DEEL MODAL ===== -->
+<!-- DEEL MODAL -->
 <div class="deel-modal" id="deelModal">
   <div class="deel-panel">
     <button class="deel-close" onclick="closeDeelModal()">×</button>
@@ -437,10 +295,8 @@
       <canvas class="main-canvas" id="mainCanvas" tabindex="0"></canvas>
     </div>
 
-    <!-- Punt formulier -->
     <div class="punt-kaart">
       <div class="punt-info" id="puntInfo">👆 Tik op de tekening om een punt te plaatsen</div>
-
       <div class="punt-grid">
         <div class="punt-fld">
           <label>📌 Omschrijving schade</label>
@@ -467,7 +323,6 @@
         </div>
       </div>
 
-      <!-- Foto's -->
       <div class="foto-sectie">
         <div class="foto-sectie-title">📷 Foto's van de schade</div>
         <label class="upload-lbl-sm" for="puntFotoInput">+ Foto's toevoegen</label>
@@ -485,7 +340,6 @@
       <div id="opslaanMsg" class="opgeslagen-msg hidden">✓ Punt opgeslagen!</div>
     </div>
 
-    <!-- Punten lijst -->
     <div class="punten-lijst">
       <div class="punten-lijst-header" id="pLijstHeader">Punten in dit deel</div>
       <div class="punten-lijst-body" id="pLijstBody"></div>
@@ -493,7 +347,7 @@
   </div>
 </div>
 
-<!-- ===== LIGHTBOX ===== -->
+<!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox">
   <div class="lb-inner">
     <img class="lb-img" id="lbImg" src="" alt="">
@@ -505,7 +359,48 @@
 
 <script>
 const DELEN = 5;
-let projects = JSON.parse(localStorage.getItem('edProjects') || '[]');
+const STORAGE_KEY = 'edProjects_v2';
+
+// Laad projecten veilig
+function loadProjects() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch(e) { return []; }
+}
+
+// Sla op met foutafhandeling — geeft true/false terug
+function saveAll() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+    return true;
+  } catch(e) {
+    // QuotaExceededError — foto's te groot
+    console.warn('localStorage vol:', e);
+    return false;
+  }
+}
+
+// Verklein afbeelding naar max 800px breed, kwaliteit 0.7
+function resizeImage(dataUrl, maxW, maxH, quality) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(cv.toDataURL('image/jpeg', quality || 0.75));
+    };
+    img.src = dataUrl;
+  });
+}
+
+let projects = loadProjects();
 let projIdx = -1, deelIdx = 0, selPuntId = null;
 let draftFotos = [];
 let editProjIdx = -1, nieuwFoto = null;
@@ -513,7 +408,6 @@ let canvasImg = null, zoom = 1, panX = 0, panY = 0;
 let isPan = false, panSX = 0, panSY = 0, cSX = 0, cSY = 0, didPan = false;
 let lbFotos = [], lbIdx = 0;
 
-// ===== INIT =====
 function init() {
   renderDash();
   document.getElementById('planUpload').addEventListener('change', handlePlanUpload);
@@ -529,25 +423,27 @@ function init() {
 function renderDash() {
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   const filtered = projects.filter(p => p.naam.toLowerCase().includes(q) || (p.locatie||'').toLowerCase().includes(q));
-  const totPts = projects.reduce((a,p) => a + p.delen.reduce((b,d) => b+(d.punten||[]).length,0), 0);
-  const donePts = projects.reduce((a,p) => a + p.delen.reduce((b,d) => b+(d.punten||[]).filter(x=>x.status==='done').length,0), 0);
+  const totPts = projects.reduce((a,p) => a + p.delen.reduce((b,d) => b+(d.punten||[]).length, 0), 0);
+  const donePts = projects.reduce((a,p) => a + p.delen.reduce((b,d) => b+(d.punten||[]).filter(x=>x.status==='done').length, 0), 0);
 
   document.getElementById('dashStats').innerHTML = `
     <div class="stat-pill"><span class="stat-dot"></span>${projects.length} project${projects.length!==1?'en':''}</div>
-    <div class="stat-pill"><span class="stat-dot orange"></span>${totPts} schade punt${totPts!==1?'en':''}</div>
+    <div class="stat-pill"><span class="stat-dot orange"></span>${totPts} punt${totPts!==1?'en':''}</div>
     <div class="stat-pill"><span class="stat-dot green"></span>${donePts} afgerond</div>`;
 
   const grid = document.getElementById('projectGrid');
-  if (!filtered.length) { grid.innerHTML='<div style="color:rgba(255,255,255,0.6);padding:20px;grid-column:1/-1;">Geen projecten gevonden.</div>'; return; }
-
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="color:rgba(255,255,255,0.6);padding:20px;grid-column:1/-1;">Geen projecten gevonden.</div>';
+    return;
+  }
   grid.innerHTML = filtered.map(p => {
     const ri = projects.indexOf(p);
     const cnt = p.delen.reduce((a,d) => a+(d.punten||[]).length, 0);
-    const img = p.foto
+    const imgHtml = p.foto
       ? `<img class="project-card-img" src="${p.foto}" alt="" onclick="openProject(${ri})">`
       : `<div class="project-card-img-placeholder" onclick="openProject(${ri})">🏗️</div>`;
     return `<div class="project-card">
-      ${img}
+      ${imgHtml}
       <button class="card-menu-btn" onclick="toggleMenu(event,${ri})">⋮</button>
       <div class="card-dropdown" id="cm${ri}">
         <div class="card-dropdown-item" onclick="openProject(${ri});closeMenus()">📂 Openen</div>
@@ -570,84 +466,127 @@ function toggleMenu(e,i) { e.stopPropagation(); closeMenus(); document.getElemen
 function closeMenus() { document.querySelectorAll('.card-dropdown.open').forEach(d=>d.classList.remove('open')); }
 
 // ===== PROJECT MODAL =====
-function openProjectModal(isEdit=false) {
+function openProjectModal(isEdit) {
+  document.getElementById('projErrMsg').innerHTML = '';
   if (!isEdit) {
-    editProjIdx=-1; nieuwFoto=null;
-    document.getElementById('pModalTitle').textContent='Nieuw project';
-    document.getElementById('projNaam').value='';
-    document.getElementById('projLocatie').value='';
-    document.getElementById('puPreview').style.display='none';
-    document.getElementById('puArea').style.display='block';
+    editProjIdx = -1; nieuwFoto = null;
+    document.getElementById('pModalTitle').textContent = 'Nieuw project';
+    document.getElementById('projNaam').value = '';
+    document.getElementById('projLocatie').value = '';
+    document.getElementById('puPreview').style.display = 'none';
+    document.getElementById('puArea').style.display = 'block';
   }
   document.getElementById('projectModal').classList.add('open');
 }
-function closeProjectModal() { document.getElementById('projectModal').classList.remove('open'); }
+
+function closeProjectModal() {
+  document.getElementById('projectModal').classList.remove('open');
+}
 
 function editProject(i) {
   closeMenus();
-  editProjIdx=i;
-  const p=projects[i];
-  nieuwFoto=p.foto||null;
-  document.getElementById('pModalTitle').textContent='Project bewerken';
-  document.getElementById('projNaam').value=p.naam||'';
-  document.getElementById('projLocatie').value=p.locatie||'';
+  editProjIdx = i;
+  const p = projects[i];
+  nieuwFoto = p.foto || null;
+  document.getElementById('pModalTitle').textContent = 'Project bewerken';
+  document.getElementById('projNaam').value = p.naam || '';
+  document.getElementById('projLocatie').value = p.locatie || '';
+  document.getElementById('projErrMsg').innerHTML = '';
   if (p.foto) {
-    document.getElementById('puPreviewImg').src=p.foto;
-    document.getElementById('puPreview').style.display='block';
-    document.getElementById('puArea').style.display='none';
+    document.getElementById('puPreviewImg').src = p.foto;
+    document.getElementById('puPreview').style.display = 'block';
+    document.getElementById('puArea').style.display = 'none';
   } else {
-    document.getElementById('puPreview').style.display='none';
-    document.getElementById('puArea').style.display='block';
+    document.getElementById('puPreview').style.display = 'none';
+    document.getElementById('puArea').style.display = 'block';
   }
   openProjectModal(true);
 }
 
+// Foto selecteren — direct verkleinen
 function handleProjFoto(e) {
-  const file=e.target.files[0]; if(!file) return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    nieuwFoto=ev.target.result;
-    document.getElementById('puPreviewImg').src=nieuwFoto;
-    document.getElementById('puPreview').style.display='block';
-    document.getElementById('puArea').style.display='none';
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev => {
+    // Verklein naar max 1200x900 voor dashboard-foto
+    const klein = await resizeImage(ev.target.result, 1200, 900, 0.80);
+    nieuwFoto = klein;
+    document.getElementById('puPreviewImg').src = klein;
+    document.getElementById('puPreview').style.display = 'block';
+    document.getElementById('puArea').style.display = 'none';
   };
-  r.readAsDataURL(file); e.target.value='';
+  reader.readAsDataURL(file);
+  e.target.value = '';
 }
 
+// OPSLAAN — de gecorrigeerde functie
 function saveProject() {
-  const naam=document.getElementById('projNaam').value.trim();
-  if (!naam) { alert('Vul een projectnaam in.'); return; }
-  const locatie=document.getElementById('projLocatie').value.trim();
-  if (editProjIdx>=0) {
-    projects[editProjIdx].naam=naam;
-    projects[editProjIdx].locatie=locatie;
-    if (nieuwFoto) projects[editProjIdx].foto=nieuwFoto;
-  } else {
-    projects.push({ naam, locatie, foto:nieuwFoto, plan:null, delen:Array.from({length:DELEN},()=>({punten:[]})) });
+  const naam = document.getElementById('projNaam').value.trim();
+  const errDiv = document.getElementById('projErrMsg');
+  errDiv.innerHTML = '';
+
+  if (!naam) {
+    errDiv.innerHTML = '<div class="err-msg">⚠️ Vul een projectnaam in.</div>';
+    return;
   }
-  save(); closeProjectModal(); renderDash();
+
+  const locatie = document.getElementById('projLocatie').value.trim();
+
+  if (editProjIdx >= 0) {
+    // Bestaand project bewerken
+    projects[editProjIdx].naam = naam;
+    projects[editProjIdx].locatie = locatie;
+    if (nieuwFoto) projects[editProjIdx].foto = nieuwFoto;
+  } else {
+    // Nieuw project aanmaken
+    const nieuwProject = {
+      naam: naam,
+      locatie: locatie,
+      foto: nieuwFoto,
+      plan: null,
+      delen: Array.from({ length: DELEN }, () => ({ punten: [] }))
+    };
+    projects.push(nieuwProject);
+  }
+
+  const gelukt = saveAll();
+  if (!gelukt) {
+    errDiv.innerHTML = '<div class="err-msg">⚠️ Opslaan mislukt — te weinig geheugen. Verwijder wat oude projecten of gebruik kleinere foto\'s.</div>';
+    // Rol terug als nieuw project
+    if (editProjIdx < 0) projects.pop();
+    return;
+  }
+
+  closeProjectModal();
+  renderDash();
 }
 
 function deleteProject(i) {
   closeMenus();
   if (!confirm(`Project "${projects[i].naam}" verwijderen?`)) return;
-  projects.splice(i,1); save(); renderDash();
+  projects.splice(i, 1);
+  saveAll();
+  renderDash();
 }
 
 // ===== PROJECT PAGINA =====
 function openProject(i) {
-  projIdx=i;
-  const p=projects[i];
-  if (!p.delen||p.delen.length<DELEN)
-    p.delen=Array.from({length:DELEN},(_,j)=>p.delen?.[j]||{punten:[]});
-  save();
+  projIdx = i;
+  const p = projects[i];
+  if (!p.delen || p.delen.length < DELEN)
+    p.delen = Array.from({ length: DELEN }, (_, j) => p.delen?.[j] || { punten: [] });
+  saveAll();
   document.getElementById('dashPage').classList.add('hidden');
   document.getElementById('projPage').classList.remove('hidden');
-  document.getElementById('sbProjNaam').textContent=p.naam;
-  document.getElementById('projPageTitle').textContent=p.naam;
+  document.getElementById('sbProjNaam').textContent = p.naam;
+  document.getElementById('projPageTitle').textContent = p.naam;
   renderSidebar(); renderSplitGrid();
   if (p.plan) showPlan(p.plan);
-  else { document.getElementById('planCanvas').style.display='none'; document.getElementById('planPlaceholder').classList.remove('hidden'); }
+  else {
+    document.getElementById('planCanvas').style.display = 'none';
+    document.getElementById('planPlaceholder').classList.remove('hidden');
+  }
 }
 
 function goBack() {
@@ -657,9 +596,9 @@ function goBack() {
 }
 
 function renderSidebar() {
-  const p=projects[projIdx];
-  document.getElementById('sbMenu').innerHTML=p.delen.map((d,i)=>{
-    const cnt=(d.punten||[]).length;
+  const p = projects[projIdx];
+  document.getElementById('sbMenu').innerHTML = p.delen.map((d,i) => {
+    const cnt = (d.punten||[]).length;
     return `<div class="sb-item ${i===deelIdx?'active':''}" onclick="deelIdx=${i};renderSidebar();openDeel(${i})">
       <span>Deel ${i+1}</span><span class="sb-count">(${cnt})</span></div>`;
   }).join('');
@@ -667,75 +606,79 @@ function renderSidebar() {
 
 // ===== SPLIT GRID =====
 function renderSplitGrid() {
-  const p=projects[projIdx];
-  document.getElementById('splitGrid').innerHTML=p.delen.map((d,i)=>{
-    const cnt=(d.punten||[]).length;
+  const p = projects[projIdx];
+  document.getElementById('splitGrid').innerHTML = p.delen.map((d,i) => {
+    const cnt = (d.punten||[]).length;
     return `<div class="split-card" onclick="openDeel(${i})">
       <div class="split-head"><span>Deel ${i+1}</span><span class="badge">${cnt} punt${cnt!==1?'en':''}</span></div>
       <canvas class="split-thumb" id="th${i}"></canvas>
     </div>`;
   }).join('');
-  setTimeout(()=>p.delen.forEach((_,i)=>drawThumb(i)),60);
+  setTimeout(() => p.delen.forEach((_,i) => drawThumb(i)), 60);
 }
 
 function drawThumb(pi) {
-  const cv=document.getElementById('th'+pi); if(!cv) return;
-  const dpr=window.devicePixelRatio||1, dW=cv.offsetWidth||220, dH=cv.offsetHeight||200;
-  cv.width=dW*dpr; cv.height=dH*dpr;
-  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,dW,dH);
-  const p=projects[projIdx], pts=p.delen[pi].punten||[];
+  const cv = document.getElementById('th'+pi); if (!cv) return;
+  const dpr = window.devicePixelRatio||1, dW = cv.offsetWidth||220, dH = cv.offsetHeight||200;
+  cv.width = dW*dpr; cv.height = dH*dpr;
+  const ctx = cv.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,dW,dH);
+  const p = projects[projIdx], pts = p.delen[pi].punten||[];
   if (!p.plan) {
     ctx.fillStyle='#f1f5f9'; ctx.fillRect(0,0,dW,dH);
     ctx.fillStyle='#94a3b8'; ctx.font='bold 14px Arial';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('Deel '+(pi+1),dW/2,dH/2); return;
+    ctx.fillText('Deel '+(pi+1), dW/2, dH/2); return;
   }
-  const img=new Image();
-  img.onload=()=>{
-    const segW=img.naturalWidth/DELEN, segX=segW*pi, segH=img.naturalHeight;
-    const scale=Math.min(dW/segW,dH/segH);
-    const dw=segW*scale, dh=segH*scale, ox=(dW-dw)/2, oy=(dH-dh)/2;
-    ctx.drawImage(img,segX,0,segW,segH,ox,oy,dw,dh);
-    pts.forEach(pt=>{
-      const lx=ox+(pt.x-segX)*scale, ly=oy+pt.y*scale;
+  const img = new Image();
+  img.onload = () => {
+    const segW = img.naturalWidth/DELEN, segX = segW*pi, segH = img.naturalHeight;
+    const scale = Math.min(dW/segW, dH/segH);
+    const dw = segW*scale, dh = segH*scale, ox = (dW-dw)/2, oy = (dH-dh)/2;
+    ctx.drawImage(img, segX,0,segW,segH, ox,oy,dw,dh);
+    pts.forEach(pt => {
+      const lx = ox+(pt.x-segX)*scale, ly = oy+pt.y*scale;
       ctx.beginPath(); ctx.arc(lx,ly,9,0,Math.PI*2);
-      ctx.fillStyle=pt.status==='done'?'#22c55e':'#ef4444'; ctx.fill();
+      ctx.fillStyle = pt.status==='done'?'#22c55e':'#ef4444'; ctx.fill();
       ctx.strokeStyle='white'; ctx.lineWidth=2; ctx.stroke();
       ctx.fillStyle='white'; ctx.font='bold 9px Arial';
       ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('✕',lx,ly);
     });
   };
-  img.src=p.plan;
+  img.src = p.plan;
 }
 
 // ===== PLAN UPLOAD =====
 function handlePlanUpload(e) {
-  const file=e.target.files[0]; if(!file) return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    projects[projIdx].plan=ev.target.result;
-    save(); showPlan(ev.target.result); renderSplitGrid();
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev => {
+    // Verklein plattegrond naar max 2400px breed
+    const klein = await resizeImage(ev.target.result, 2400, 1800, 0.85);
+    projects[projIdx].plan = klein;
+    const ok = saveAll();
+    if (!ok) { alert('Plattegrond te groot om op te slaan. Probeer een kleinere afbeelding.'); projects[projIdx].plan = null; return; }
+    showPlan(klein); renderSplitGrid();
   };
-  r.readAsDataURL(file);
+  reader.readAsDataURL(file);
 }
 
 function showPlan(src) {
-  const cv=document.getElementById('planCanvas'), ctx=cv.getContext('2d'), img=new Image();
-  img.onload=()=>{
-    cv.width=img.naturalWidth; cv.height=img.naturalHeight;
+  const cv = document.getElementById('planCanvas'), ctx = cv.getContext('2d'), img = new Image();
+  img.onload = () => {
+    cv.width = img.naturalWidth; cv.height = img.naturalHeight;
     ctx.drawImage(img,0,0);
     document.getElementById('planPlaceholder').classList.add('hidden');
-    cv.style.display='block';
+    cv.style.display = 'block';
   };
-  img.src=src;
+  img.src = src;
 }
 
 // ===== DEEL MODAL =====
 function openDeel(i) {
-  deelIdx=i; selPuntId=null; draftFotos=[];
+  deelIdx = i; selPuntId = null; draftFotos = [];
   nieuwPunt();
-  document.getElementById('deelTitle').textContent='Deel '+(i+1);
-  document.getElementById('pLijstHeader').textContent='Punten in deel '+(i+1);
+  document.getElementById('deelTitle').textContent = 'Deel '+(i+1);
+  document.getElementById('pLijstHeader').textContent = 'Punten in deel '+(i+1);
   document.getElementById('deelModal').classList.add('open');
   initCanvas(); renderPuntenLijst(); renderSidebar();
 }
@@ -747,56 +690,65 @@ function closeDeelModal() {
 
 // ===== CANVAS =====
 function getSeg() {
-  if (!canvasImg) return {segX:0,segW:800,segH:600};
-  return {segX:canvasImg.naturalWidth/DELEN*deelIdx, segW:canvasImg.naturalWidth/DELEN, segH:canvasImg.naturalHeight};
+  if (!canvasImg) return {segX:0, segW:800, segH:600};
+  return { segX: canvasImg.naturalWidth/DELEN*deelIdx, segW: canvasImg.naturalWidth/DELEN, segH: canvasImg.naturalHeight };
 }
 
 function initCanvas() {
-  const cv=document.getElementById('mainCanvas');
+  const cv = document.getElementById('mainCanvas');
   zoom=1; panX=0; panY=0;
-  const p=projects[projIdx];
-  if (p.plan) { canvasImg=new Image(); canvasImg.onload=fitView; canvasImg.src=p.plan; }
-  else { canvasImg=null; drawCanvas(); }
-  cv.onmousedown=mDown; cv.onmousemove=mMove; cv.onmouseup=mUp;
-  cv.onwheel=mWheel; cv.onkeydown=kDown;
-  cv.ontouchstart=tStart; cv.ontouchmove=tMove; cv.ontouchend=tEnd;
+  const p = projects[projIdx];
+  if (p.plan) { canvasImg = new Image(); canvasImg.onload = fitView; canvasImg.src = p.plan; }
+  else { canvasImg = null; drawCanvas(); }
+  cv.onmousedown = mDown; cv.onmousemove = mMove; cv.onmouseup = mUp;
+  cv.onwheel = mWheel; cv.onkeydown = kDown;
+  cv.ontouchstart = tStart; cv.ontouchmove = tMove; cv.ontouchend = tEnd;
 }
 
 function drawCanvas() {
-  const cv=document.getElementById('mainCanvas'); if(!cv) return;
-  const dpr=window.devicePixelRatio||1, dW=cv.offsetWidth, dH=cv.offsetHeight;
-  cv.width=dW*dpr; cv.height=dH*dpr;
-  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const cv = document.getElementById('mainCanvas'); if (!cv) return;
+  const dpr = window.devicePixelRatio||1, dW = cv.offsetWidth, dH = cv.offsetHeight;
+  cv.width = dW*dpr; cv.height = dH*dpr;
+  const ctx = cv.getContext('2d'); ctx.scale(dpr,dpr);
   ctx.clearRect(0,0,dW,dH);
   ctx.save(); ctx.translate(panX,panY); ctx.scale(zoom,zoom);
-  const {segX,segW,segH}=getSeg();
-  if (canvasImg) ctx.drawImage(canvasImg,segX,0,segW,segH,0,0,segW,segH);
-  else { ctx.fillStyle='#f0f7ff'; ctx.fillRect(0,0,800,600); ctx.fillStyle='#94a3b8'; ctx.font='bold 18px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('Upload eerst een plattegrond',400,300); }
-  (projects[projIdx].delen[deelIdx].punten||[]).forEach(pt=>drawMarker(ctx,pt.x-segX,pt.y,pt));
+  const {segX,segW,segH} = getSeg();
+  if (canvasImg) ctx.drawImage(canvasImg, segX,0,segW,segH, 0,0,segW,segH);
+  else {
+    ctx.fillStyle='#f0f7ff'; ctx.fillRect(0,0,800,600);
+    ctx.fillStyle='#94a3b8'; ctx.font='bold 18px Arial';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Upload eerst een plattegrond',400,300);
+  }
+  (projects[projIdx].delen[deelIdx].punten||[]).forEach(pt => drawMarker(ctx, pt.x-segX, pt.y, pt));
   ctx.restore();
-  document.getElementById('zoomLbl').textContent=Math.round(zoom*100)+'%';
+  document.getElementById('zoomLbl').textContent = Math.round(zoom*100)+'%';
 }
 
 function drawMarker(ctx,lx,ly,pt) {
-  const r=14/zoom, sel=pt.id===selPuntId;
+  const r = 14/zoom, sel = pt.id===selPuntId;
   ctx.beginPath(); ctx.arc(lx,ly,r,0,Math.PI*2);
-  ctx.fillStyle=pt.status==='done'?'#22c55e':'#ef4444'; ctx.fill();
-  if(sel){ ctx.strokeStyle='#2563eb'; ctx.lineWidth=4/zoom; ctx.stroke();
+  ctx.fillStyle = pt.status==='done'?'#22c55e':'#ef4444'; ctx.fill();
+  if (sel) {
+    ctx.strokeStyle='#2563eb'; ctx.lineWidth=4/zoom; ctx.stroke();
     ctx.beginPath(); ctx.arc(lx,ly,r+6/zoom,0,Math.PI*2);
     ctx.strokeStyle='rgba(37,99,235,0.3)'; ctx.lineWidth=3/zoom; ctx.stroke();
   } else { ctx.strokeStyle='white'; ctx.lineWidth=2.5/zoom; ctx.stroke(); }
   ctx.fillStyle='white'; ctx.font=`bold ${Math.max(10,13/zoom)}px Arial`;
   ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('✕',lx,ly);
-  if(pt.naam){ ctx.fillStyle='#1e3a5f'; ctx.font=`bold ${Math.max(9,11/zoom)}px Arial`; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(pt.naam,lx+r+4/zoom,ly); }
+  if (pt.naam) {
+    ctx.fillStyle='#1e3a5f'; ctx.font=`bold ${Math.max(9,11/zoom)}px Arial`;
+    ctx.textAlign='left'; ctx.fillText(pt.naam, lx+r+4/zoom, ly);
+  }
 }
 
-function segCoords(cv,e){const r=cv.getBoundingClientRect();return{lx:(e.clientX-r.left-panX)/zoom,ly:(e.clientY-r.top-panY)/zoom};}
-function toFull(lx,ly){return{x:lx+getSeg().segX,y:ly};}
-function toLoc(x,y){return{lx:x-getSeg().segX,ly:y};}
+function segCoords(cv,e) { const r=cv.getBoundingClientRect(); return {lx:(e.clientX-r.left-panX)/zoom, ly:(e.clientY-r.top-panY)/zoom}; }
+function toFull(lx,ly) { return {x:lx+getSeg().segX, y:ly}; }
+function toLoc(x,y) { return {lx:x-getSeg().segX, ly:y}; }
 
-function mDown(e){cSX=e.clientX;cSY=e.clientY;didPan=false;isPan=true;panSX=e.clientX-panX;panSY=e.clientY-panY;}
-function mMove(e){if(!isPan)return;if(Math.abs(e.clientX-cSX)>5||Math.abs(e.clientY-cSY)>5)didPan=true;panX=e.clientX-panSX;panY=e.clientY-panSY;drawCanvas();}
-function mUp(e){
+function mDown(e) { cSX=e.clientX; cSY=e.clientY; didPan=false; isPan=true; panSX=e.clientX-panX; panSY=e.clientY-panY; }
+function mMove(e) { if(!isPan)return; if(Math.abs(e.clientX-cSX)>5||Math.abs(e.clientY-cSY)>5)didPan=true; panX=e.clientX-panSX; panY=e.clientY-panSY; drawCanvas(); }
+function mUp(e) {
   isPan=false; if(didPan){didPan=false;return;}
   if(!document.getElementById('editToggle').checked) return;
   const cv=document.getElementById('mainCanvas');
@@ -806,7 +758,7 @@ function mUp(e){
   if(hit) selectPunt(hit.id);
   else { const f=toFull(lx,ly); plaatsPunt(f.x,f.y); }
 }
-function mWheel(e){
+function mWheel(e) {
   e.preventDefault();
   const r=document.getElementById('mainCanvas').getBoundingClientRect();
   const mx=e.clientX-r.left, my=e.clientY-r.top;
@@ -828,7 +780,7 @@ function kDown(e){
   else if(e.key==='ArrowDown'){pt.y+=s;e.preventDefault();}
   else if(e.key==='Delete'||e.key==='Backspace'){deletePunt();return;}
   else if(e.key==='Escape'){selPuntId=null;drawCanvas();return;}
-  save(); drawCanvas();
+  saveAll(); drawCanvas();
 }
 
 function zoomIn(){zoomBy(1.2);}
@@ -838,18 +790,16 @@ function resetView(){zoom=1;panX=0;panY=0;drawCanvas();}
 function fitView(){const cv=document.getElementById('mainCanvas');const{segW,segH}=getSeg();zoom=Math.min(cv.offsetWidth/segW,cv.offsetHeight/segH)*0.94;panX=(cv.offsetWidth-segW*zoom)/2;panY=(cv.offsetHeight-segH*zoom)/2;drawCanvas();}
 
 // ===== PUNTEN =====
-function plaatsPunt(x,y){
+function plaatsPunt(x,y) {
   const p=projects[projIdx];
   if(!p.delen[deelIdx].punten) p.delen[deelIdx].punten=[];
   const id='pt_'+Date.now();
-  const datum=new Date().toLocaleDateString('nl-NL');
-  p.delen[deelIdx].punten.push({id,x,y,naam:'',collega:'',status:'open',datum,notitie:'',fotos:[]});
-  save(); selectPunt(id); drawCanvas(); renderPuntenLijst();
+  p.delen[deelIdx].punten.push({id,x,y,naam:'',collega:'',status:'open',datum:new Date().toLocaleDateString('nl-NL'),notitie:'',fotos:[]});
+  saveAll(); selectPunt(id); drawCanvas(); renderPuntenLijst();
 }
 
-function selectPunt(id){
-  selPuntId=id;
-  draftFotos=[];
+function selectPunt(id) {
+  selPuntId=id; draftFotos=[];
   const pt=(projects[projIdx].delen[deelIdx].punten||[]).find(p=>p.id===id);
   if(!pt) return;
   document.getElementById('pNaam').value=pt.naam||'';
@@ -859,11 +809,11 @@ function selectPunt(id){
   document.getElementById('pNotitie').value=pt.notitie||'';
   draftFotos=[...(pt.fotos||[])];
   const{lx,ly}=toLoc(pt.x,pt.y);
-  document.getElementById('puntInfo').innerHTML=`<strong>✓ Geselecteerd:</strong> ${pt.naam||'(geen naam)'} &nbsp;|&nbsp; X:${Math.round(lx)} Y:${Math.round(ly)}`;
+  document.getElementById('puntInfo').innerHTML=`<strong>✓ Geselecteerd:</strong> ${pt.naam||'(geen naam)'} &nbsp;|&nbsp; positie ${Math.round(lx)}, ${Math.round(ly)}`;
   renderFotos(); drawCanvas();
 }
 
-function nieuwPunt(){
+function nieuwPunt() {
   selPuntId=null; draftFotos=[];
   document.getElementById('pNaam').value='';
   document.getElementById('pCollega').value='';
@@ -874,43 +824,46 @@ function nieuwPunt(){
   renderFotos(); drawCanvas();
 }
 
-function savePunt(){
+function savePunt() {
   if(!selPuntId){alert('Selecteer eerst een punt op de tekening.');return;}
   const pt=(projects[projIdx].delen[deelIdx].punten||[]).find(p=>p.id===selPuntId);
-  if(!pt) return;
+  if(!pt)return;
   pt.naam=document.getElementById('pNaam').value;
   pt.collega=document.getElementById('pCollega').value;
   pt.status=document.getElementById('pStatus').value;
   pt.datum=document.getElementById('pDatum').value;
   pt.notitie=document.getElementById('pNotitie').value;
   pt.fotos=[...draftFotos];
-  save(); drawCanvas(); renderPuntenLijst(); renderSidebar();
+  const ok=saveAll();
+  if(!ok){alert('Opslaan mislukt — probeer minder of kleinere foto\'s toe te voegen.');return;}
+  drawCanvas(); renderPuntenLijst(); renderSidebar();
   const m=document.getElementById('opslaanMsg');
   m.classList.remove('hidden'); setTimeout(()=>m.classList.add('hidden'),2500);
 }
 
-function deletePunt(){
-  if(!selPuntId) return;
-  if(!confirm('Dit punt verwijderen?')) return;
-  const p=projects[projIdx];
-  p.delen[deelIdx].punten=(p.delen[deelIdx].punten||[]).filter(pt=>pt.id!==selPuntId);
+function deletePunt() {
+  if(!selPuntId)return;
+  if(!confirm('Dit punt verwijderen?'))return;
+  projects[projIdx].delen[deelIdx].punten=(projects[projIdx].delen[deelIdx].punten||[]).filter(pt=>pt.id!==selPuntId);
   selPuntId=null; draftFotos=[];
-  save(); drawCanvas(); renderPuntenLijst(); renderSidebar(); nieuwPunt();
+  saveAll(); drawCanvas(); renderPuntenLijst(); renderSidebar(); nieuwPunt();
 }
 
 // ===== FOTO'S =====
-function handlePuntFotos(e){
-  Array.from(e.target.files).forEach(file=>{
+function handlePuntFotos(e) {
+  Array.from(e.target.files).forEach(file => {
     const r=new FileReader();
-    r.onload=ev=>{draftFotos.push(ev.target.result);renderFotos();};
+    r.onload = async ev => {
+      const klein = await resizeImage(ev.target.result, 1200, 900, 0.75);
+      draftFotos.push(klein); renderFotos();
+    };
     r.readAsDataURL(file);
   });
   e.target.value='';
 }
 
-function renderFotos(){
-  const leeg=document.getElementById('fotoLeeg');
-  const grid=document.getElementById('fotoGrid');
+function renderFotos() {
+  const leeg=document.getElementById('fotoLeeg'), grid=document.getElementById('fotoGrid');
   if(!draftFotos.length){leeg.classList.remove('hidden');grid.classList.add('hidden');grid.innerHTML='';return;}
   leeg.classList.add('hidden'); grid.classList.remove('hidden');
   grid.innerHTML=draftFotos.map((src,i)=>
@@ -922,7 +875,7 @@ function renderFotos(){
 function delFoto(i){draftFotos.splice(i,1);renderFotos();}
 
 // ===== PUNTEN LIJST =====
-function renderPuntenLijst(){
+function renderPuntenLijst() {
   const pts=(projects[projIdx].delen[deelIdx].punten||[]);
   const body=document.getElementById('pLijstBody');
   if(!pts.length){body.innerHTML='<div class="punt-leeg">Nog geen punten in dit deel</div>';return;}
@@ -934,7 +887,7 @@ function renderPuntenLijst(){
         <div class="punt-naam">${pt.naam||'(geen omschrijving)'}
           <span class="status-badge ${pt.status==='done'?'s-done':'s-open'}">${pt.status==='done'?'Klaar':'Open'}</span>
         </div>
-        <div class="punt-meta">${pt.collega?'👷 '+pt.collega+' &nbsp;':''} ${pt.datum?'📅 '+pt.datum:''}</div>
+        <div class="punt-meta">${pt.collega?'👷 '+pt.collega+'&nbsp;&nbsp;':''}${pt.datum?'📅 '+pt.datum:''}</div>
       </div>
       ${fCnt?`<div class="punt-fotos">📷 ${fCnt}</div>`:''}
     </div>`;
@@ -967,10 +920,7 @@ function exportPdf(){
   doc.save((p.naam||'rapport')+'_rapport.pdf');
 }
 
-// ===== SAVE =====
-function save(){localStorage.setItem('edProjects',JSON.stringify(projects));}
-
-window.addEventListener('DOMContentLoaded',init);
+window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
