@@ -1,776 +1,1665 @@
-"use client";
-
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, LayoutDashboard, Folder, Trash2, AlertCircle, HardHat, MapPin, User, ChevronRight, Upload, X, MousePointer2, FileText, ImageIcon, ZoomIn, ZoomOut, Maximize, RotateCcw } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-
-// --- TYPES ---
-type Fase = 'start' | 'mid' | 'end';
-type Urgentie = 'laag' | 'middel' | 'hoog';
-
-interface Project {
-  id: string;
-  name: string;
-  location?: string;
-  client?: string;
-  photoUrl?: string;
-  planUrl?: string;
-  createdBy: string;
-  createdAt?: any;
-}
-
-interface Registration {
-  id: string;
-  title: string;
-  category: string;
-  locationDesc?: string;
-  urgency: Urgentie;
-  status: 'open' | 'done';
-  responsible?: string;
-  note?: string;
-  fase: Fase;
-  photoUrls: string[];
-  planX?: number;
-  planY?: number;
-  planDeel?: number; // 0 t/m 4 (5 delen)
-  createdAt: any;
-}
-
-export default function BGControlsApp() {
-  // --- AUTH PLACEHOLDER ---
-  const currentUser = { 
-    id: "temp_local",
-    name: 'Testgebruiker', 
-    email: 'test@local', 
-    role: 'Beheerder' 
-  };
-  
-  const [activePage, setActivePage] = useState<'dashboard' | 'projects' | 'project-detail'>('dashboard');
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [currentProject, setCurrentProject] = useState<Project | null>(null);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [activeFase, setActiveFase] = useState<Fase>('start');
-  const [saveStatus, setSaveStatus] = useState('Opgeslagen');
-
-  // Modals
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [isRegModalOpen, setIsRegModalOpen] = useState(false);
-  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
-  
-  // Forms
-  const [newProject, setNewProject] = useState({ name: '', location: '', client: '', photoUrl: '' });
-  const [editingReg, setEditingReg] = useState<Registration | null>(null);
-  const [regForm, setRegForm] = useState<Partial<Registration>>({
-    title: '', category: 'Scheurvorming', urgency: 'laag', status: 'open', note: ''
-  });
-
-  // Plan Canvas State
-  const [selectedDeel, setSelectedDeel] = useState(0);
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const planImageRef = useRef<HTMLImageElement | null>(null);
-
-  // --- DATA FETCHING ---
-  useEffect(() => {
-    const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const projs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
-      setProjects(projs);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!currentProject) return;
-    const q = query(collection(db, 'projects', currentProject.id, 'registrations'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const regs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Registration));
-      setRegistrations(regs);
-    });
-    return () => unsubscribe();
-  }, [currentProject]);
-
-  // Load Image into Ref
-  useEffect(() => {
-    if (currentProject?.planUrl) {
-      const img = new Image();
-      img.src = currentProject.planUrl;
-      img.onload = () => {
-        planImageRef.current = img;
-        if (isPlanModalOpen) drawCanvas();
-      };
-    } else {
-      planImageRef.current = null;
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bouwherstel Tool</title>
+  <style>
+    :root{
+      --bg:#f4f1eb;
+      --panel:#ffffff;
+      --panel-2:#f8f6f2;
+      --line:#ddd6cb;
+      --text:#1f1f1f;
+      --muted:#6f6a63;
+      --primary:#0b6b6f;
+      --primary-dark:#084f52;
+      --danger:#c73333;
+      --warning:#b7791f;
+      --ok:#2f855a;
+      --shadow:0 8px 24px rgba(0,0,0,.08);
+      --radius:16px;
     }
-  }, [currentProject?.planUrl]);
 
-  // Redraw when modal or state changes
-  useEffect(() => {
-    if (isPlanModalOpen && planImageRef.current) {
-      // Small timeout to ensure canvas DOM is ready
-      const timer = setTimeout(() => drawCanvas(), 50);
-      return () => clearTimeout(timer);
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    body{min-height:100vh}
+
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer;border:none}
+    img{max-width:100%;display:block}
+
+    .app{
+      display:grid;
+      grid-template-columns:280px 1fr;
+      min-height:100vh;
     }
-  }, [isPlanModalOpen, zoom, pan, selectedDeel, registrations, activeFase]);
 
-  // --- ACTIONS ---
-  const handleSaveStatus = (msg: string) => {
-    setSaveStatus(msg);
-    setTimeout(() => setSaveStatus('Opgeslagen'), 2000);
-  };
-
-  const saveProject = async () => {
-    if (!newProject.name) return;
-    handleSaveStatus('Opslaan...');
-    addDoc(collection(db, 'projects'), {
-      ...newProject,
-      createdBy: currentUser.name,
-      createdAt: serverTimestamp()
-    });
-    setNewProject({ name: '', location: '', client: '', photoUrl: '' });
-    setIsProjectModalOpen(false);
-    handleSaveStatus('✓ Project aangemaakt');
-  };
-
-  const deleteProject = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (confirm('Weet u zeker dat u dit project wilt verwijderen?')) {
-      deleteDoc(doc(db, 'projects', id));
-      if (currentProject?.id === id) setActivePage('projects');
+    .sidebar{
+      background:#1f2b2f;
+      color:#fff;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
     }
-  };
 
-  const saveRegistration = async () => {
-    if (!currentProject || !regForm.title) return;
-    handleSaveStatus('Opslaan...');
-    
-    const data = {
-      ...regForm,
-      fase: activeFase,
-      updatedAt: serverTimestamp()
-    };
-
-    if (editingReg) {
-      updateDoc(doc(db, 'projects', currentProject.id, 'registrations', editingReg.id), data);
-    } else {
-      addDoc(collection(db, 'projects', currentProject.id, 'registrations'), {
-        ...data,
-        photoUrls: [],
-        createdBy: currentUser.name,
-        createdAt: serverTimestamp()
-      });
+    .brand{
+      font-size:24px;
+      font-weight:700;
+      line-height:1.2;
     }
-    setIsRegModalOpen(false);
-    handleSaveStatus('✓ Punt opgeslagen');
-  };
 
-  const deleteRegistration = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!currentProject) return;
-    if (confirm('Dit punt verwijderen?')) {
-      deleteDoc(doc(db, 'projects', currentProject.id, 'registrations', id));
+    .brand small{
+      display:block;
+      margin-top:6px;
+      font-size:13px;
+      color:#cbd5d9;
+      font-weight:400;
     }
-  };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, target: 'project' | 'plan' | 'reg') => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      if (target === 'project') setNewProject({ ...newProject, photoUrl: base64 });
-      if (target === 'plan' && currentProject) {
-        updateDoc(doc(db, 'projects', currentProject.id), { planUrl: base64 });
-        setCurrentProject({ ...currentProject, planUrl: base64 });
-        handleSaveStatus('✓ Plattegrond opgeslagen');
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // --- CANVAS LOGIC ---
-  const drawCanvas = () => {
-    const canvas = canvasRef.current;
-    const img = planImageRef.current;
-    if (!canvas || !img) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Reset transform before clear
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    const partWidth = img.width / 5;
-    const sx = partWidth * selectedDeel;
-    
-    ctx.save();
-    ctx.translate(pan.x, pan.y);
-    ctx.scale(zoom, zoom);
-    
-    // Draw only the selected part
-    ctx.drawImage(img, sx, 0, partWidth, img.height, 0, 0, canvas.width, canvas.height);
-    
-    // Draw markers
-    registrations.filter(r => r.planDeel === selectedDeel && r.fase === activeFase).forEach((reg, idx) => {
-      if (reg.planX != null && reg.planY != null) {
-        const color = reg.urgency === 'hoog' ? '#ef4444' : reg.urgency === 'middel' ? '#f59e0b' : '#22c55e';
-        ctx.beginPath();
-        ctx.arc(reg.planX, reg.planY, 15 / zoom, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2 / zoom;
-        ctx.stroke();
-        
-        ctx.fillStyle = 'white';
-        ctx.font = `bold ${Math.max(10, 12 / zoom)}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText((idx + 1).toString(), reg.planX, reg.planY);
-      }
-    });
-    ctx.restore();
-  };
-
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!currentProject) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    
-    const x = (e.clientX - rect.left - pan.x) / zoom;
-    const y = (e.clientY - rect.top - pan.y) / zoom;
-    
-    const hit = registrations.find(r => 
-      r.planDeel === selectedDeel && 
-      r.fase === activeFase && 
-      r.planX != null && 
-      Math.hypot(r.planX - x, r.planY! - y) < 20 / zoom
-    );
-    
-    if (hit) {
-      setEditingReg(hit);
-      setRegForm(hit);
-      setIsRegModalOpen(true);
-    } else {
-      setRegForm({
-        title: '', category: 'Scheurvorming', urgency: 'laag', status: 'open',
-        planX: x, planY: y, planDeel: selectedDeel, fase: activeFase
-      });
-      setIsRegModalOpen(true);
+    .side-btn{
+      width:100%;
+      text-align:left;
+      padding:14px 16px;
+      border-radius:12px;
+      background:rgba(255,255,255,.08);
+      color:#fff;
     }
-  };
 
-  // --- PDF EXPORT ---
-  const exportPDF = () => {
-    if (!currentProject) return;
-    const doc = new jsPDF();
-    doc.setFontSize(22);
-    doc.setTextColor(26, 46, 69);
-    doc.text(currentProject.name, 14, 20);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Locatie: ${currentProject.location || '-'}`, 14, 28);
-    doc.text(`Opdrachtgever: ${currentProject.client || '-'}`, 14, 34);
-    doc.text(`Datum: ${new Date().toLocaleDateString('nl-NL')}`, 14, 40);
-    let y = 50;
-    const phases: Fase[] = ['start', 'mid', 'end'];
-    const phaseLabels = { start: 'START FASE', mid: 'MIDDEN FASE', end: 'EINDE FASE' };
-    phases.forEach(phase => {
-      const phaseRegs = registrations.filter(r => r.fase === phase);
-      if (phaseRegs.length > 0) {
-        doc.setFontSize(14);
-        doc.setTextColor(26, 46, 69);
-        doc.text(phaseLabels[phase], 14, y);
-        y += 6;
-        const tableData = phaseRegs.map((r, i) => [
-          i + 1,
-          r.title,
-          r.category,
-          r.urgency.toUpperCase(),
-          r.status === 'done' ? 'KLAAR' : 'OPEN',
-          r.responsible || '-',
-          new Date(r.createdAt?.seconds * 1000).toLocaleDateString('nl-NL')
-        ]);
-        (doc as any).autoTable({
-          startY: y,
-          head: [['#', 'Omschrijving', 'Categorie', 'Urgentie', 'Status', 'Verantwoordelijke', 'Datum']],
-          body: tableData,
-          theme: 'grid',
-          headStyles: { fillColor: [26, 46, 69] },
-          styles: { fontSize: 8 }
-        });
-        y = (doc as any).lastAutoTable.finalY + 15;
-      }
-    });
-    doc.save(`${currentProject.name}_rapport.pdf`);
-  };
+    .side-btn.active{
+      background:var(--primary);
+    }
 
-  // --- STATS ---
-  const stats = useMemo(() => {
-    const totalRegs = registrations.length;
-    const openRegs = registrations.filter(r => r.status === 'open').length;
-    const doneRegs = totalRegs - openRegs;
-    return { totalRegs, openRegs, doneRegs };
-  }, [registrations]);
+    .content{
+      padding:22px;
+    }
 
-  const sortedRegistrations = useMemo(() => {
-    const urgencyOrder: Record<Urgentie, number> = { hoog: 0, middel: 1, laag: 2 };
-    return [...registrations].sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
-  }, [registrations]);
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
 
-  return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white flex flex-col shrink-0">
-        <div className="p-6 border-b border-slate-800 cursor-pointer" onClick={() => setActivePage('dashboard')}>
-          <h1 className="text-xl font-black tracking-tighter">bg <span className="font-light text-slate-400">CONTROLS</span></h1>
-        </div>
-        <div className="p-4 border-b border-slate-800 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold">T</div>
-          <div>
-            <div className="text-sm font-bold">{currentUser.name}</div>
-            <div className="text-[10px] text-slate-500 uppercase font-black">{currentUser.role}</div>
+    .title-wrap h1{
+      margin:0;
+      font-size:28px;
+      line-height:1.1;
+    }
+
+    .title-wrap p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .primary-btn{
+      background:var(--primary);
+      color:#fff;
+      padding:14px 18px;
+      border-radius:12px;
+      font-weight:700;
+    }
+
+    .primary-btn:hover{
+      background:var(--primary-dark);
+    }
+
+    .secondary-btn{
+      background:#e8f1f1;
+      color:var(--primary-dark);
+      padding:12px 16px;
+      border-radius:12px;
+      font-weight:700;
+    }
+
+    .danger-btn{
+      background:#fdeaea;
+      color:#a32626;
+      padding:12px 16px;
+      border-radius:12px;
+      font-weight:700;
+    }
+
+    .hidden{display:none !important}
+
+    .dashboard{
+      display:grid;
+      gap:20px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:16px;
+    }
+
+    .stat-card,
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .stat-card{
+      padding:18px;
+    }
+
+    .stat-card h3{
+      margin:0 0 10px;
+      font-size:14px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .stat-card .big{
+      font-size:34px;
+      font-weight:700;
+    }
+
+    .dashboard-photos{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:16px;
+    }
+
+    .dash-photo{
+      overflow:hidden;
+      border-radius:16px;
+      background:#ddd;
+      border:1px solid var(--line);
+      min-height:180px;
+    }
+
+    .dash-photo img{
+      width:100%;
+      height:180px;
+      object-fit:cover;
+    }
+
+    .project-list{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+      gap:18px;
+    }
+
+    .project-card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .project-cover{
+      height:170px;
+      background:#d8d2c8;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#6b6257;
+      font-weight:700;
+      font-size:15px;
+    }
+
+    .project-body{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .project-body h3{
+      margin:0;
+      font-size:20px;
+    }
+
+    .project-meta{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .project-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .project-view{
+      display:grid;
+      gap:18px;
+    }
+
+    .project-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+
+    .project-header h2{
+      margin:0 0 8px;
+      font-size:26px;
+    }
+
+    .project-header p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .plan-wrap{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      display:grid;
+      gap:16px;
+    }
+
+    .plan-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .plan-grid{
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0,1fr));
+      gap:14px;
+    }
+
+    .part-card{
+      background:var(--panel-2);
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .part-card:hover{
+      transform:translateY(-2px);
+      box-shadow:var(--shadow);
+    }
+
+    .part-thumb{
+      height:120px;
+      background:#ddd7cd;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#746b61;
+      font-weight:700;
+    }
+
+    .part-label{
+      padding:12px;
+      font-size:14px;
+      font-weight:700;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+
+    .badge{
+      background:#efe7db;
+      color:#7b5f33;
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .markers-layer{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+    }
+
+    .marker-mini{
+      position:absolute;
+      width:18px;
+      height:18px;
+      transform:translate(-50%,-50%);
+    }
+
+    .marker-mini:before,
+    .marker-mini:after{
+      content:"";
+      position:absolute;
+      left:8px;
+      top:0;
+      width:3px;
+      height:18px;
+      background:var(--danger);
+      border-radius:2px;
+    }
+
+    .marker-mini:before{transform:rotate(45deg)}
+    .marker-mini:after{transform:rotate(-45deg)}
+
+    .phase-tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .phase-tab{
+      padding:12px 16px;
+      border-radius:12px;
+      background:#ece7df;
+      color:#4e473f;
+      font-weight:700;
+    }
+
+    .phase-tab.active{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.5);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      z-index:50;
+    }
+
+    .modal-card{
+      width:min(1100px, 100%);
+      max-height:92vh;
+      overflow:auto;
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 20px 50px rgba(0,0,0,.22);
+      padding:18px;
+      display:grid;
+      gap:18px;
+    }
+
+    .modal-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    .modal-head h3{
+      margin:0 0 6px;
+      font-size:24px;
+    }
+
+    .modal-head p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .close-btn{
+      width:44px;
+      height:44px;
+      border-radius:12px;
+      background:#f2eee8;
+      font-size:24px;
+      line-height:1;
+    }
+
+    .detail-layout{
+      display:grid;
+      grid-template-columns:1.2fr .9fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .zoom-board{
+      background:#f7f4ef;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+
+    .board-frame{
+      position:relative;
+      width:100%;
+      aspect-ratio:16/10;
+      background:#ddd7cd;
+      border-radius:14px;
+      overflow:hidden;
+      cursor:crosshair;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#766d63;
+      font-weight:700;
+      user-select:none;
+    }
+
+    .board-frame img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      background:#e8e1d5;
+    }
+
+    .marker{
+      position:absolute;
+      width:28px;
+      height:28px;
+      transform:translate(-50%,-50%);
+      cursor:pointer;
+    }
+
+    .marker:before,
+    .marker:after{
+      content:"";
+      position:absolute;
+      left:12px;
+      top:0;
+      width:4px;
+      height:28px;
+      background:var(--danger);
+      border-radius:2px;
+    }
+
+    .marker:before{transform:rotate(45deg)}
+    .marker:after{transform:rotate(-45deg)}
+
+    .side-panel{
+      display:grid;
+      gap:14px;
+    }
+
+    .box{
+      background:#faf8f4;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+
+    .box h4{
+      margin:0 0 12px;
+      font-size:17px;
+    }
+
+    .field{
+      display:grid;
+      gap:6px;
+      margin-bottom:12px;
+    }
+
+    .field label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      border:1px solid #cfc6ba;
+      border-radius:12px;
+      padding:12px 14px;
+      background:#fff;
+    }
+
+    .field textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .phase-panels{
+      display:grid;
+      gap:12px;
+    }
+
+    .phase-panel{
+      display:none;
+      gap:12px;
+    }
+
+    .phase-panel.active{
+      display:grid;
+    }
+
+    .photo-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:10px;
+    }
+
+    .photo-item{
+      border-radius:12px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      background:#e5ded2;
+      height:110px;
+      cursor:pointer;
+      position:relative;
+    }
+
+    .photo-item img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .photo-empty{
+      height:110px;
+      border:2px dashed #cdbfae;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#847868;
+      font-size:14px;
+      text-align:center;
+      padding:12px;
+    }
+
+    .point-list{
+      display:grid;
+      gap:10px;
+      max-height:280px;
+      overflow:auto;
+    }
+
+    .point-item{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:12px;
+      display:grid;
+      gap:8px;
+    }
+
+    .point-item.active{
+      border-color:var(--primary);
+      box-shadow:0 0 0 2px rgba(11,107,111,.12);
+    }
+
+    .point-row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .point-name{
+      font-weight:700;
+    }
+
+    .small{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .row-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .tiny-btn{
+      background:#f0ece5;
+      color:#3c3834;
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .tiny-btn.danger{
+      background:#fdeaea;
+      color:#a32626;
+    }
+
+    .lightbox{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.85);
+      z-index:80;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .lightbox-card{
+      width:min(1100px,100%);
+      display:grid;
+      gap:14px;
+    }
+
+    .lightbox-stage{
+      position:relative;
+      background:#111;
+      border-radius:16px;
+      overflow:hidden;
+      min-height:70vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .lightbox-stage img{
+      max-height:78vh;
+      width:auto;
+      max-width:100%;
+      object-fit:contain;
+    }
+
+    .lightbox-close,
+    .nav-btn{
+      position:absolute;
+      background:rgba(255,255,255,.14);
+      color:#fff;
+      width:52px;
+      height:52px;
+      border-radius:14px;
+      font-size:24px;
+      backdrop-filter:blur(6px);
+    }
+
+    .lightbox-close{top:14px;right:14px}
+    .nav-prev{left:14px;top:50%;transform:translateY(-50%)}
+    .nav-next{right:14px;top:50%;transform:translateY(-50%)}
+
+    .empty-state{
+      background:var(--panel);
+      border:1px dashed #c9beb1;
+      border-radius:18px;
+      padding:40px 20px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .file-input{
+      display:none;
+    }
+
+    @media (max-width: 1100px){
+      .detail-layout{grid-template-columns:1fr}
+      .plan-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
+    }
+
+    @media (max-width: 800px){
+      .app{grid-template-columns:1fr}
+      .sidebar{padding:16px}
+      .stats{grid-template-columns:1fr}
+      .dashboard-photos{grid-template-columns:1fr}
+      .plan-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .photo-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .content{padding:16px}
+    }
+
+    @media (max-width: 560px){
+      .plan-grid{grid-template-columns:1fr}
+      .photo-grid{grid-template-columns:1fr}
+      .phase-tabs{display:grid;grid-template-columns:1fr 1fr 1fr}
+      .phase-tab{text-align:center;padding:12px 8px;font-size:14px}
+      .project-header h2{font-size:22px}
+      .title-wrap h1{font-size:24px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        Bouwherstel Tool
+        <small>Zonder login - simpele werkversie</small>
+      </div>
+
+      <button class="side-btn active" id="navDashboardBtn">Dashboard</button>
+      <button class="side-btn" id="navProjectsBtn">Projecten</button>
+      <button class="side-btn" id="newProjectSideBtn">Nieuw project</button>
+    </aside>
+
+    <main class="content">
+      <section id="dashboardView">
+        <div class="topbar">
+          <div class="title-wrap">
+            <h1>Dashboard</h1>
+            <p>Snel overzicht van projecten, punten en laatste werkfoto’s.</p>
           </div>
+          <button class="primary-btn" id="openNewProjectBtn">Nieuw project</button>
         </div>
-        <nav className="flex-1 p-4 space-y-1">
-          <Button variant="ghost" onClick={() => setActivePage('dashboard')} className={cn("w-full justify-start gap-3 hover:bg-slate-800", activePage === 'dashboard' && "bg-slate-800")}>
-            <LayoutDashboard size={18} /> Dashboard
-          </Button>
-          <Button variant="ghost" onClick={() => setActivePage('projects')} className={cn("w-full justify-start gap-3 hover:bg-slate-800", (activePage === 'projects' || activePage === 'project-detail') && "bg-slate-800")}>
-            <Folder size={18} /> Projecten
-          </Button>
-        </nav>
-        <div className="p-4 border-t border-slate-800 text-center">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Testmodus actief</span>
-        </div>
-      </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b flex items-center justify-between px-6 shrink-0">
-          <h2 className="font-bold text-lg text-slate-800 truncate">
-            {activePage === 'dashboard' ? 'Dashboard' : 
-             activePage === 'projects' ? 'Projecten' : 
-             currentProject?.name}
-          </h2>
-          <div className="flex items-center gap-4">
-            <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">{saveStatus}</Badge>
-            <Button size="sm" onClick={() => setIsProjectModalOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-              <PlusCircle size={16} className="mr-2" /> Nieuw project
-            </Button>
+        <div class="dashboard">
+          <div class="stats">
+            <div class="stat-card">
+              <h3>Totaal projecten</h3>
+              <div class="big" id="statProjects">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>Totaal punten</h3>
+              <div class="big" id="statPoints">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>Open punten</h3>
+              <div class="big" id="statOpen">0</div>
+            </div>
           </div>
-        </header>
 
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
-          {activePage === 'dashboard' && (
-            <div className="space-y-8 max-w-6xl mx-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="p-6 text-center border-none shadow-sm">
-                  <div className="text-3xl font-black text-slate-900">{projects.length}</div>
-                  <div className="text-[10px] uppercase font-bold text-slate-400">Projecten</div>
-                </Card>
-                <Card className="p-6 text-center border-none shadow-sm">
-                  <div className="text-3xl font-black text-blue-600">{stats.totalRegs}</div>
-                  <div className="text-[10px] uppercase font-bold text-slate-400">Registraties</div>
-                </Card>
-                <Card className="p-6 text-center border-none shadow-sm">
-                  <div className="text-3xl font-black text-red-500">{stats.openRegs}</div>
-                  <div className="text-[10px] uppercase font-bold text-slate-400">Open punten</div>
-                </Card>
-                <Card className="p-6 text-center border-none shadow-sm">
-                  <div className="text-3xl font-black text-green-600">{stats.doneRegs}</div>
-                  <div className="text-[10px] uppercase font-bold text-slate-400">Afgerond</div>
-                </Card>
+          <div class="panel" style="padding:18px;">
+            <div class="topbar" style="margin-bottom:14px;">
+              <div class="title-wrap">
+                <h1 style="font-size:22px;">Dashboard foto's</h1>
+                <p>3 testfoto’s zodat je direct ziet dat nieuwe code geladen is.</p>
               </div>
+              <button class="secondary-btn" id="refreshDashPhotosBtn">Nieuwe testfoto's</button>
+            </div>
+
+            <div class="dashboard-photos">
+              <div class="dash-photo"><img id="dashPhoto1" alt="Dashboard testfoto 1"></div>
+              <div class="dash-photo"><img id="dashPhoto2" alt="Dashboard testfoto 2"></div>
+              <div class="dash-photo"><img id="dashPhoto3" alt="Dashboard testfoto 3"></div>
+            </div>
+          </div>
+
+          <div class="panel" style="padding:18px;">
+            <div class="topbar" style="margin-bottom:14px;">
+              <div class="title-wrap">
+                <h1 style="font-size:22px;">Projecten</h1>
+                <p>Klik op een project om verder te werken.</p>
+              </div>
+            </div>
+            <div class="project-list" id="dashboardProjectList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="projectsView" class="hidden">
+        <div class="topbar">
+          <div class="title-wrap">
+            <h1>Projecten</h1>
+            <p>Beheer alle bouwherstel projecten op één plek.</p>
+          </div>
+          <button class="primary-btn" id="openNewProjectBtn2">Nieuw project</button>
+        </div>
+
+        <div id="projectsList" class="project-list"></div>
+      </section>
+
+      <section id="projectDetailView" class="hidden">
+        <div class="project-view">
+          <div class="project-header">
+            <div>
+              <h2 id="detailProjectName">Project</h2>
+              <p id="detailProjectMeta">Geen project geladen.</p>
+            </div>
+            <div class="row-actions">
+              <button class="secondary-btn" id="backToProjectsBtn">Terug</button>
+              <label class="secondary-btn" for="planUploadInput">Hoofdplattegrond uploaden</label>
+              <input type="file" id="planUploadInput" class="file-input" accept="image/*">
+            </div>
+          </div>
+
+          <div class="plan-wrap">
+            <div class="plan-top">
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-xl">Recente projecten</h3>
-                  <Button variant="link" onClick={() => setActivePage('projects')} className="text-blue-600 font-bold p-0">Bekijk alle <ChevronRight size={16} /></Button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {projects.slice(0, 3).map(p => (
-                    <ProjectCard key={p.id} project={p} onClick={() => { setCurrentProject(p); setActivePage('project-detail'); }} onDelete={deleteProject} />
-                  ))}
-                  {projects.length === 0 && <EmptyState text="Nog geen projecten" sub="Maak een project aan om te starten" />}
-                </div>
+                <h3 style="margin:0 0 6px;">Plattegrond delen</h3>
+                <div class="small">Klik op een deel om het groot te openen en daar een punt te zetten.</div>
               </div>
+              <div class="badge" id="projectPointCountBadge">0 punten</div>
             </div>
-          )}
 
-          {activePage === 'projects' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
-              {projects.map(p => (
-                <ProjectCard key={p.id} project={p} onClick={() => { setCurrentProject(p); setActivePage('project-detail'); }} onDelete={deleteProject} />
-              ))}
-              <Button variant="outline" className="h-full min-h-[250px] border-2 border-dashed border-slate-300 flex flex-col gap-3" onClick={() => setIsProjectModalOpen(true)}>
-                <PlusCircle size={32} className="text-slate-300" />
-                <span className="font-bold text-slate-400 uppercase text-xs">Nieuw project</span>
-              </Button>
-            </div>
-          )}
-
-          {activePage === 'project-detail' && currentProject && (
-            <div className="max-w-6xl mx-auto space-y-6">
-              <div className="bg-white p-6 rounded-xl shadow-sm border flex flex-col md:flex-row gap-6 items-center">
-                <div className="w-24 h-24 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center shrink-0 border shadow-inner">
-                  {currentProject.photoUrl ? <img src={currentProject.photoUrl} className="w-full h-full object-cover" /> : <HardHat className="text-slate-300" size={40} />}
-                </div>
-                <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-2xl font-black tracking-tight">{currentProject.name}</h3>
-                  <div className="text-sm text-slate-500 mt-1 flex flex-wrap justify-center md:justify-start gap-4">
-                    <span className="flex items-center gap-1"><MapPin size={14} /> {currentProject.location || '-'}</span>
-                    <span className="flex items-center gap-1"><User size={14} /> {currentProject.client || '-'}</span>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setActivePage('projects')}>Terug</Button>
-                  <Button variant="outline" size="sm" onClick={exportPDF} className="font-bold text-blue-600 border-blue-100 hover:bg-blue-50">
-                    <FileText size={16} className="mr-2" /> PDF Rapport
-                  </Button>
-                </div>
-              </div>
-
-              <Tabs defaultValue="start" onValueChange={v => setActiveFase(v as Fase)} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 h-14 p-1 bg-slate-200 rounded-xl">
-                  <TabsTrigger value="start" className="font-bold rounded-lg data-[state=active]:bg-amber-500 data-[state=active]:text-white">START</TabsTrigger>
-                  <TabsTrigger value="mid" className="font-bold rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white">MIDDEN</TabsTrigger>
-                  <TabsTrigger value="end" className="font-bold rounded-lg data-[state=active]:bg-green-600 data-[state=active]:text-white">EINDE</TabsTrigger>
-                </TabsList>
-
-                {['start', 'mid', 'end'].map(fase => (
-                  <TabsContent key={fase} value={fase} className="mt-6 space-y-6">
-                    {/* Plan Section */}
-                    <Card className="border-none shadow-sm overflow-hidden">
-                      <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <ImageIcon size={18} className="text-slate-400" />
-                          <span className="text-xs font-bold uppercase tracking-widest">Interactieve Plattegrond</span>
-                        </div>
-                        <label className="cursor-pointer">
-                          <input type="file" className="hidden" accept="image/*" onChange={e => handlePhotoUpload(e, 'plan')} />
-                          <Button variant="secondary" size="xs" asChild className="h-7 px-3 text-[10px] font-bold">
-                            <span>{currentProject.planUrl ? 'WIJZIGEN' : 'UPLOADEN'}</span>
-                          </Button>
-                        </label>
-                      </div>
-                      
-                      {currentProject.planUrl ? (
-                        <div className="p-4 bg-slate-100 space-y-6">
-                          {/* Hoofdplattegrond */}
-                          <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden relative shadow-sm">
-                             <div className="p-3 border-b bg-slate-50 flex items-center justify-between">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hoofdplattegrond Overzicht</span>
-                                <Badge variant="outline" className="bg-slate-900 text-white text-[10px]">{registrations.filter(r => r.fase === activeFase).length} breekpunten</Badge>
-                             </div>
-                             <div className="relative w-full aspect-[21/9] flex items-center justify-center bg-slate-50">
-                                <img src={currentProject.planUrl} className="max-w-full max-h-full object-contain" />
-                                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                  {registrations.filter(r => r.fase === activeFase).map((reg) => {
-                                    const partWidthPct = 20; 
-                                    const xPct = (reg.planDeel! * partWidthPct) + (reg.planX! / 800 * partWidthPct);
-                                    const yPct = (reg.planY! / 500) * 100;
-                                    const color = reg.urgency === 'hoog' ? '#ef4444' : reg.urgency === 'middel' ? '#f59e0b' : '#22c55e';
-                                    return (
-                                      <circle 
-                                        key={reg.id} 
-                                        cx={xPct} 
-                                        cy={yPct} 
-                                        r="0.8" 
-                                        fill={color} 
-                                        stroke="white" 
-                                        strokeWidth="0.1"
-                                      />
-                                    );
-                                  })}
-                                </svg>
-                             </div>
-                          </div>
-
-                          {/* Deelsecties */}
-                          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
-                            {[0, 1, 2, 3, 4].map(idx => {
-                              const count = registrations.filter(r => r.planDeel === idx && r.fase === activeFase).length;
-                              return (
-                                <div 
-                                  key={idx} 
-                                  onClick={() => { setSelectedDeel(idx); setIsPlanModalOpen(true); }}
-                                  className="aspect-video bg-white rounded-lg border-2 border-slate-200 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all overflow-hidden relative group"
-                                >
-                                  <div className="absolute top-1 left-1 z-10">
-                                    <Badge className="bg-slate-900/80 text-[8px] h-4">Deel {idx + 1}</Badge>
-                                  </div>
-                                  <div className="absolute top-1 right-1 z-10">
-                                    <Badge variant="secondary" className="bg-blue-600 text-white border-none text-[8px] h-4">{count}</Badge>
-                                  </div>
-                                  <div 
-                                    className="w-full h-full grayscale group-hover:grayscale-0 transition-all opacity-60 group-hover:opacity-100"
-                                    style={{
-                                      backgroundImage: `url(${currentProject.planUrl})`,
-                                      backgroundSize: '500% 100%',
-                                      backgroundPosition: `${idx * 25}% 0%`,
-                                      backgroundRepeat: 'no-repeat'
-                                    }}
-                                  />
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="p-12 text-center bg-slate-50 border-2 border-dashed border-slate-200 m-4 rounded-lg">
-                          <ImageIcon size={40} className="mx-auto text-slate-200 mb-2" />
-                          <p className="text-xs font-bold text-slate-400 uppercase">Geen plattegrond geüpload</p>
-                        </div>
-                      )}
-                    </Card>
-
-                    {/* Reg List */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-bold flex items-center gap-2">
-                          {fase === 'start' ? '🟡 Start' : fase === 'mid' ? '🔵 Midden' : '🟢 Einde'} Punten
-                        </h4>
-                        <Button size="sm" onClick={() => { setEditingReg(null); setRegForm({ title: '', category: 'Scheurvorming', urgency: 'laag', status: 'open' }); setIsRegModalOpen(true); }}>
-                          + Punt toevoegen
-                        </Button>
-                      </div>
-                      <div className="grid grid-cols-1 gap-3">
-                        {sortedRegistrations.filter(r => r.fase === fase).map(reg => (
-                          <RegistrationCard key={reg.id} reg={reg} onEdit={() => { setEditingReg(reg); setRegForm(reg); setIsRegModalOpen(true); }} onDelete={deleteRegistration} />
-                        ))}
-                        {registrations.filter(r => r.fase === fase).length === 0 && <EmptyState text="Geen punten in deze fase" />}
-                      </div>
-                    </div>
-                  </TabsContent>
-                ))}
-              </Tabs>
-            </div>
-          )}
+            <div class="plan-grid" id="planGrid"></div>
+          </div>
         </div>
-      </main>
+      </section>
+    </main>
+  </div>
 
-      {/* --- MODALS --- */}
-      <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Nieuw project</DialogTitle></DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Projectfoto (optioneel)</Label>
-              <div className="h-32 bg-slate-50 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer overflow-hidden relative group" onClick={() => document.getElementById('proj-img')?.click()}>
-                {newProject.photoUrl ? <img src={newProject.photoUrl} className="w-full h-full object-cover" /> : <PlusCircle className="text-slate-300" />}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-opacity">KLIK OM TE WIJZIGEN</div>
-                <input id="proj-img" type="file" className="hidden" accept="image/*" onChange={e => handlePhotoUpload(e, 'project')} />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Projectnaam *</Label>
-              <Input value={newProject.name} onChange={e => setNewProject({ ...newProject, name: e.target.value })} placeholder="Bijv. Renovatie Utrecht" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Locatie</Label>
-                <Input value={newProject.location} onChange={e => setNewProject({ ...newProject, location: e.target.value })} placeholder="Stad/Adres" />
-              </div>
-              <div className="space-y-2">
-                <Label>Opdrachtgever</Label>
-                <Input value={newProject.client} onChange={e => setNewProject({ ...newProject, client: e.target.value })} placeholder="Naam bedrijf" />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsProjectModalOpen(false)}>Annuleren</Button>
-            <Button onClick={saveProject} className="bg-slate-900">Project opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isRegModalOpen} onOpenChange={setIsRegModalOpen}>
-        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingReg ? 'Punt bewerken' : 'Nieuw punt'}</DialogTitle>
-            <Badge variant="outline" className="uppercase text-[10px] w-fit">{activeFase} fase</Badge>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Omschrijving *</Label>
-              <Input value={regForm.title} onChange={e => setRegForm({ ...regForm, title: e.target.value })} placeholder="Wat is het mankement?" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Categorie</Label>
-                <Select value={regForm.category} onValueChange={v => setRegForm({ ...regForm, category: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Scheurvorming">Scheurvorming</SelectItem>
-                    <SelectItem value="Vochtschade">Vochtschade</SelectItem>
-                    <SelectItem value="Constructieschade">Constructieschade</SelectItem>
-                    <SelectItem value="Mankement">Mankement</SelectItem>
-                    <SelectItem value="Overig">Overig</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Urgentie</Label>
-                <Select value={regForm.urgency} onValueChange={(v: Urgentie) => setRegForm({ ...regForm, urgency: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="laag">🟢 Laag</SelectItem>
-                    <SelectItem value="middel">🟡 Middel</SelectItem>
-                    <SelectItem value="hoog">🔴 Hoog</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Locatie plek</Label>
-                <Input value={regForm.locationDesc} onChange={e => setRegForm({ ...regForm, locationDesc: e.target.value })} placeholder="Hoek A3" />
-              </div>
-              <div className="space-y-2">
-                <Label>Verantwoordelijke</Label>
-                <Input value={regForm.responsible} onChange={e => setRegForm({ ...regForm, responsible: e.target.value })} placeholder="Naam collega" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select value={regForm.status} onValueChange={(v: 'open' | 'done') => setRegForm({ ...regForm, status: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="open">🔴 Open</SelectItem>
-                  <SelectItem value="done">🟢 Klaar</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Notitie</Label>
-              <Textarea value={regForm.note} onChange={e => setRegForm({ ...regForm, note: e.target.value })} placeholder="Extra details..." />
-            </div>
-          </div>
-          <DialogFooter>
-            {editingReg && <Button variant="ghost" onClick={(e) => deleteRegistration(editingReg.id, e as any)} className="text-red-500 mr-auto font-bold">🗑 Verwijderen</Button>}
-            <Button variant="outline" onClick={() => setIsRegModalOpen(false)}>Annuleren</Button>
-            <Button onClick={saveRegistration} className="bg-slate-900">Opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isPlanModalOpen} onOpenChange={setIsPlanModalOpen}>
-        <DialogContent className="sm:max-w-5xl p-0 overflow-hidden border-none bg-slate-950">
-          <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
-            <h3 className="font-bold text-sm">Plattegrond — Deel {selectedDeel + 1}</h3>
-            <div className="flex items-center gap-2">
-              <Button size="icon" variant="ghost" onClick={() => setZoom(z => Math.min(z * 1.2, 5))} className="h-8 w-8 text-slate-400 hover:text-white"><ZoomIn size={16} /></Button>
-              <Button size="icon" variant="ghost" onClick={() => setZoom(z => Math.max(z / 1.2, 0.2))} className="h-8 w-8 text-slate-400 hover:text-white"><ZoomOut size={16} /></Button>
-              <Button size="icon" variant="ghost" onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="h-8 w-8 text-slate-400 hover:text-white"><Maximize size={16} /></Button>
-              <Button size="icon" variant="ghost" onClick={() => setIsPlanModalOpen(false)} className="h-8 w-8 text-slate-400 hover:text-white"><X size={16} /></Button>
-            </div>
-          </div>
-          
-          <div className="relative bg-slate-950 flex items-center justify-center h-[600px] overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <canvas 
-                ref={canvasRef} 
-                width={800} 
-                height={500} 
-                onClick={handleCanvasClick}
-                className="cursor-crosshair bg-slate-900 shadow-2xl transition-opacity duration-300"
-              />
-            </div>
-            <div className="absolute bottom-4 left-4 bg-black/80 text-white text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest border border-slate-700 backdrop-blur-sm">
-              Tik op kaart om punt te plaatsen of te bewerken
-            </div>
-          </div>
-          
-          <div className="p-4 bg-slate-900 border-t border-slate-800 flex gap-4 overflow-x-auto min-h-[100px] items-center">
-            {registrations.filter(r => r.planDeel === selectedDeel && r.fase === activeFase).length > 0 ? (
-              registrations.filter(r => r.planDeel === selectedDeel && r.fase === activeFase).map((r, i) => (
-                <div key={r.id} className="shrink-0 bg-slate-800 p-3 rounded-lg border border-slate-700 w-48 hover:border-blue-500 cursor-pointer transition-colors" onClick={() => { setEditingReg(r); setRegForm(r); setIsRegModalOpen(true); }}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white">{i + 1}</div>
-                    <div className="font-bold text-xs truncate text-white">{r.title}</div>
-                  </div>
-                  <div className="text-[10px] text-slate-400 truncate flex items-center gap-1"><MapPin size={10} /> {r.locationDesc || '-'}</div>
-                </div>
-              ))
-            ) : (
-              <div className="w-full text-center text-slate-500 text-xs italic">Geen punten in dit deel</div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-// --- SUB-COMPONENTS ---
-function ProjectCard({ project, onClick, onDelete }: { project: Project, onClick: () => void, onDelete: (id: string, e: React.MouseEvent) => void }) {
-  return (
-    <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-all group border-none shadow-sm relative bg-white" onClick={onClick}>
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-        <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full bg-white/90 shadow-md hover:text-red-500 backdrop-blur-sm" onClick={(e) => onDelete(project.id, e)}>
-          <Trash2 size={14} />
-        </Button>
+  <div class="modal hidden" id="projectModal">
+    <div class="modal-card" style="max-width:640px;">
+      <div class="modal-head">
+        <div>
+          <h3>Nieuw project</h3>
+          <p>Vul alleen de basis in. Simpel houden.</p>
+        </div>
+        <button class="close-btn" id="closeProjectModalBtn">&times;</button>
       </div>
-      <div className="h-40 bg-slate-100 flex items-center justify-center border-b overflow-hidden">
-        {project.photoUrl ? <img src={project.photoUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" /> : <HardHat className="text-slate-200" size={48} />}
-      </div>
-      <CardHeader className="p-4">
-        <CardTitle className="text-base truncate font-bold text-slate-900">{project.name}</CardTitle>
-        <div className="text-xs text-slate-500 flex items-center gap-1 mt-1 truncate">
-          <MapPin size={12} className="text-slate-400" /> {project.location || 'Geen locatie'}
-        </div>
-      </CardHeader>
-    </Card>
-  );
-}
 
-function RegistrationCard({ reg, onEdit, onDelete }: { reg: Registration, onEdit: () => void, onDelete: (id: string, e: React.MouseEvent) => void }) {
-  const urgencyColors = { hoog: 'bg-red-500', middel: 'bg-amber-500', laag: 'bg-green-600' };
-  return (
-    <Card className="hover:ring-2 hover:ring-blue-100 transition-all cursor-pointer border-none shadow-sm group bg-white" onClick={onEdit}>
-      <CardContent className="p-4 flex items-start gap-4">
-        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-white font-black shrink-0 shadow-sm", urgencyColors[reg.urgency])}>!</div>
-        <div className="flex-1 min-w-0">
-          <h5 className="font-bold text-slate-900 truncate">{reg.title}</h5>
-          <p className="text-xs text-slate-500 mt-0.5 truncate">{reg.category} | {reg.locationDesc || '-'}</p>
-          <div className="flex gap-2 mt-3">
-            <Badge variant={reg.status === 'done' ? 'default' : 'outline'} className={cn(reg.status === 'done' ? "bg-green-600 text-white border-none" : "text-red-500 border-red-200 bg-red-50")}>
-              {reg.status === 'done' ? '✓ Klaar' : '🔴 Open'}
-            </Badge>
-            <Badge variant="secondary" className="text-[10px] uppercase font-bold text-slate-500 bg-slate-100">{reg.urgency}</Badge>
-            {reg.responsible && <Badge variant="outline" className="text-[10px] border-slate-200 text-slate-600">👷 {reg.responsible}</Badge>}
+      <div class="field">
+        <label for="projectNameInput">Projectnaam</label>
+        <input id="projectNameInput" type="text" placeholder="Bijv. Werfkelder Utrecht 12">
+      </div>
+
+      <div class="field">
+        <label for="projectLocationInput">Locatie</label>
+        <input id="projectLocationInput" type="text" placeholder="Bijv. Utrecht">
+      </div>
+
+      <div class="field">
+        <label for="projectNoteInput">Korte opmerking</label>
+        <textarea id="projectNoteInput" placeholder="Korte toelichting"></textarea>
+      </div>
+
+      <div class="row-actions">
+        <button class="primary-btn" id="saveProjectBtn">Project opslaan</button>
+        <button class="danger-btn" id="cancelProjectBtn">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="partModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h3 id="partModalTitle">Deel openen</h3>
+          <p>Klik eerst op de juiste plek voor een rood kruis. Daarna vul je de gegevens in.</p>
+        </div>
+        <button class="close-btn" id="closePartModalBtn">&times;</button>
+      </div>
+
+      <div class="detail-layout">
+        <div class="zoom-board">
+          <div class="board-frame" id="boardFrame">
+            <img id="boardImage" alt="Deel afbeelding">
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-opacity" onClick={(e) => onDelete(reg.id, e)}>
-          <Trash2 size={16} />
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
 
-function EmptyState({ text, sub }: { text: string, sub?: string }) {
-  return (
-    <div className="py-12 text-center bg-white rounded-xl border-2 border-dashed border-slate-200 w-full col-span-full">
-      <AlertCircle size={40} className="mx-auto text-slate-200 mb-3" />
-      <p className="font-bold text-slate-400 uppercase text-xs tracking-widest">{text}</p>
-      {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+        <div class="side-panel">
+          <div class="box">
+            <h4>Punten in dit deel</h4>
+            <div id="pointList" class="point-list"></div>
+          </div>
+
+          <div class="box hidden" id="pointEditorBox">
+            <h4>Punt dossier</h4>
+
+            <div class="field">
+              <label for="pointTitleInput">Naam punt</label>
+              <input id="pointTitleInput" type="text" placeholder="Bijv. Scheur linksboven">
+            </div>
+
+            <div class="field">
+              <label for="pointStatusInput">Status</label>
+              <select id="pointStatusInput">
+                <option value="Open">Open</option>
+                <option value="Gereed">Gereed</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="pointColleagueInput">Naam collega</label>
+              <input id="pointColleagueInput" type="text" placeholder="Naam collega">
+            </div>
+
+            <div class="phase-tabs">
+              <button class="phase-tab active" data-phase="start">Start</button>
+              <button class="phase-tab" data-phase="midden">Midden</button>
+              <button class="phase-tab" data-phase="eind">Eind</button>
+            </div>
+
+            <div class="phase-panels">
+              <div class="phase-panel active" data-panel="start">
+                <div class="small" id="dateStartText"></div>
+                <div class="field">
+                  <label>Opmerking start</label>
+                  <textarea id="noteStartInput" placeholder="Opmerking voor startfase"></textarea>
+                </div>
+                <label class="secondary-btn" for="photoStartInput">Foto's toevoegen</label>
+                <input type="file" id="photoStartInput" class="file-input" accept="image/*" multiple>
+                <div id="photoStartGrid" class="photo-grid"></div>
+              </div>
+
+              <div class="phase-panel" data-panel="midden">
+                <div class="small" id="dateMiddenText"></div>
+                <div class="field">
+                  <label>Opmerking midden</label>
+                  <textarea id="noteMiddenInput" placeholder="Opmerking voor middenfase"></textarea>
+                </div>
+                <label class="secondary-btn" for="photoMiddenInput">Foto's toevoegen</label>
+                <input type="file" id="photoMiddenInput" class="file-input" accept="image/*" multiple>
+                <div id="photoMiddenGrid" class="photo-grid"></div>
+              </div>
+
+              <div class="phase-panel" data-panel="eind">
+                <div class="small" id="dateEindText"></div>
+                <div class="field">
+                  <label>Opmerking eind</label>
+                  <textarea id="noteEindInput" placeholder="Opmerking voor eindfase"></textarea>
+                </div>
+                <label class="secondary-btn" for="photoEindInput">Foto's toevoegen</label>
+                <input type="file" id="photoEindInput" class="file-input" accept="image/*" multiple>
+                <div id="photoEindGrid" class="photo-grid"></div>
+              </div>
+            </div>
+
+            <div class="row-actions">
+              <button class="primary-btn" id="savePointBtn">Punt opslaan</button>
+              <button class="tiny-btn danger" id="deletePointBtn">Punt verwijderen</button>
+            </div>
+          </div>
+
+          <div class="box" id="pointHintBox">
+            <h4>Werkwijze</h4>
+            <div class="small">
+              1. Klik op de tekening.<br>
+              2. Er komt een rood kruis.<br>
+              3. Vul daarna punt, foto's en opmerking in.<br>
+              4. Klik op opslaan.
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  );
-}
+  </div>
+
+  <div class="lightbox hidden" id="lightbox">
+    <div class="lightbox-card">
+      <div class="lightbox-stage">
+        <button class="lightbox-close" id="lightboxCloseBtn">&times;</button>
+        <button class="nav-btn nav-prev" id="lightboxPrevBtn">&#10094;</button>
+        <img id="lightboxImage" alt="Vergrote foto">
+        <button class="nav-btn nav-next" id="lightboxNextBtn">&#10095;</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "bouwhersteltool_v1_simple";
+    const PHASES = ["start", "midden", "eind"];
+
+    const state = {
+      projects: [],
+      currentProjectId: null,
+      currentPartIndex: null,
+      currentPointId: null,
+      dashPhotoSeeds: [101, 202, 303],
+      lightboxPhotos: [],
+      lightboxIndex: 0
+    };
+
+    function uid(){
+      return "id-" + Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
+    }
+
+    function todayString(){
+      const d = new Date();
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth()+1).padStart(2, "0");
+      const year = d.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+
+    function createEmptyPart(index){
+      return {
+        id: uid(),
+        name: "Deel " + (index + 1),
+        image: "",
+        points: []
+      };
+    }
+
+    function createProject(name, location, note){
+      return {
+        id: uid(),
+        name: name || "Nieuw project",
+        location: location || "",
+        note: note || "",
+        createdAt: todayString(),
+        cover: "",
+        mainPlan: "",
+        parts: Array.from({length:5}, (_,i)=>createEmptyPart(i))
+      };
+    }
+
+    function createPoint(x, y){
+      return {
+        id: uid(),
+        title: "",
+        status: "Open",
+        colleague: "",
+        x,
+        y,
+        createdAt: todayString(),
+        phases: {
+          start: { date: todayString(), note: "", photos: [] },
+          midden: { date: todayString(), note: "", photos: [] },
+          eind: { date: todayString(), note: "", photos: [] }
+        }
+      };
+    }
+
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.projects));
+    }
+
+    function loadState(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        try{
+          state.projects = JSON.parse(raw);
+        }catch(e){
+          state.projects = [];
+        }
+      }
+
+      if(state.projects.length === 0){
+        const demo = createProject("Demo project", "Utrecht", "Voorbeeldproject voor snelle test");
+        demo.parts[0].image = "https://picsum.photos/seed/deel1/1200/800";
+        demo.parts[1].image = "https://picsum.photos/seed/deel2/1200/800";
+        demo.parts[2].image = "https://picsum.photos/seed/deel3/1200/800";
+        demo.parts[3].image = "https://picsum.photos/seed/deel4/1200/800";
+        demo.parts[4].image = "https://picsum.photos/seed/deel5/1200/800";
+        demo.cover = demo.parts[0].image;
+        state.projects.push(demo);
+        saveState();
+      }
+    }
+
+    const dashboardView = document.getElementById("dashboardView");
+    const projectsView = document.getElementById("projectsView");
+    const projectDetailView = document.getElementById("projectDetailView");
+
+    const navDashboardBtn = document.getElementById("navDashboardBtn");
+    const navProjectsBtn = document.getElementById("navProjectsBtn");
+    const newProjectSideBtn = document.getElementById("newProjectSideBtn");
+    const openNewProjectBtn = document.getElementById("openNewProjectBtn");
+    const openNewProjectBtn2 = document.getElementById("openNewProjectBtn2");
+
+    const dashboardProjectList = document.getElementById("dashboardProjectList");
+    const projectsList = document.getElementById("projectsList");
+
+    const statProjects = document.getElementById("statProjects");
+    const statPoints = document.getElementById("statPoints");
+    const statOpen = document.getElementById("statOpen");
+
+    const projectModal = document.getElementById("projectModal");
+    const closeProjectModalBtn = document.getElementById("closeProjectModalBtn");
+    const cancelProjectBtn = document.getElementById("cancelProjectBtn");
+    const saveProjectBtn = document.getElementById("saveProjectBtn");
+
+    const projectNameInput = document.getElementById("projectNameInput");
+    const projectLocationInput = document.getElementById("projectLocationInput");
+    const projectNoteInput = document.getElementById("projectNoteInput");
+
+    const detailProjectName = document.getElementById("detailProjectName");
+    const detailProjectMeta = document.getElementById("detailProjectMeta");
+    const planGrid = document.getElementById("planGrid");
+    const backToProjectsBtn = document.getElementById("backToProjectsBtn");
+    const projectPointCountBadge = document.getElementById("projectPointCountBadge");
+    const planUploadInput = document.getElementById("planUploadInput");
+
+    const partModal = document.getElementById("partModal");
+    const closePartModalBtn = document.getElementById("closePartModalBtn");
+    const partModalTitle = document.getElementById("partModalTitle");
+    const boardFrame = document.getElementById("boardFrame");
+    const boardImage = document.getElementById("boardImage");
+    const pointList = document.getElementById("pointList");
+    const pointEditorBox = document.getElementById("pointEditorBox");
+    const pointHintBox = document.getElementById("pointHintBox");
+
+    const pointTitleInput = document.getElementById("pointTitleInput");
+    const pointStatusInput = document.getElementById("pointStatusInput");
+    const pointColleagueInput = document.getElementById("pointColleagueInput");
+    const noteStartInput = document.getElementById("noteStartInput");
+    const noteMiddenInput = document.getElementById("noteMiddenInput");
+    const noteEindInput = document.getElementById("noteEindInput");
+    const dateStartText = document.getElementById("dateStartText");
+    const dateMiddenText = document.getElementById("dateMiddenText");
+    const dateEindText = document.getElementById("dateEindText");
+    const savePointBtn = document.getElementById("savePointBtn");
+    const deletePointBtn = document.getElementById("deletePointBtn");
+
+    const photoStartInput = document.getElementById("photoStartInput");
+    const photoMiddenInput = document.getElementById("photoMiddenInput");
+    const photoEindInput = document.getElementById("photoEindInput");
+    const photoStartGrid = document.getElementById("photoStartGrid");
+    const photoMiddenGrid = document.getElementById("photoMiddenGrid");
+    const photoEindGrid = document.getElementById("photoEindGrid");
+
+    const refreshDashPhotosBtn = document.getElementById("refreshDashPhotosBtn");
+    const dashPhoto1 = document.getElementById("dashPhoto1");
+    const dashPhoto2 = document.getElementById("dashPhoto2");
+    const dashPhoto3 = document.getElementById("dashPhoto3");
+
+    const phaseTabs = Array.from(document.querySelectorAll(".phase-tab"));
+    const phasePanels = Array.from(document.querySelectorAll(".phase-panel"));
+
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImage = document.getElementById("lightboxImage");
+    const lightboxCloseBtn = document.getElementById("lightboxCloseBtn");
+    const lightboxPrevBtn = document.getElementById("lightboxPrevBtn");
+    const lightboxNextBtn = document.getElementById("lightboxNextBtn");
+
+    function showView(name){
+      dashboardView.classList.add("hidden");
+      projectsView.classList.add("hidden");
+      projectDetailView.classList.add("hidden");
+
+      navDashboardBtn.classList.remove("active");
+      navProjectsBtn.classList.remove("active");
+
+      if(name === "dashboard"){
+        dashboardView.classList.remove("hidden");
+        navDashboardBtn.classList.add("active");
+      }
+      if(name === "projects"){
+        projectsView.classList.remove("hidden");
+        navProjectsBtn.classList.add("active");
+      }
+      if(name === "detail"){
+        projectDetailView.classList.remove("hidden");
+        navProjectsBtn.classList.add("active");
+      }
+    }
+
+    function getCurrentProject(){
+      return state.projects.find(p => p.id === state.currentProjectId) || null;
+    }
+
+    function getCurrentPart(){
+      const project = getCurrentProject();
+      if(!project || state.currentPartIndex === null) return null;
+      return project.parts[state.currentPartIndex];
+    }
+
+    function getCurrentPoint(){
+      const part = getCurrentPart();
+      if(!part) return null;
+      return part.points.find(p => p.id === state.currentPointId) || null;
+    }
+
+    function countAllPoints(){
+      return state.projects.reduce((sum, project) => {
+        return sum + project.parts.reduce((s, part) => s + part.points.length, 0);
+      }, 0);
+    }
+
+    function countOpenPoints(){
+      return state.projects.reduce((sum, project) => {
+        return sum + project.parts.reduce((s, part) => {
+          return s + part.points.filter(p => p.status !== "Gereed").length;
+        }, 0);
+      }, 0);
+    }
+
+    function renderStats(){
+      statProjects.textContent = state.projects.length;
+      statPoints.textContent = countAllPoints();
+      statOpen.textContent = countOpenPoints();
+    }
+
+    function renderDashboardPhotos(){
+      dashPhoto1.src = `https://picsum.photos/seed/${state.dashPhotoSeeds[0]}/800/500`;
+      dashPhoto2.src = `https://picsum.photos/seed/${state.dashPhotoSeeds[1]}/800/500`;
+      dashPhoto3.src = `https://picsum.photos/seed/${state.dashPhotoSeeds[2]}/800/500`;
+    }
+
+    function shuffleDashboardPhotos(){
+      state.dashPhotoSeeds = [
+        Math.floor(Math.random()*1000)+1,
+        Math.floor(Math.random()*1000)+1001,
+        Math.floor(Math.random()*1000)+2001
+      ];
+      renderDashboardPhotos();
+    }
+
+    function projectCardHtml(project){
+      const points = project.parts.reduce((sum, part)=>sum + part.points.length, 0);
+      const cover = project.cover || project.parts[0]?.image || "";
+      return `
+        <div class="project-card">
+          <div class="project-cover">
+            ${cover ? `<img src="${cover}" alt="Project afbeelding" style="width:100%;height:100%;object-fit:cover;">` : "Geen afbeelding"}
+          </div>
+          <div class="project-body">
+            <h3>${escapeHtml(project.name)}</h3>
+            <div class="project-meta">${escapeHtml(project.location || "Geen locatie")} • ${points} punten</div>
+            <div class="project-meta">${escapeHtml(project.createdAt || "")}</div>
+            <div class="project-actions">
+              <button class="primary-btn" onclick="openProject('${project.id}')">Open project</button>
+              <button class="danger-btn" onclick="deleteProject('${project.id}')">Verwijderen</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProjects(){
+      const html = state.projects.map(projectCardHtml).join("");
+      dashboardProjectList.innerHTML = html || `<div class="empty-state">Nog geen projecten.</div>`;
+      projectsList.innerHTML = html || `<div class="empty-state">Nog geen projecten.</div>`;
+    }
+
+    function renderProjectDetail(){
+      const project = getCurrentProject();
+      if(!project) return;
+
+      detailProjectName.textContent = project.name;
+      detailProjectMeta.textContent = `${project.location || "Geen locatie"} • aangemaakt op ${project.createdAt}`;
+      const totalPoints = project.parts.reduce((sum, part)=>sum + part.points.length, 0);
+      projectPointCountBadge.textContent = `${totalPoints} punten`;
+
+      planGrid.innerHTML = project.parts.map((part, index) => {
+        const image = part.image || project.mainPlan || "";
+        return `
+          <div class="part-card" onclick="openPart(${index})">
+            <div class="part-thumb">
+              ${image ? `<img src="${image}" alt="${escapeHtml(part.name)}" style="width:100%;height:100%;object-fit:cover;">` : `Geen beeld<br>${escapeHtml(part.name)}`}
+              <div class="markers-layer">
+                ${part.points.map(point => `
+                  <div class="marker-mini" style="left:${point.x}%;top:${point.y}%;"></div>
+                `).join("")}
+              </div>
+            </div>
+            <div class="part-label">
+              <span>${escapeHtml(part.name)}</span>
+              <span class="badge">${part.points.length}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function openProjectModal(){
+      projectModal.classList.remove("hidden");
+    }
+
+    function closeProjectModal(){
+      projectModal.classList.add("hidden");
+      projectNameInput.value = "";
+      projectLocationInput.value = "";
+      projectNoteInput.value = "";
+    }
+
+    function openProject(projectId){
+      state.currentProjectId = projectId;
+      renderProjectDetail();
+      showView("detail");
+    }
+
+    function deleteProject(projectId){
+      if(!confirm("Project verwijderen?")) return;
+      state.projects = state.projects.filter(p => p.id !== projectId);
+      if(state.currentProjectId === projectId){
+        state.currentProjectId = null;
+      }
+      saveState();
+      renderAll();
+      showView("projects");
+    }
+
+    function saveProject(){
+      const name = projectNameInput.value.trim();
+      if(!name){
+        alert("Vul een projectnaam in.");
+        return;
+      }
+
+      const project = createProject(
+        name,
+        projectLocationInput.value.trim(),
+        projectNoteInput.value.trim()
+      );
+
+      state.projects.unshift(project);
+      saveState();
+      closeProjectModal();
+      renderAll();
+      openProject(project.id);
+    }
+
+    function openPart(index){
+      state.currentPartIndex = index;
+      state.currentPointId = null;
+      const part = getCurrentPart();
+      if(!part) return;
+
+      partModalTitle.textContent = `${part.name} - klik op de plek van het mankement`;
+      boardImage.src = part.image || getCurrentProject().mainPlan || "https://picsum.photos/seed/defaultplan/1200/800";
+      boardFrame.querySelectorAll(".marker").forEach(el => el.remove());
+
+      part.points.forEach(point => drawMarker(point));
+      renderPointList();
+      clearPointEditor();
+      partModal.classList.remove("hidden");
+    }
+
+    function closePartModal(){
+      partModal.classList.add("hidden");
+      state.currentPartIndex = null;
+      state.currentPointId = null;
+      clearPointEditor();
+    }
+
+    function drawMarker(point){
+      const marker = document.createElement("div");
+      marker.className = "marker";
+      marker.style.left = point.x + "%";
+      marker.style.top = point.y + "%";
+      marker.dataset.pointId = point.id;
+      marker.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectPoint(point.id);
+      });
+      boardFrame.appendChild(marker);
+    }
+
+    function redrawBoardMarkers(){
+      boardFrame.querySelectorAll(".marker").forEach(el => el.remove());
+      const part = getCurrentPart();
+      if(!part) return;
+      part.points.forEach(point => drawMarker(point));
+    }
+
+    function renderPointList(){
+      const part = getCurrentPart();
+      if(!part) return;
+
+      if(part.points.length === 0){
+        pointList.innerHTML = `<div class="empty-state" style="padding:20px;">Nog geen punten in dit deel.</div>`;
+        return;
+      }
+
+      pointList.innerHTML = part.points.map(point => `
+        <div class="point-item ${point.id === state.currentPointId ? "active" : ""}">
+          <div class="point-row">
+            <div class="point-name">${escapeHtml(point.title || "Nieuw punt")}</div>
+            <div class="badge">${escapeHtml(point.status)}</div>
+          </div>
+          <div class="small">Collega: ${escapeHtml(point.colleague || "-")}</div>
+          <div class="small">Positie: ${Math.round(point.x)}% / ${Math.round(point.y)}%</div>
+          <div class="row-actions">
+            <button class="tiny-btn" onclick="selectPoint('${point.id}')">Open</button>
+            <button class="tiny-btn danger" onclick="removePoint('${point.id}')">Verwijder</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function clearPointEditor(){
+      pointEditorBox.classList.add("hidden");
+      pointHintBox.classList.remove("hidden");
+      pointTitleInput.value = "";
+      pointStatusInput.value = "Open";
+      pointColleagueInput.value = "";
+      noteStartInput.value = "";
+      noteMiddenInput.value = "";
+      noteEindInput.value = "";
+      dateStartText.textContent = "";
+      dateMiddenText.textContent = "";
+      dateEindText.textContent = "";
+      renderPhotoGrid(photoStartGrid, []);
+      renderPhotoGrid(photoMiddenGrid, []);
+      renderPhotoGrid(photoEindGrid, []);
+    }
+
+    function selectPoint(pointId){
+      state.currentPointId = pointId;
+      const point = getCurrentPoint();
+      if(!point) return;
+
+      pointEditorBox.classList.remove("hidden");
+      pointHintBox.classList.add("hidden");
+
+      pointTitleInput.value = point.title || "";
+      pointStatusInput.value = point.status || "Open";
+      pointColleagueInput.value = point.colleague || "";
+
+      noteStartInput.value = point.phases.start.note || "";
+      noteMiddenInput.value = point.phases.midden.note || "";
+      noteEindInput.value = point.phases.eind.note || "";
+
+      dateStartText.textContent = "Datum: " + (point.phases.start.date || todayString());
+      dateMiddenText.textContent = "Datum: " + (point.phases.midden.date || todayString());
+      dateEindText.textContent = "Datum: " + (point.phases.eind.date || todayString());
+
+      renderPhotoGrid(photoStartGrid, point.phases.start.photos || [], "start");
+      renderPhotoGrid(photoMiddenGrid, point.phases.midden.photos || [], "midden");
+      renderPhotoGrid(photoEindGrid, point.phases.eind.photos || [], "eind");
+
+      renderPointList();
+    }
+
+    function removePoint(pointId){
+      const part = getCurrentPart();
+      if(!part) return;
+      if(!confirm("Punt verwijderen?")) return;
+
+      part.points = part.points.filter(p => p.id !== pointId);
+      if(state.currentPointId === pointId){
+        state.currentPointId = null;
+        clearPointEditor();
+      }
+      saveState();
+      renderProjectDetail();
+      redrawBoardMarkers();
+      renderPointList();
+    }
+
+    function savePointEdits(){
+      const point = getCurrentPoint();
+      if(!point){
+        alert("Selecteer eerst een punt.");
+        return;
+      }
+
+      point.title = pointTitleInput.value.trim();
+      point.status = pointStatusInput.value;
+      point.colleague = pointColleagueInput.value.trim();
+
+      point.phases.start.note = noteStartInput.value.trim();
+      point.phases.midden.note = noteMiddenInput.value.trim();
+      point.phases.eind.note = noteEindInput.value.trim();
+
+      if(!point.phases.start.date) point.phases.start.date = todayString();
+      if(!point.phases.midden.date) point.phases.midden.date = todayString();
+      if(!point.phases.eind.date) point.phases.eind.date = todayString();
+
+      saveState();
+      renderAll();
+      openPart(state.currentPartIndex);
+      selectPoint(point.id);
+    }
+
+    function renderPhotoGrid(container, photos, phaseName = ""){
+      if(!photos || photos.length === 0){
+        container.innerHTML = `<div class="photo-empty">Nog geen foto's toegevoegd</div>`;
+        return;
+      }
+
+      container.innerHTML = photos.map((src, index) => `
+        <div class="photo-item" onclick="openLightboxForPhase('${phaseName}', ${index})">
+          <img src="${src}" alt="Fase foto ${index+1}">
+        </div>
+      `).join("");
+    }
+
+    function setPhaseTab(phase){
+      phaseTabs.forEach(btn => btn.classList.toggle("active", btn.dataset.phase === phase));
+      phasePanels.forEach(panel => panel.classList.toggle("active", panel.dataset.panel === phase));
+    }
+
+    function readFilesAsDataUrls(fileList, callback){
+      const files = Array.from(fileList || []);
+      if(files.length === 0){
+        callback([]);
+        return;
+      }
+
+      const results = [];
+      let done = 0;
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          results.push(e.target.result);
+          done++;
+          if(done === files.length) callback(results);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function addPhotosToPhase(phase, files){
+      const point = getCurrentPoint();
+      if(!point){
+        alert("Klik eerst op een punt en sla dat punt op.");
+        return;
+      }
+
+      readFilesAsDataUrls(files, (images) => {
+        point.phases[phase].photos.push(...images);
+        if(!point.phases[phase].date) point.phases[phase].date = todayString();
+        saveState();
+        selectPoint(point.id);
+        renderProjectDetail();
+      });
+    }
+
+    function openLightbox(photos, startIndex){
+      if(!photos || photos.length === 0) return;
+      state.lightboxPhotos = photos;
+      state.lightboxIndex = startIndex || 0;
+      updateLightbox();
+      lightbox.classList.remove("hidden");
+    }
+
+    function updateLightbox(){
+      lightboxImage.src = state.lightboxPhotos[state.lightboxIndex] || "";
+    }
+
+    function openLightboxForPhase(phase, index){
+      const point = getCurrentPoint();
+      if(!point) return;
+      const photos = point.phases[phase]?.photos || [];
+      openLightbox(photos, index);
+    }
+
+    function escapeHtml(text){
+      return String(text || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    boardFrame.addEventListener("click", (e) => {
+      const part = getCurrentPart();
+      if(!part) return;
+
+      const rect = boardFrame.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+      const point = createPoint(x, y);
+      part.points.push(point);
+      state.currentPointId = point.id;
+
+      saveState();
+      redrawBoardMarkers();
+      renderPointList();
+      selectPoint(point.id);
+      renderProjectDetail();
+    });
+
+    phaseTabs.forEach(btn => {
+      btn.addEventListener("click", () => setPhaseTab(btn.dataset.phase));
+    });
+
+    photoStartInput.addEventListener("change", e => addPhotosToPhase("start", e.target.files));
+    photoMiddenInput.addEventListener("change", e => addPhotosToPhase("midden", e.target.files));
+    photoEindInput.addEventListener("change", e => addPhotosToPhase("eind", e.target.files));
+
+    savePointBtn.addEventListener("click", savePointEdits);
+    deletePointBtn.addEventListener("click", () => {
+      if(state.currentPointId) removePoint(state.currentPointId);
+    });
+
+    refreshDashPhotosBtn.addEventListener("click", shuffleDashboardPhotos);
+
+    navDashboardBtn.addEventListener("click", () => showView("dashboard"));
+    navProjectsBtn.addEventListener("click", () => showView("projects"));
+    newProjectSideBtn.addEventListener("click", openProjectModal);
+    openNewProjectBtn.addEventListener("click", openProjectModal);
+    openNewProjectBtn2.addEventListener("click", openProjectModal);
+
+    closeProjectModalBtn.addEventListener("click", closeProjectModal);
+    cancelProjectBtn.addEventListener("click", closeProjectModal);
+    saveProjectBtn.addEventListener("click", saveProject);
+
+    backToProjectsBtn.addEventListener("click", () => showView("projects"));
+    closePartModalBtn.addEventListener("click", closePartModal);
+
+    planUploadInput.addEventListener("change", e => {
+      const project = getCurrentProject();
+      if(!project) return;
+
+      const file = e.target.files[0];
+      if(!file) return;
+
+      const reader = new FileReader();
+      reader.onload = ev => {
+        project.mainPlan = ev.target.result;
+        project.cover = ev.target.result;
+        project.parts.forEach(part => {
+          if(!part.image) part.image = ev.target.result;
+        });
+        saveState();
+        renderAll();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    lightboxCloseBtn.addEventListener("click", () => lightbox.classList.add("hidden"));
+    lightboxPrevBtn.addEventListener("click", () => {
+      if(state.lightboxPhotos.length === 0) return;
+      state.lightboxIndex = (state.lightboxIndex - 1 + state.lightboxPhotos.length) % state.lightboxPhotos.length;
+      updateLightbox();
+    });
+    lightboxNextBtn.addEventListener("click", () => {
+      if(state.lightboxPhotos.length === 0) return;
+      state.lightboxIndex = (state.lightboxIndex + 1) % state.lightboxPhotos.length;
+      updateLightbox();
+    });
+
+    function renderAll(){
+      renderStats();
+      renderDashboardPhotos();
+      renderProjects();
+      if(state.currentProjectId){
+        renderProjectDetail();
+      }
+    }
+
+    loadState();
+    renderAll();
+    showView("dashboard");
+
+    window.openProject = openProject;
+    window.deleteProject = deleteProject;
+    window.openPart = openPart;
+    window.selectPoint = selectPoint;
+    window.removePoint = removePoint;
+    window.openLightboxForPhase = openLightboxForPhase;
+  </script>
+</body>
+</html>
