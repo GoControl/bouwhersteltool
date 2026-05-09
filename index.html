@@ -1,33 +1,34 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bouwherstel Tool</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ED Controls — Bouwherstel Tool</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root{
       --bg:#f4f1eb;
       --panel:#ffffff;
-      --panel-2:#f8f6f2;
+      --panel2:#faf8f4;
       --line:#ddd6cb;
-      --text:#1f1f1f;
-      --muted:#6f6a63;
-      --primary:#0b6b6f;
-      --primary-dark:#084f52;
-      --danger:#c73333;
-      --warning:#b7791f;
+      --text:#1e1f1d;
+      --muted:#6a6862;
+      --primary:#0c6b70;
+      --primary-dark:#084f53;
+      --danger:#bf2f2f;
       --ok:#2f855a;
-      --shadow:0 8px 24px rgba(0,0,0,.08);
+      --warn:#b7791f;
       --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.08);
     }
 
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
     body{min-height:100vh}
-
     button,input,select,textarea{font:inherit}
     button{cursor:pointer;border:none}
     img{max-width:100%;display:block}
+    .hidden{display:none !important}
 
     .app{
       display:grid;
@@ -41,20 +42,20 @@
       padding:20px;
       display:flex;
       flex-direction:column;
-      gap:18px;
+      gap:16px;
     }
 
     .brand{
       font-size:24px;
       font-weight:700;
-      line-height:1.2;
+      line-height:1.15;
     }
 
     .brand small{
       display:block;
       margin-top:6px;
+      color:#cad4d7;
       font-size:13px;
-      color:#cbd5d9;
       font-weight:400;
     }
 
@@ -65,23 +66,20 @@
       border-radius:12px;
       background:rgba(255,255,255,.08);
       color:#fff;
+      font-weight:700;
     }
 
-    .side-btn.active{
-      background:var(--primary);
-    }
+    .side-btn.active{background:var(--primary)}
 
-    .content{
-      padding:22px;
-    }
+    .content{padding:22px}
 
     .topbar{
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:16px;
-      margin-bottom:20px;
       flex-wrap:wrap;
+      margin-bottom:18px;
     }
 
     .title-wrap h1{
@@ -96,70 +94,36 @@
       font-size:14px;
     }
 
-    .primary-btn{
-      background:var(--primary);
-      color:#fff;
-      padding:14px 18px;
-      border-radius:12px;
-      font-weight:700;
-    }
-
-    .primary-btn:hover{
-      background:var(--primary-dark);
-    }
-
-    .secondary-btn{
-      background:#e8f1f1;
-      color:var(--primary-dark);
-      padding:12px 16px;
-      border-radius:12px;
-      font-weight:700;
-    }
-
-    .danger-btn{
-      background:#fdeaea;
-      color:#a32626;
-      padding:12px 16px;
-      border-radius:12px;
-      font-weight:700;
-    }
-
-    .hidden{display:none !important}
-
-    .dashboard{
-      display:grid;
-      gap:20px;
-    }
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:16px;
-    }
-
-    .stat-card,
-    .panel{
+    .panel, .stat-card, .project-card, .main-card{
       background:var(--panel);
       border:1px solid var(--line);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
     }
 
-    .stat-card{
-      padding:18px;
+    .primary-btn, .secondary-btn, .danger-btn, .tiny-btn{
+      border:none;
+      border-radius:12px;
+      font-weight:700;
+      padding:12px 16px;
     }
 
-    .stat-card h3{
-      margin:0 0 10px;
-      font-size:14px;
-      color:var(--muted);
-      font-weight:700;
+    .primary-btn{background:var(--primary);color:#fff}
+    .primary-btn:hover{background:var(--primary-dark)}
+    .secondary-btn{background:#e8f0f1;color:var(--primary-dark)}
+    .danger-btn{background:#fdeaea;color:#a12626}
+    .tiny-btn{background:#efeae2;color:#3f3a35;padding:8px 10px;font-size:13px}
+    .tiny-btn.danger{background:#fdeaea;color:#a12626}
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:16px;
     }
 
-    .stat-card .big{
-      font-size:34px;
-      font-weight:700;
-    }
+    .stat-card{padding:18px}
+    .stat-card h3{margin:0 0 10px;font-size:14px;color:var(--muted)}
+    .big{font-size:34px;font-weight:700}
 
     .dashboard-photos{
       display:grid;
@@ -168,10 +132,10 @@
     }
 
     .dash-photo{
-      overflow:hidden;
       border-radius:16px;
-      background:#ddd;
+      overflow:hidden;
       border:1px solid var(--line);
+      background:#ddd;
       min-height:180px;
     }
 
@@ -188,10 +152,6 @@
     }
 
     .project-card{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:18px;
-      box-shadow:var(--shadow);
       overflow:hidden;
       display:flex;
       flex-direction:column;
@@ -199,20 +159,18 @@
 
     .project-cover{
       height:170px;
-      background:#d8d2c8;
+      background:#ddd5ca;
       display:flex;
       align-items:center;
       justify-content:center;
-      color:#6b6257;
+      color:#746c61;
       font-weight:700;
-      font-size:15px;
     }
 
     .project-body{
       padding:16px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+      display:grid;
+      gap:10px;
     }
 
     .project-body h3{
@@ -221,32 +179,24 @@
     }
 
     .project-meta{
-      color:var(--muted);
       font-size:14px;
+      color:var(--muted);
     }
 
     .project-actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-    }
-
-    .project-view{
-      display:grid;
-      gap:18px;
+      margin-top:4px;
     }
 
     .project-header{
+      padding:18px;
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
       gap:16px;
       flex-wrap:wrap;
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:18px;
     }
 
     .project-header h2{
@@ -260,32 +210,17 @@
       font-size:14px;
     }
 
-    .plan-wrap{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:18px;
-      display:grid;
-      gap:16px;
-    }
-
-    .plan-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
+    .main-card{padding:18px}
 
     .plan-grid{
       display:grid;
       grid-template-columns:repeat(5, minmax(0,1fr));
       gap:14px;
+      margin-top:14px;
     }
 
     .part-card{
-      background:var(--panel-2);
+      background:var(--panel2);
       border:1px solid var(--line);
       border-radius:14px;
       overflow:hidden;
@@ -299,33 +234,41 @@
     }
 
     .part-thumb{
-      height:120px;
-      background:#ddd7cd;
+      height:130px;
+      background:#ddd5ca;
       position:relative;
       display:flex;
       align-items:center;
       justify-content:center;
-      color:#746b61;
+      color:#746c61;
       font-weight:700;
+      overflow:hidden;
+    }
+
+    .part-thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
     }
 
     .part-label{
       padding:12px;
-      font-size:14px;
-      font-weight:700;
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:10px;
+      font-size:14px;
+      font-weight:700;
     }
 
     .badge{
-      background:#efe7db;
-      color:#7b5f33;
+      background:#eee4d5;
+      color:#7b6136;
       border-radius:999px;
       padding:5px 10px;
       font-size:12px;
       font-weight:700;
+      white-space:nowrap;
     }
 
     .markers-layer{
@@ -341,8 +284,8 @@
       transform:translate(-50%,-50%);
     }
 
-    .marker-mini:before,
-    .marker-mini:after{
+    .marker-mini::before,
+    .marker-mini::after{
       content:"";
       position:absolute;
       left:8px;
@@ -353,87 +296,18 @@
       border-radius:2px;
     }
 
-    .marker-mini:before{transform:rotate(45deg)}
-    .marker-mini:after{transform:rotate(-45deg)}
+    .marker-mini::before{transform:rotate(45deg)}
+    .marker-mini::after{transform:rotate(-45deg)}
 
-    .phase-tabs{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .phase-tab{
-      padding:12px 16px;
-      border-radius:12px;
-      background:#ece7df;
-      color:#4e473f;
-      font-weight:700;
-    }
-
-    .phase-tab.active{
-      background:var(--primary);
-      color:#fff;
-    }
-
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.5);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      z-index:50;
-    }
-
-    .modal-card{
-      width:min(1100px, 100%);
-      max-height:92vh;
-      overflow:auto;
-      background:#fff;
-      border-radius:20px;
-      box-shadow:0 20px 50px rgba(0,0,0,.22);
-      padding:18px;
+    .map-shell{
       display:grid;
-      gap:18px;
-    }
-
-    .modal-head{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:flex-start;
-    }
-
-    .modal-head h3{
-      margin:0 0 6px;
-      font-size:24px;
-    }
-
-    .modal-head p{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .close-btn{
-      width:44px;
-      height:44px;
-      border-radius:12px;
-      background:#f2eee8;
-      font-size:24px;
-      line-height:1;
-    }
-
-    .detail-layout{
-      display:grid;
-      grid-template-columns:1.2fr .9fr;
+      grid-template-columns:1.15fr .95fr;
       gap:18px;
       align-items:start;
     }
 
-    .zoom-board{
-      background:#f7f4ef;
+    .board-wrap{
+      background:var(--panel2);
       border:1px solid var(--line);
       border-radius:16px;
       padding:14px;
@@ -443,15 +317,15 @@
       position:relative;
       width:100%;
       aspect-ratio:16/10;
-      background:#ddd7cd;
+      background:#ddd5ca;
       border-radius:14px;
       overflow:hidden;
-      cursor:crosshair;
       display:flex;
       align-items:center;
       justify-content:center;
-      color:#766d63;
+      color:#746c61;
       font-weight:700;
+      cursor:crosshair;
       user-select:none;
     }
 
@@ -459,7 +333,7 @@
       width:100%;
       height:100%;
       object-fit:contain;
-      background:#e8e1d5;
+      background:#e8dfd2;
     }
 
     .marker{
@@ -470,8 +344,8 @@
       cursor:pointer;
     }
 
-    .marker:before,
-    .marker:after{
+    .marker::before,
+    .marker::after{
       content:"";
       position:absolute;
       left:12px;
@@ -482,8 +356,8 @@
       border-radius:2px;
     }
 
-    .marker:before{transform:rotate(45deg)}
-    .marker:after{transform:rotate(-45deg)}
+    .marker::before{transform:rotate(45deg)}
+    .marker::after{transform:rotate(-45deg)}
 
     .side-panel{
       display:grid;
@@ -517,9 +391,9 @@
     .field textarea,
     .field select{
       width:100%;
+      padding:12px 14px;
       border:1px solid #cfc6ba;
       border-radius:12px;
-      padding:12px 14px;
       background:#fff;
     }
 
@@ -528,32 +402,42 @@
       resize:vertical;
     }
 
-    .phase-panels{
-      display:grid;
-      gap:12px;
+    .phase-tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
     }
 
-    .phase-panel{
-      display:none;
-      gap:12px;
+    .phase-tab{
+      padding:12px 16px;
+      border-radius:12px;
+      background:#ece7df;
+      color:#4d473f;
+      font-weight:700;
     }
 
-    .phase-panel.active{
-      display:grid;
+    .phase-tab.active{
+      background:var(--primary);
+      color:#fff;
     }
+
+    .phase-panel{display:none}
+    .phase-panel.active{display:block}
 
     .photo-grid{
       display:grid;
       grid-template-columns:repeat(3, minmax(0,1fr));
       gap:10px;
+      margin-top:10px;
     }
 
     .photo-item{
+      height:110px;
+      border:1px solid var(--line);
       border-radius:12px;
       overflow:hidden;
-      border:1px solid var(--line);
-      background:#e5ded2;
-      height:110px;
+      background:#ddd5ca;
       cursor:pointer;
       position:relative;
     }
@@ -564,30 +448,41 @@
       object-fit:cover;
     }
 
+    .photo-remove{
+      position:absolute;
+      top:6px;
+      right:6px;
+      background:rgba(0,0,0,.65);
+      color:#fff;
+      border-radius:8px;
+      font-size:12px;
+      padding:5px 7px;
+    }
+
     .photo-empty{
       height:110px;
-      border:2px dashed #cdbfae;
+      border:2px dashed #cbbdac;
       border-radius:12px;
       display:flex;
       align-items:center;
       justify-content:center;
-      color:#847868;
-      font-size:14px;
       text-align:center;
+      color:#847767;
       padding:12px;
+      background:#fff;
     }
 
     .point-list{
       display:grid;
       gap:10px;
-      max-height:280px;
+      max-height:320px;
       overflow:auto;
     }
 
     .point-item{
+      background:#fff;
       border:1px solid var(--line);
       border-radius:12px;
-      background:#fff;
       padding:12px;
       display:grid;
       gap:8px;
@@ -595,50 +490,88 @@
 
     .point-item.active{
       border-color:var(--primary);
-      box-shadow:0 0 0 2px rgba(11,107,111,.12);
+      box-shadow:0 0 0 2px rgba(12,107,112,.12);
     }
 
     .point-row{
       display:flex;
       justify-content:space-between;
-      gap:10px;
       align-items:center;
+      gap:10px;
       flex-wrap:wrap;
     }
 
-    .point-name{
-      font-weight:700;
-    }
+    .point-name{font-weight:700}
+    .small{font-size:13px;color:var(--muted)}
+    .row-actions{display:flex;gap:8px;flex-wrap:wrap}
 
-    .small{
-      font-size:13px;
+    .empty-state{
+      border:1px dashed #cabfb1;
+      border-radius:16px;
+      background:var(--panel);
+      padding:30px 20px;
+      text-align:center;
       color:var(--muted);
     }
 
-    .row-actions{
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.5);
       display:flex;
-      gap:8px;
-      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      z-index:60;
     }
 
-    .tiny-btn{
-      background:#f0ece5;
-      color:#3c3834;
-      padding:8px 10px;
-      border-radius:10px;
-      font-size:13px;
-      font-weight:700;
+    .modal-card{
+      width:min(1200px, 100%);
+      max-height:92vh;
+      overflow:auto;
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 20px 60px rgba(0,0,0,.25);
+      padding:18px;
+      display:grid;
+      gap:18px;
     }
 
-    .tiny-btn.danger{
-      background:#fdeaea;
-      color:#a32626;
+    .modal-card.small{
+      max-width:640px;
+    }
+
+    .modal-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+    }
+
+    .modal-head h3{
+      margin:0 0 6px;
+      font-size:24px;
+    }
+
+    .modal-head p{
+      margin:0;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .close-btn{
+      width:44px;
+      height:44px;
+      border-radius:12px;
+      background:#f2eee8;
+      font-size:24px;
+      line-height:1;
     }
 
     .lightbox{
       position:fixed;
       inset:0;
-      background:rgba(0,0,0,.85);
+      background:rgba(0,0,0,.88);
       z-index:80;
       display:flex;
       align-items:center;
@@ -647,80 +580,78 @@
     }
 
     .lightbox-card{
-      width:min(1100px,100%);
+      width:min(1100px, 100%);
       display:grid;
       gap:14px;
     }
 
     .lightbox-stage{
       position:relative;
+      min-height:72vh;
       background:#111;
-      border-radius:16px;
+      border-radius:18px;
       overflow:hidden;
-      min-height:70vh;
       display:flex;
       align-items:center;
       justify-content:center;
     }
 
     .lightbox-stage img{
-      max-height:78vh;
-      width:auto;
       max-width:100%;
+      max-height:78vh;
       object-fit:contain;
     }
 
-    .lightbox-close,
-    .nav-btn{
+    .lb-close,.lb-nav{
       position:absolute;
-      background:rgba(255,255,255,.14);
-      color:#fff;
       width:52px;
       height:52px;
       border-radius:14px;
+      color:#fff;
+      background:rgba(255,255,255,.14);
       font-size:24px;
       backdrop-filter:blur(6px);
     }
 
-    .lightbox-close{top:14px;right:14px}
-    .nav-prev{left:14px;top:50%;transform:translateY(-50%)}
-    .nav-next{right:14px;top:50%;transform:translateY(-50%)}
+    .lb-close{top:14px;right:14px}
+    .lb-prev{left:14px;top:50%;transform:translateY(-50%)}
+    .lb-next{right:14px;top:50%;transform:translateY(-50%)}
 
-    .empty-state{
-      background:var(--panel);
-      border:1px dashed #c9beb1;
-      border-radius:18px;
-      padding:40px 20px;
-      text-align:center;
-      color:var(--muted);
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:10px;
     }
 
-    .file-input{
-      display:none;
-    }
+    .file-input{display:none}
 
-    @media (max-width: 1100px){
-      .detail-layout{grid-template-columns:1fr}
+    .status-open{color:#9a6200}
+    .status-done{color:#1f6f47}
+
+    @media (max-width:1100px){
+      .map-shell{grid-template-columns:1fr}
       .plan-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
+      .stats{grid-template-columns:repeat(2, minmax(0,1fr))}
     }
 
-    @media (max-width: 800px){
+    @media (max-width:800px){
       .app{grid-template-columns:1fr}
       .sidebar{padding:16px}
-      .stats{grid-template-columns:1fr}
+      .content{padding:16px}
       .dashboard-photos{grid-template-columns:1fr}
       .plan-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
       .photo-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
-      .content{padding:16px}
     }
 
-    @media (max-width: 560px){
+    @media (max-width:560px){
+      .stats{grid-template-columns:1fr}
       .plan-grid{grid-template-columns:1fr}
       .photo-grid{grid-template-columns:1fr}
       .phase-tabs{display:grid;grid-template-columns:1fr 1fr 1fr}
       .phase-tab{text-align:center;padding:12px 8px;font-size:14px}
-      .project-header h2{font-size:22px}
       .title-wrap h1{font-size:24px}
+      .project-header h2{font-size:22px}
     }
   </style>
 </head>
@@ -728,13 +659,17 @@
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
-        Bouwherstel Tool
-        <small>Zonder login - simpele werkversie</small>
+        ED Controls
+        <small>Bouwherstel Tool — zonder login</small>
       </div>
 
       <button class="side-btn active" id="navDashboardBtn">Dashboard</button>
       <button class="side-btn" id="navProjectsBtn">Projecten</button>
+      <button class="side-btn" id="navHelpBtn">Werkwijze</button>
       <button class="side-btn" id="newProjectSideBtn">Nieuw project</button>
+      <label class="side-btn" for="importJsonInput" style="display:block;cursor:pointer;">Importeer JSON</label>
+      <input type="file" id="importJsonInput" class="file-input" accept=".json">
+      <button class="side-btn" id="exportAllBtn">Exporteer JSON</button>
     </aside>
 
     <main class="content">
@@ -742,52 +677,55 @@
         <div class="topbar">
           <div class="title-wrap">
             <h1>Dashboard</h1>
-            <p>Snel overzicht van projecten, punten en laatste werkfoto’s.</p>
+            <p>Snel overzicht van projecten, punten, open meldingen en laatste testfoto’s.</p>
           </div>
-          <button class="primary-btn" id="openNewProjectBtn">Nieuw project</button>
+          <div class="row-actions">
+            <button class="primary-btn" id="openNewProjectBtn">Nieuw project</button>
+          </div>
         </div>
 
-        <div class="dashboard">
-          <div class="stats">
-            <div class="stat-card">
-              <h3>Totaal projecten</h3>
-              <div class="big" id="statProjects">0</div>
+        <div class="stats">
+          <div class="stat-card">
+            <h3>Totaal projecten</h3>
+            <div class="big" id="statProjects">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Totaal punten</h3>
+            <div class="big" id="statPoints">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Open punten</h3>
+            <div class="big" id="statOpen">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Gereed</h3>
+            <div class="big" id="statDone">0</div>
+          </div>
+        </div>
+
+        <div class="panel" style="padding:18px;margin-top:18px;">
+          <div class="topbar" style="margin-bottom:14px;">
+            <div class="title-wrap">
+              <h1 style="font-size:22px;">Dashboard foto's</h1>
+              <p>3 wisselende testfoto’s om direct te zien dat de nieuwe versie geladen is.</p>
             </div>
-            <div class="stat-card">
-              <h3>Totaal punten</h3>
-              <div class="big" id="statPoints">0</div>
-            </div>
-            <div class="stat-card">
-              <h3>Open punten</h3>
-              <div class="big" id="statOpen">0</div>
+            <button class="secondary-btn" id="refreshDashPhotosBtn">Nieuwe testfoto's</button>
+          </div>
+          <div class="dashboard-photos">
+            <div class="dash-photo"><img id="dashPhoto1" alt="Dashboard foto 1"></div>
+            <div class="dash-photo"><img id="dashPhoto2" alt="Dashboard foto 2"></div>
+            <div class="dash-photo"><img id="dashPhoto3" alt="Dashboard foto 3"></div>
+          </div>
+        </div>
+
+        <div class="panel" style="padding:18px;margin-top:18px;">
+          <div class="topbar" style="margin-bottom:14px;">
+            <div class="title-wrap">
+              <h1 style="font-size:22px;">Projecten</h1>
+              <p>Klik op een project om direct verder te werken.</p>
             </div>
           </div>
-
-          <div class="panel" style="padding:18px;">
-            <div class="topbar" style="margin-bottom:14px;">
-              <div class="title-wrap">
-                <h1 style="font-size:22px;">Dashboard foto's</h1>
-                <p>3 testfoto’s zodat je direct ziet dat nieuwe code geladen is.</p>
-              </div>
-              <button class="secondary-btn" id="refreshDashPhotosBtn">Nieuwe testfoto's</button>
-            </div>
-
-            <div class="dashboard-photos">
-              <div class="dash-photo"><img id="dashPhoto1" alt="Dashboard testfoto 1"></div>
-              <div class="dash-photo"><img id="dashPhoto2" alt="Dashboard testfoto 2"></div>
-              <div class="dash-photo"><img id="dashPhoto3" alt="Dashboard testfoto 3"></div>
-            </div>
-          </div>
-
-          <div class="panel" style="padding:18px;">
-            <div class="topbar" style="margin-bottom:14px;">
-              <div class="title-wrap">
-                <h1 style="font-size:22px;">Projecten</h1>
-                <p>Klik op een project om verder te werken.</p>
-              </div>
-            </div>
-            <div class="project-list" id="dashboardProjectList"></div>
-          </div>
+          <div class="project-list" id="dashboardProjectList"></div>
         </div>
       </section>
 
@@ -795,50 +733,74 @@
         <div class="topbar">
           <div class="title-wrap">
             <h1>Projecten</h1>
-            <p>Beheer alle bouwherstel projecten op één plek.</p>
+            <p>Alle projecten op één plek, simpel en overzichtelijk.</p>
           </div>
-          <button class="primary-btn" id="openNewProjectBtn2">Nieuw project</button>
+          <div class="row-actions">
+            <button class="primary-btn" id="openNewProjectBtn2">Nieuw project</button>
+          </div>
+        </div>
+        <div class="project-list" id="projectsList"></div>
+      </section>
+
+      <section id="helpView" class="hidden">
+        <div class="topbar">
+          <div class="title-wrap">
+            <h1>Werkwijze</h1>
+            <p>Houd het simpel: project openen, op tekening klikken, foto's toevoegen, opslaan.</p>
+          </div>
         </div>
 
-        <div id="projectsList" class="project-list"></div>
+        <div class="main-card">
+          <ol style="margin:0;padding-left:20px;display:grid;gap:10px;">
+            <li>Maak een project aan.</li>
+            <li>Upload een hoofdplattegrond of gebruik de voorbeeldafbeelding.</li>
+            <li>Klik een deel open.</li>
+            <li>Klik in de grote tekening op de plek van het mankement.</li>
+            <li>Vul puntnaam, status en collega in.</li>
+            <li>Werk in de tabs Start, Midden en Eind.</li>
+            <li>Voeg foto's toe en schrijf korte opmerkingen.</li>
+            <li>Sla het punt op.</li>
+            <li>Exporteer JSON of maak een PDF-rapport.</li>
+          </ol>
+        </div>
       </section>
 
       <section id="projectDetailView" class="hidden">
-        <div class="project-view">
-          <div class="project-header">
+        <div class="project-header panel">
+          <div>
+            <h2 id="detailProjectName">Project</h2>
+            <p id="detailProjectMeta">Geen project geladen.</p>
+          </div>
+          <div class="row-actions">
+            <button class="secondary-btn" id="backToProjectsBtn">Terug</button>
+            <label class="secondary-btn" for="planUploadInput">Hoofdplattegrond uploaden</label>
+            <input type="file" id="planUploadInput" class="file-input" accept="image/*">
+            <button class="secondary-btn" id="splitPlanBtn">Kopieer plan naar 5 delen</button>
+            <button class="secondary-btn" id="exportProjectBtn">Export project</button>
+            <button class="primary-btn" id="pdfProjectBtn">PDF rapport</button>
+          </div>
+        </div>
+
+        <div class="main-card" style="margin-top:18px;">
+          <div class="topbar" style="margin-bottom:10px;">
             <div>
-              <h2 id="detailProjectName">Project</h2>
-              <p id="detailProjectMeta">Geen project geladen.</p>
+              <h3 style="margin:0 0 6px;">Project plattegrond</h3>
+              <div class="small">Klik op een deel om het groot te openen en daar een rood kruis te zetten.</div>
             </div>
-            <div class="row-actions">
-              <button class="secondary-btn" id="backToProjectsBtn">Terug</button>
-              <label class="secondary-btn" for="planUploadInput">Hoofdplattegrond uploaden</label>
-              <input type="file" id="planUploadInput" class="file-input" accept="image/*">
-            </div>
+            <div class="badge" id="projectPointCountBadge">0 punten</div>
           </div>
-
-          <div class="plan-wrap">
-            <div class="plan-top">
-              <div>
-                <h3 style="margin:0 0 6px;">Plattegrond delen</h3>
-                <div class="small">Klik op een deel om het groot te openen en daar een punt te zetten.</div>
-              </div>
-              <div class="badge" id="projectPointCountBadge">0 punten</div>
-            </div>
-
-            <div class="plan-grid" id="planGrid"></div>
-          </div>
+          <div class="plan-grid" id="planGrid"></div>
         </div>
       </section>
     </main>
   </div>
 
   <div class="modal hidden" id="projectModal">
-    <div class="modal-card" style="max-width:640px;">
+    <div class="modal-card small">
       <div class="modal-head">
         <div>
           <h3>Nieuw project</h3>
-          <p>Vul alleen de basis in. Simpel houden.</p>
+          <p>Vul alleen de basis in. Later kun je verder aanvullen.</p>
         </div>
         <button class="close-btn" id="closeProjectModalBtn">&times;</button>
       </div>
@@ -851,6 +813,11 @@
       <div class="field">
         <label for="projectLocationInput">Locatie</label>
         <input id="projectLocationInput" type="text" placeholder="Bijv. Utrecht">
+      </div>
+
+      <div class="field">
+        <label for="projectClientInput">Opdrachtgever</label>
+        <input id="projectClientInput" type="text" placeholder="Bijv. Gemeente Utrecht">
       </div>
 
       <div class="field">
@@ -875,10 +842,16 @@
         <button class="close-btn" id="closePartModalBtn">&times;</button>
       </div>
 
-      <div class="detail-layout">
-        <div class="zoom-board">
+      <div class="map-shell">
+        <div class="board-wrap">
           <div class="board-frame" id="boardFrame">
             <img id="boardImage" alt="Deel afbeelding">
+          </div>
+          <div class="toolbar">
+            <label class="secondary-btn" for="partImageUploadInput">Afbeelding voor dit deel</label>
+            <input type="file" id="partImageUploadInput" class="file-input" accept="image/*">
+            <button class="secondary-btn" id="duplicatePointBtn">Dupliceer punt</button>
+            <button class="secondary-btn" id="moveModeBtn">Verplaats modus: uit</button>
           </div>
         </div>
 
@@ -909,50 +882,53 @@
               <input id="pointColleagueInput" type="text" placeholder="Naam collega">
             </div>
 
+            <div class="field">
+              <label for="pointRemarkInput">Algemene opmerking punt</label>
+              <textarea id="pointRemarkInput" placeholder="Algemene opmerking over dit punt"></textarea>
+            </div>
+
             <div class="phase-tabs">
               <button class="phase-tab active" data-phase="start">Start</button>
               <button class="phase-tab" data-phase="midden">Midden</button>
               <button class="phase-tab" data-phase="eind">Eind</button>
             </div>
 
-            <div class="phase-panels">
-              <div class="phase-panel active" data-panel="start">
-                <div class="small" id="dateStartText"></div>
-                <div class="field">
-                  <label>Opmerking start</label>
-                  <textarea id="noteStartInput" placeholder="Opmerking voor startfase"></textarea>
-                </div>
-                <label class="secondary-btn" for="photoStartInput">Foto's toevoegen</label>
-                <input type="file" id="photoStartInput" class="file-input" accept="image/*" multiple>
-                <div id="photoStartGrid" class="photo-grid"></div>
+            <div class="phase-panel active" data-panel="start">
+              <div class="small" id="dateStartText"></div>
+              <div class="field">
+                <label>Opmerking start</label>
+                <textarea id="noteStartInput" placeholder="Opmerking voor startfase"></textarea>
               </div>
-
-              <div class="phase-panel" data-panel="midden">
-                <div class="small" id="dateMiddenText"></div>
-                <div class="field">
-                  <label>Opmerking midden</label>
-                  <textarea id="noteMiddenInput" placeholder="Opmerking voor middenfase"></textarea>
-                </div>
-                <label class="secondary-btn" for="photoMiddenInput">Foto's toevoegen</label>
-                <input type="file" id="photoMiddenInput" class="file-input" accept="image/*" multiple>
-                <div id="photoMiddenGrid" class="photo-grid"></div>
-              </div>
-
-              <div class="phase-panel" data-panel="eind">
-                <div class="small" id="dateEindText"></div>
-                <div class="field">
-                  <label>Opmerking eind</label>
-                  <textarea id="noteEindInput" placeholder="Opmerking voor eindfase"></textarea>
-                </div>
-                <label class="secondary-btn" for="photoEindInput">Foto's toevoegen</label>
-                <input type="file" id="photoEindInput" class="file-input" accept="image/*" multiple>
-                <div id="photoEindGrid" class="photo-grid"></div>
-              </div>
+              <label class="secondary-btn" for="photoStartInput">Foto's toevoegen</label>
+              <input type="file" id="photoStartInput" class="file-input" accept="image/*" multiple>
+              <div class="photo-grid" id="photoStartGrid"></div>
             </div>
 
-            <div class="row-actions">
+            <div class="phase-panel" data-panel="midden">
+              <div class="small" id="dateMiddenText"></div>
+              <div class="field">
+                <label>Opmerking midden</label>
+                <textarea id="noteMiddenInput" placeholder="Opmerking voor middenfase"></textarea>
+              </div>
+              <label class="secondary-btn" for="photoMiddenInput">Foto's toevoegen</label>
+              <input type="file" id="photoMiddenInput" class="file-input" accept="image/*" multiple>
+              <div class="photo-grid" id="photoMiddenGrid"></div>
+            </div>
+
+            <div class="phase-panel" data-panel="eind">
+              <div class="small" id="dateEindText"></div>
+              <div class="field">
+                <label>Opmerking eind</label>
+                <textarea id="noteEindInput" placeholder="Opmerking voor eindfase"></textarea>
+              </div>
+              <label class="secondary-btn" for="photoEindInput">Foto's toevoegen</label>
+              <input type="file" id="photoEindInput" class="file-input" accept="image/*" multiple>
+              <div class="photo-grid" id="photoEindGrid"></div>
+            </div>
+
+            <div class="row-actions" style="margin-top:8px;">
               <button class="primary-btn" id="savePointBtn">Punt opslaan</button>
-              <button class="tiny-btn danger" id="deletePointBtn">Punt verwijderen</button>
+              <button class="danger-btn" id="deletePointBtn">Punt verwijderen</button>
             </div>
           </div>
 
@@ -961,8 +937,9 @@
             <div class="small">
               1. Klik op de tekening.<br>
               2. Er komt een rood kruis.<br>
-              3. Vul daarna punt, foto's en opmerking in.<br>
-              4. Klik op opslaan.
+              3. Vul punt, status en foto's in.<br>
+              4. Sla het punt op.<br>
+              5. Open later hetzelfde punt om verder te werken.
             </div>
           </div>
         </div>
@@ -973,38 +950,51 @@
   <div class="lightbox hidden" id="lightbox">
     <div class="lightbox-card">
       <div class="lightbox-stage">
-        <button class="lightbox-close" id="lightboxCloseBtn">&times;</button>
-        <button class="nav-btn nav-prev" id="lightboxPrevBtn">&#10094;</button>
+        <button class="lb-close" id="lightboxCloseBtn">&times;</button>
+        <button class="lb-nav lb-prev" id="lightboxPrevBtn">&#10094;</button>
         <img id="lightboxImage" alt="Vergrote foto">
-        <button class="nav-btn nav-next" id="lightboxNextBtn">&#10095;</button>
+        <button class="lb-nav lb-next" id="lightboxNextBtn">&#10095;</button>
       </div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "bouwhersteltool_v1_simple";
-    const PHASES = ["start", "midden", "eind"];
+    const STORAGE_KEY = "ed_controls_bouwherstel_complete_v1";
+    const DASH_KEY = "ed_controls_dash_seeds_v1";
+    const PHASES = ["start","midden","eind"];
 
     const state = {
       projects: [],
       currentProjectId: null,
       currentPartIndex: null,
       currentPointId: null,
-      dashPhotoSeeds: [101, 202, 303],
       lightboxPhotos: [],
-      lightboxIndex: 0
+      lightboxIndex: 0,
+      moveMode: false
     };
 
+    let dashSeeds = [111, 222, 333];
+    let draggingPointId = null;
+
     function uid(){
-      return "id-" + Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
+      return "id-" + Math.random().toString(36).slice(2,9) + Date.now().toString(36);
     }
 
     function todayString(){
       const d = new Date();
       const day = String(d.getDate()).padStart(2, "0");
-      const month = String(d.getMonth()+1).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
       const year = d.getFullYear();
       return `${day}-${month}-${year}`;
+    }
+
+    function escapeHtml(text){
+      return String(text || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
 
     function createEmptyPart(index){
@@ -1016,13 +1006,15 @@
       };
     }
 
-    function createProject(name, location, note){
+    function createProject(name, location, client, note){
       return {
         id: uid(),
         name: name || "Nieuw project",
         location: location || "",
+        client: client || "",
         note: note || "",
         createdAt: todayString(),
+        updatedAt: todayString(),
         cover: "",
         mainPlan: "",
         parts: Array.from({length:5}, (_,i)=>createEmptyPart(i))
@@ -1035,9 +1027,11 @@
         title: "",
         status: "Open",
         colleague: "",
+        remark: "",
         x,
         y,
         createdAt: todayString(),
+        updatedAt: todayString(),
         phases: {
           start: { date: todayString(), note: "", photos: [] },
           midden: { date: todayString(), note: "", photos: [] },
@@ -1059,52 +1053,110 @@
           state.projects = [];
         }
       }
+      const dashRaw = localStorage.getItem(DASH_KEY);
+      if(dashRaw){
+        try{
+          dashSeeds = JSON.parse(dashRaw);
+        }catch(e){}
+      }
 
       if(state.projects.length === 0){
-        const demo = createProject("Demo project", "Utrecht", "Voorbeeldproject voor snelle test");
-        demo.parts[0].image = "https://picsum.photos/seed/deel1/1200/800";
-        demo.parts[1].image = "https://picsum.photos/seed/deel2/1200/800";
-        demo.parts[2].image = "https://picsum.photos/seed/deel3/1200/800";
-        demo.parts[3].image = "https://picsum.photos/seed/deel4/1200/800";
-        demo.parts[4].image = "https://picsum.photos/seed/deel5/1200/800";
-        demo.cover = demo.parts[0].image;
+        const demo = createProject("Demo project", "Utrecht", "Gemeente Utrecht", "Voorbeeldproject");
+        demo.mainPlan = "https://picsum.photos/seed/mainplan123/1400/900";
+        demo.cover = demo.mainPlan;
+        demo.parts.forEach((part, i) => {
+          part.image = `https://picsum.photos/seed/deel-demo-${i+1}/1200/800`;
+        });
+        const p = createPoint(35, 40);
+        p.title = "Scheur wand";
+        p.colleague = "Test collega";
+        p.remark = "Voorbeeldpunt";
+        p.phases.start.note = "Startschade vastgelegd";
+        demo.parts[0].points.push(p);
         state.projects.push(demo);
         saveState();
       }
     }
 
+    function persistDashSeeds(){
+      localStorage.setItem(DASH_KEY, JSON.stringify(dashSeeds));
+    }
+
+    function getCurrentProject(){
+      return state.projects.find(p => p.id === state.currentProjectId) || null;
+    }
+
+    function getCurrentPart(){
+      const project = getCurrentProject();
+      if(!project || state.currentPartIndex === null) return null;
+      return project.parts[state.currentPartIndex];
+    }
+
+    function getCurrentPoint(){
+      const part = getCurrentPart();
+      if(!part || !state.currentPointId) return null;
+      return part.points.find(p => p.id === state.currentPointId) || null;
+    }
+
+    function countProjectPoints(project){
+      return project.parts.reduce((sum, part) => sum + part.points.length, 0);
+    }
+
+    function countAllPoints(){
+      return state.projects.reduce((sum, project) => sum + countProjectPoints(project), 0);
+    }
+
+    function countStatus(status){
+      return state.projects.reduce((sum, project) => {
+        return sum + project.parts.reduce((sub, part) => {
+          return sub + part.points.filter(point => point.status === status).length;
+        }, 0);
+      }, 0);
+    }
+
     const dashboardView = document.getElementById("dashboardView");
     const projectsView = document.getElementById("projectsView");
+    const helpView = document.getElementById("helpView");
     const projectDetailView = document.getElementById("projectDetailView");
 
     const navDashboardBtn = document.getElementById("navDashboardBtn");
     const navProjectsBtn = document.getElementById("navProjectsBtn");
+    const navHelpBtn = document.getElementById("navHelpBtn");
     const newProjectSideBtn = document.getElementById("newProjectSideBtn");
     const openNewProjectBtn = document.getElementById("openNewProjectBtn");
     const openNewProjectBtn2 = document.getElementById("openNewProjectBtn2");
 
-    const dashboardProjectList = document.getElementById("dashboardProjectList");
-    const projectsList = document.getElementById("projectsList");
-
     const statProjects = document.getElementById("statProjects");
     const statPoints = document.getElementById("statPoints");
     const statOpen = document.getElementById("statOpen");
+    const statDone = document.getElementById("statDone");
+
+    const dashPhoto1 = document.getElementById("dashPhoto1");
+    const dashPhoto2 = document.getElementById("dashPhoto2");
+    const dashPhoto3 = document.getElementById("dashPhoto3");
+    const refreshDashPhotosBtn = document.getElementById("refreshDashPhotosBtn");
+
+    const dashboardProjectList = document.getElementById("dashboardProjectList");
+    const projectsList = document.getElementById("projectsList");
 
     const projectModal = document.getElementById("projectModal");
     const closeProjectModalBtn = document.getElementById("closeProjectModalBtn");
-    const cancelProjectBtn = document.getElementById("cancelProjectBtn");
     const saveProjectBtn = document.getElementById("saveProjectBtn");
-
+    const cancelProjectBtn = document.getElementById("cancelProjectBtn");
     const projectNameInput = document.getElementById("projectNameInput");
     const projectLocationInput = document.getElementById("projectLocationInput");
+    const projectClientInput = document.getElementById("projectClientInput");
     const projectNoteInput = document.getElementById("projectNoteInput");
 
     const detailProjectName = document.getElementById("detailProjectName");
     const detailProjectMeta = document.getElementById("detailProjectMeta");
+    const projectPointCountBadge = document.getElementById("projectPointCountBadge");
     const planGrid = document.getElementById("planGrid");
     const backToProjectsBtn = document.getElementById("backToProjectsBtn");
-    const projectPointCountBadge = document.getElementById("projectPointCountBadge");
     const planUploadInput = document.getElementById("planUploadInput");
+    const splitPlanBtn = document.getElementById("splitPlanBtn");
+    const exportProjectBtn = document.getElementById("exportProjectBtn");
+    const pdfProjectBtn = document.getElementById("pdfProjectBtn");
 
     const partModal = document.getElementById("partModal");
     const closePartModalBtn = document.getElementById("closePartModalBtn");
@@ -1114,10 +1166,14 @@
     const pointList = document.getElementById("pointList");
     const pointEditorBox = document.getElementById("pointEditorBox");
     const pointHintBox = document.getElementById("pointHintBox");
+    const duplicatePointBtn = document.getElementById("duplicatePointBtn");
+    const moveModeBtn = document.getElementById("moveModeBtn");
+    const partImageUploadInput = document.getElementById("partImageUploadInput");
 
     const pointTitleInput = document.getElementById("pointTitleInput");
     const pointStatusInput = document.getElementById("pointStatusInput");
     const pointColleagueInput = document.getElementById("pointColleagueInput");
+    const pointRemarkInput = document.getElementById("pointRemarkInput");
     const noteStartInput = document.getElementById("noteStartInput");
     const noteMiddenInput = document.getElementById("noteMiddenInput");
     const noteEindInput = document.getElementById("noteEindInput");
@@ -1134,11 +1190,6 @@
     const photoMiddenGrid = document.getElementById("photoMiddenGrid");
     const photoEindGrid = document.getElementById("photoEindGrid");
 
-    const refreshDashPhotosBtn = document.getElementById("refreshDashPhotosBtn");
-    const dashPhoto1 = document.getElementById("dashPhoto1");
-    const dashPhoto2 = document.getElementById("dashPhoto2");
-    const dashPhoto3 = document.getElementById("dashPhoto3");
-
     const phaseTabs = Array.from(document.querySelectorAll(".phase-tab"));
     const phasePanels = Array.from(document.querySelectorAll(".phase-panel"));
 
@@ -1148,13 +1199,18 @@
     const lightboxPrevBtn = document.getElementById("lightboxPrevBtn");
     const lightboxNextBtn = document.getElementById("lightboxNextBtn");
 
+    const importJsonInput = document.getElementById("importJsonInput");
+    const exportAllBtn = document.getElementById("exportAllBtn");
+
     function showView(name){
       dashboardView.classList.add("hidden");
       projectsView.classList.add("hidden");
+      helpView.classList.add("hidden");
       projectDetailView.classList.add("hidden");
 
       navDashboardBtn.classList.remove("active");
       navProjectsBtn.classList.remove("active");
+      navHelpBtn.classList.remove("active");
 
       if(name === "dashboard"){
         dashboardView.classList.remove("hidden");
@@ -1164,66 +1220,54 @@
         projectsView.classList.remove("hidden");
         navProjectsBtn.classList.add("active");
       }
+      if(name === "help"){
+        helpView.classList.remove("hidden");
+        navHelpBtn.classList.add("active");
+      }
       if(name === "detail"){
         projectDetailView.classList.remove("hidden");
         navProjectsBtn.classList.add("active");
       }
     }
 
-    function getCurrentProject(){
-      return state.projects.find(p => p.id === state.currentProjectId) || null;
+    function openProjectModal(){
+      projectModal.classList.remove("hidden");
     }
 
-    function getCurrentPart(){
-      const project = getCurrentProject();
-      if(!project || state.currentPartIndex === null) return null;
-      return project.parts[state.currentPartIndex];
-    }
-
-    function getCurrentPoint(){
-      const part = getCurrentPart();
-      if(!part) return null;
-      return part.points.find(p => p.id === state.currentPointId) || null;
-    }
-
-    function countAllPoints(){
-      return state.projects.reduce((sum, project) => {
-        return sum + project.parts.reduce((s, part) => s + part.points.length, 0);
-      }, 0);
-    }
-
-    function countOpenPoints(){
-      return state.projects.reduce((sum, project) => {
-        return sum + project.parts.reduce((s, part) => {
-          return s + part.points.filter(p => p.status !== "Gereed").length;
-        }, 0);
-      }, 0);
+    function closeProjectModal(){
+      projectModal.classList.add("hidden");
+      projectNameInput.value = "";
+      projectLocationInput.value = "";
+      projectClientInput.value = "";
+      projectNoteInput.value = "";
     }
 
     function renderStats(){
       statProjects.textContent = state.projects.length;
       statPoints.textContent = countAllPoints();
-      statOpen.textContent = countOpenPoints();
+      statOpen.textContent = countStatus("Open");
+      statDone.textContent = countStatus("Gereed");
     }
 
     function renderDashboardPhotos(){
-      dashPhoto1.src = `https://picsum.photos/seed/${state.dashPhotoSeeds[0]}/800/500`;
-      dashPhoto2.src = `https://picsum.photos/seed/${state.dashPhotoSeeds[1]}/800/500`;
-      dashPhoto3.src = `https://picsum.photos/seed/${state.dashPhotoSeeds[2]}/800/500`;
+      dashPhoto1.src = `https://picsum.photos/seed/${dashSeeds[0]}/900/600`;
+      dashPhoto2.src = `https://picsum.photos/seed/${dashSeeds[1]}/900/600`;
+      dashPhoto3.src = `https://picsum.photos/seed/${dashSeeds[2]}/900/600`;
     }
 
     function shuffleDashboardPhotos(){
-      state.dashPhotoSeeds = [
-        Math.floor(Math.random()*1000)+1,
-        Math.floor(Math.random()*1000)+1001,
-        Math.floor(Math.random()*1000)+2001
+      dashSeeds = [
+        Math.floor(Math.random() * 10000) + 1,
+        Math.floor(Math.random() * 10000) + 10001,
+        Math.floor(Math.random() * 10000) + 20001
       ];
+      persistDashSeeds();
       renderDashboardPhotos();
     }
 
     function projectCardHtml(project){
-      const points = project.parts.reduce((sum, part)=>sum + part.points.length, 0);
-      const cover = project.cover || project.parts[0]?.image || "";
+      const points = countProjectPoints(project);
+      const cover = project.cover || project.mainPlan || project.parts[0]?.image || "";
       return `
         <div class="project-card">
           <div class="project-cover">
@@ -1232,10 +1276,11 @@
           <div class="project-body">
             <h3>${escapeHtml(project.name)}</h3>
             <div class="project-meta">${escapeHtml(project.location || "Geen locatie")} • ${points} punten</div>
-            <div class="project-meta">${escapeHtml(project.createdAt || "")}</div>
+            <div class="project-meta">${escapeHtml(project.client || "Geen opdrachtgever")} • ${escapeHtml(project.createdAt || "")}</div>
             <div class="project-actions">
               <button class="primary-btn" onclick="openProject('${project.id}')">Open project</button>
-              <button class="danger-btn" onclick="deleteProject('${project.id}')">Verwijderen</button>
+              <button class="secondary-btn" onclick="exportSingleProject('${project.id}')">Export</button>
+              <button class="danger-btn" onclick="deleteProject('${project.id}')">Verwijder</button>
             </div>
           </div>
         </div>
@@ -1244,8 +1289,9 @@
 
     function renderProjects(){
       const html = state.projects.map(projectCardHtml).join("");
-      dashboardProjectList.innerHTML = html || `<div class="empty-state">Nog geen projecten.</div>`;
-      projectsList.innerHTML = html || `<div class="empty-state">Nog geen projecten.</div>`;
+      const empty = `<div class="empty-state">Nog geen projecten aangemaakt.</div>`;
+      dashboardProjectList.innerHTML = html || empty;
+      projectsList.innerHTML = html || empty;
     }
 
     function renderProjectDetail(){
@@ -1253,16 +1299,16 @@
       if(!project) return;
 
       detailProjectName.textContent = project.name;
-      detailProjectMeta.textContent = `${project.location || "Geen locatie"} • aangemaakt op ${project.createdAt}`;
-      const totalPoints = project.parts.reduce((sum, part)=>sum + part.points.length, 0);
-      projectPointCountBadge.textContent = `${totalPoints} punten`;
+      detailProjectMeta.textContent =
+        `${project.location || "Geen locatie"} • ${project.client || "Geen opdrachtgever"} • aangemaakt ${project.createdAt}`;
+      projectPointCountBadge.textContent = `${countProjectPoints(project)} punten`;
 
       planGrid.innerHTML = project.parts.map((part, index) => {
         const image = part.image || project.mainPlan || "";
         return `
           <div class="part-card" onclick="openPart(${index})">
             <div class="part-thumb">
-              ${image ? `<img src="${image}" alt="${escapeHtml(part.name)}" style="width:100%;height:100%;object-fit:cover;">` : `Geen beeld<br>${escapeHtml(part.name)}`}
+              ${image ? `<img src="${image}" alt="${escapeHtml(part.name)}">` : `${escapeHtml(part.name)}`}
               <div class="markers-layer">
                 ${part.points.map(point => `
                   <div class="marker-mini" style="left:${point.x}%;top:${point.y}%;"></div>
@@ -1278,15 +1324,32 @@
       }).join("");
     }
 
-    function openProjectModal(){
-      projectModal.classList.remove("hidden");
+    function renderAll(){
+      renderStats();
+      renderDashboardPhotos();
+      renderProjects();
+      if(state.currentProjectId) renderProjectDetail();
     }
 
-    function closeProjectModal(){
-      projectModal.classList.add("hidden");
-      projectNameInput.value = "";
-      projectLocationInput.value = "";
-      projectNoteInput.value = "";
+    function saveProject(){
+      const name = projectNameInput.value.trim();
+      if(!name){
+        alert("Vul een projectnaam in.");
+        return;
+      }
+
+      const project = createProject(
+        name,
+        projectLocationInput.value.trim(),
+        projectClientInput.value.trim(),
+        projectNoteInput.value.trim()
+      );
+
+      state.projects.unshift(project);
+      saveState();
+      closeProjectModal();
+      renderAll();
+      openProject(project.id);
     }
 
     function openProject(projectId){
@@ -1306,37 +1369,66 @@
       showView("projects");
     }
 
-    function saveProject(){
-      const name = projectNameInput.value.trim();
-      if(!name){
-        alert("Vul een projectnaam in.");
+    function readFileAsDataURL(file, cb){
+      const reader = new FileReader();
+      reader.onload = e => cb(e.target.result);
+      reader.readAsDataURL(file);
+    }
+
+    function readFilesAsDataUrls(fileList, callback){
+      const files = Array.from(fileList || []);
+      if(files.length === 0){
+        callback([]);
         return;
       }
+      const results = [];
+      let done = 0;
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          results.push(e.target.result);
+          done++;
+          if(done === files.length) callback(results);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
 
-      const project = createProject(
-        name,
-        projectLocationInput.value.trim(),
-        projectNoteInput.value.trim()
-      );
-
-      state.projects.unshift(project);
+    function splitPlanToAllParts(){
+      const project = getCurrentProject();
+      if(!project){
+        alert("Open eerst een project.");
+        return;
+      }
+      if(!project.mainPlan){
+        alert("Upload eerst een hoofdplattegrond.");
+        return;
+      }
+      project.parts.forEach(part => {
+        part.image = project.mainPlan;
+      });
+      project.cover = project.mainPlan;
+      project.updatedAt = todayString();
       saveState();
-      closeProjectModal();
-      renderAll();
-      openProject(project.id);
+      renderProjectDetail();
+      renderProjects();
     }
 
     function openPart(index){
       state.currentPartIndex = index;
       state.currentPointId = null;
+      state.moveMode = false;
+      draggingPointId = null;
+      moveModeBtn.textContent = "Verplaats modus: uit";
+
+      const project = getCurrentProject();
       const part = getCurrentPart();
-      if(!part) return;
+      if(!project || !part) return;
 
-      partModalTitle.textContent = `${part.name} - klik op de plek van het mankement`;
-      boardImage.src = part.image || getCurrentProject().mainPlan || "https://picsum.photos/seed/defaultplan/1200/800";
-      boardFrame.querySelectorAll(".marker").forEach(el => el.remove());
+      partModalTitle.textContent = `${part.name} — klik op de juiste plek`;
+      boardImage.src = part.image || project.mainPlan || "https://picsum.photos/seed/defaultplan/1200/800";
 
-      part.points.forEach(point => drawMarker(point));
+      redrawBoardMarkers();
       renderPointList();
       clearPointEditor();
       partModal.classList.remove("hidden");
@@ -1346,6 +1438,8 @@
       partModal.classList.add("hidden");
       state.currentPartIndex = null;
       state.currentPointId = null;
+      state.moveMode = false;
+      draggingPointId = null;
       clearPointEditor();
     }
 
@@ -1355,10 +1449,19 @@
       marker.style.left = point.x + "%";
       marker.style.top = point.y + "%";
       marker.dataset.pointId = point.id;
+
       marker.addEventListener("click", (e) => {
         e.stopPropagation();
         selectPoint(point.id);
       });
+
+      marker.addEventListener("pointerdown", (e) => {
+        if(!state.moveMode) return;
+        e.preventDefault();
+        e.stopPropagation();
+        draggingPointId = point.id;
+      });
+
       boardFrame.appendChild(marker);
     }
 
@@ -1366,7 +1469,25 @@
       boardFrame.querySelectorAll(".marker").forEach(el => el.remove());
       const part = getCurrentPart();
       if(!part) return;
-      part.points.forEach(point => drawMarker(point));
+      part.points.forEach(drawMarker);
+    }
+
+    function clearPointEditor(){
+      pointEditorBox.classList.add("hidden");
+      pointHintBox.classList.remove("hidden");
+      pointTitleInput.value = "";
+      pointStatusInput.value = "Open";
+      pointColleagueInput.value = "";
+      pointRemarkInput.value = "";
+      noteStartInput.value = "";
+      noteMiddenInput.value = "";
+      noteEindInput.value = "";
+      dateStartText.textContent = "";
+      dateMiddenText.textContent = "";
+      dateEindText.textContent = "";
+      renderPhotoGrid(photoStartGrid, [], "start");
+      renderPhotoGrid(photoMiddenGrid, [], "midden");
+      renderPhotoGrid(photoEindGrid, [], "eind");
     }
 
     function renderPointList(){
@@ -1374,7 +1495,7 @@
       if(!part) return;
 
       if(part.points.length === 0){
-        pointList.innerHTML = `<div class="empty-state" style="padding:20px;">Nog geen punten in dit deel.</div>`;
+        pointList.innerHTML = `<div class="empty-state" style="padding:18px;">Nog geen punten in dit deel.</div>`;
         return;
       }
 
@@ -1394,23 +1515,6 @@
       `).join("");
     }
 
-    function clearPointEditor(){
-      pointEditorBox.classList.add("hidden");
-      pointHintBox.classList.remove("hidden");
-      pointTitleInput.value = "";
-      pointStatusInput.value = "Open";
-      pointColleagueInput.value = "";
-      noteStartInput.value = "";
-      noteMiddenInput.value = "";
-      noteEindInput.value = "";
-      dateStartText.textContent = "";
-      dateMiddenText.textContent = "";
-      dateEindText.textContent = "";
-      renderPhotoGrid(photoStartGrid, []);
-      renderPhotoGrid(photoMiddenGrid, []);
-      renderPhotoGrid(photoEindGrid, []);
-    }
-
     function selectPoint(pointId){
       state.currentPointId = pointId;
       const point = getCurrentPoint();
@@ -1422,6 +1526,7 @@
       pointTitleInput.value = point.title || "";
       pointStatusInput.value = point.status || "Open";
       pointColleagueInput.value = point.colleague || "";
+      pointRemarkInput.value = point.remark || "";
 
       noteStartInput.value = point.phases.start.note || "";
       noteMiddenInput.value = point.phases.midden.note || "";
@@ -1438,36 +1543,23 @@
       renderPointList();
     }
 
-    function removePoint(pointId){
-      const part = getCurrentPart();
-      if(!part) return;
-      if(!confirm("Punt verwijderen?")) return;
-
-      part.points = part.points.filter(p => p.id !== pointId);
-      if(state.currentPointId === pointId){
-        state.currentPointId = null;
-        clearPointEditor();
-      }
-      saveState();
-      renderProjectDetail();
-      redrawBoardMarkers();
-      renderPointList();
-    }
-
     function savePointEdits(){
       const point = getCurrentPoint();
-      if(!point){
+      const project = getCurrentProject();
+      if(!point || !project){
         alert("Selecteer eerst een punt.");
         return;
       }
 
-      point.title = pointTitleInput.value.trim();
+      point.title = pointTitleInput.value.trim() || "Nieuw punt";
       point.status = pointStatusInput.value;
       point.colleague = pointColleagueInput.value.trim();
-
+      point.remark = pointRemarkInput.value.trim();
       point.phases.start.note = noteStartInput.value.trim();
       point.phases.midden.note = noteMiddenInput.value.trim();
       point.phases.eind.note = noteEindInput.value.trim();
+      point.updatedAt = todayString();
+      project.updatedAt = todayString();
 
       if(!point.phases.start.date) point.phases.start.date = todayString();
       if(!point.phases.midden.date) point.phases.midden.date = todayString();
@@ -1475,11 +1567,101 @@
 
       saveState();
       renderAll();
-      openPart(state.currentPartIndex);
+      redrawBoardMarkers();
+      renderPointList();
+      selectPoint(point.id);
+      alert("Punt opgeslagen.");
+    }
+
+    function removePoint(pointId){
+      const part = getCurrentPart();
+      const project = getCurrentProject();
+      if(!part || !project) return;
+      if(!confirm("Punt verwijderen?")) return;
+
+      part.points = part.points.filter(point => point.id !== pointId);
+      project.updatedAt = todayString();
+      if(state.currentPointId === pointId){
+        state.currentPointId = null;
+        clearPointEditor();
+      }
+      saveState();
+      redrawBoardMarkers();
+      renderPointList();
+      renderProjectDetail();
+      renderStats();
+    }
+
+    function duplicateCurrentPoint(){
+      const part = getCurrentPart();
+      const point = getCurrentPoint();
+      if(!part || !point){
+        alert("Selecteer eerst een punt.");
+        return;
+      }
+
+      const copy = JSON.parse(JSON.stringify(point));
+      copy.id = uid();
+      copy.title = (point.title || "Nieuw punt") + " kopie";
+      copy.x = Math.min(point.x + 4, 96);
+      copy.y = Math.min(point.y + 4, 96);
+      copy.createdAt = todayString();
+      copy.updatedAt = todayString();
+      part.points.push(copy);
+      saveState();
+      redrawBoardMarkers();
+      renderPointList();
+      renderProjectDetail();
+      selectPoint(copy.id);
+    }
+
+    function toggleMoveMode(){
+      state.moveMode = !state.moveMode;
+      moveModeBtn.textContent = state.moveMode ? "Verplaats modus: aan" : "Verplaats modus: uit";
+    }
+
+    function addPointAtClick(clientX, clientY){
+      const part = getCurrentPart();
+      if(!part) return;
+
+      const rect = boardFrame.getBoundingClientRect();
+      const x = ((clientX - rect.left) / rect.width) * 100;
+      const y = ((clientY - rect.top) / rect.height) * 100;
+
+      const safeX = Math.max(2, Math.min(98, x));
+      const safeY = Math.max(2, Math.min(98, y));
+
+      const point = createPoint(safeX, safeY);
+      part.points.push(point);
+      state.currentPointId = point.id;
+      saveState();
+      redrawBoardMarkers();
+      renderPointList();
+      renderProjectDetail();
       selectPoint(point.id);
     }
 
-    function renderPhotoGrid(container, photos, phaseName = ""){
+    function updateDraggedPoint(clientX, clientY){
+      const point = getCurrentPointById(draggingPointId);
+      if(!point) return;
+
+      const rect = boardFrame.getBoundingClientRect();
+      const x = ((clientX - rect.left) / rect.width) * 100;
+      const y = ((clientY - rect.top) / rect.height) * 100;
+      point.x = Math.max(2, Math.min(98, x));
+      point.y = Math.max(2, Math.min(98, y));
+      point.updatedAt = todayString();
+      redrawBoardMarkers();
+      renderPointList();
+    }
+
+    function getCurrentPointById(pointId){
+      const part = getCurrentPart();
+      if(!part) return null;
+      return part.points.find(p => p.id === pointId) || null;
+    }
+
+    function renderPhotoGrid(container, photos, phaseName){
       if(!photos || photos.length === 0){
         container.innerHTML = `<div class="photo-empty">Nog geen foto's toegevoegd</div>`;
         return;
@@ -1487,51 +1669,39 @@
 
       container.innerHTML = photos.map((src, index) => `
         <div class="photo-item" onclick="openLightboxForPhase('${phaseName}', ${index})">
-          <img src="${src}" alt="Fase foto ${index+1}">
+          <img src="${src}" alt="Fase foto ${index + 1}">
+          <button class="photo-remove" onclick="event.stopPropagation(); removePhotoFromPhase('${phaseName}', ${index});">X</button>
         </div>
       `).join("");
+    }
+
+    function addPhotosToPhase(phase, fileList){
+      const point = getCurrentPoint();
+      if(!point){
+        alert("Selecteer eerst een punt.");
+        return;
+      }
+      readFilesAsDataUrls(fileList, (images) => {
+        point.phases[phase].photos.push(...images);
+        if(!point.phases[phase].date) point.phases[phase].date = todayString();
+        point.updatedAt = todayString();
+        saveState();
+        selectPoint(point.id);
+      });
+    }
+
+    function removePhotoFromPhase(phase, index){
+      const point = getCurrentPoint();
+      if(!point) return;
+      point.phases[phase].photos.splice(index, 1);
+      point.updatedAt = todayString();
+      saveState();
+      selectPoint(point.id);
     }
 
     function setPhaseTab(phase){
       phaseTabs.forEach(btn => btn.classList.toggle("active", btn.dataset.phase === phase));
       phasePanels.forEach(panel => panel.classList.toggle("active", panel.dataset.panel === phase));
-    }
-
-    function readFilesAsDataUrls(fileList, callback){
-      const files = Array.from(fileList || []);
-      if(files.length === 0){
-        callback([]);
-        return;
-      }
-
-      const results = [];
-      let done = 0;
-
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          results.push(e.target.result);
-          done++;
-          if(done === files.length) callback(results);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function addPhotosToPhase(phase, files){
-      const point = getCurrentPoint();
-      if(!point){
-        alert("Klik eerst op een punt en sla dat punt op.");
-        return;
-      }
-
-      readFilesAsDataUrls(files, (images) => {
-        point.phases[phase].photos.push(...images);
-        if(!point.phases[phase].date) point.phases[phase].date = todayString();
-        saveState();
-        selectPoint(point.id);
-        renderProjectDetail();
-      });
     }
 
     function openLightbox(photos, startIndex){
@@ -1549,36 +1719,173 @@
     function openLightboxForPhase(phase, index){
       const point = getCurrentPoint();
       if(!point) return;
-      const photos = point.phases[phase]?.photos || [];
-      openLightbox(photos, index);
+      openLightbox(point.phases[phase]?.photos || [], index);
     }
 
-    function escapeHtml(text){
-      return String(text || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+    function exportAllProjects(){
+      const blob = new Blob([JSON.stringify(state.projects, null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "bouwhersteltool-alle-projecten.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function exportSingleProject(projectId){
+      const project = state.projects.find(p => p.id === projectId);
+      if(!project) return;
+      const blob = new Blob([JSON.stringify(project, null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${sanitizeFileName(project.name)}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function sanitizeFileName(name){
+      return String(name || "project")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/gi, "-")
+        .replace(/^-+|-+$/g, "") || "project";
+    }
+
+    function importProjectsFromJson(file){
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try{
+          const data = JSON.parse(e.target.result);
+
+          if(Array.isArray(data)){
+            state.projects = data;
+          }else if(data && typeof data === "object"){
+            state.projects.unshift(data);
+          }else{
+            throw new Error("Ongeldige JSON");
+          }
+
+          saveState();
+          renderAll();
+          showView("projects");
+          alert("Import gelukt.");
+        }catch(err){
+          alert("JSON import mislukt.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    async function exportProjectPdf(){
+      const project = getCurrentProject();
+      if(!project){
+        alert("Open eerst een project.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({unit:"pt", format:"a4"});
+      let y = 40;
+
+      doc.setFont("helvetica","bold");
+      doc.setFontSize(20);
+      doc.text(project.name || "Project", 40, y);
+      y += 24;
+
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(11);
+      doc.text(`Locatie: ${project.location || "-"}`, 40, y); y += 16;
+      doc.text(`Opdrachtgever: ${project.client || "-"}`, 40, y); y += 16;
+      doc.text(`Aangemaakt: ${project.createdAt || "-"}`, 40, y); y += 16;
+      doc.text(`Punten totaal: ${countProjectPoints(project)}`, 40, y); y += 26;
+
+      for(let i = 0; i < project.parts.length; i++){
+        const part = project.parts[i];
+        if(y > 720){
+          doc.addPage();
+          y = 40;
+        }
+
+        doc.setFont("helvetica","bold");
+        doc.setFontSize(14);
+        doc.text(`${part.name} (${part.points.length} punten)`, 40, y);
+        y += 18;
+
+        if(part.points.length === 0){
+          doc.setFont("helvetica","normal");
+          doc.setFontSize(10);
+          doc.text("Geen punten in dit deel.", 50, y);
+          y += 18;
+          continue;
+        }
+
+        for(let j = 0; j < part.points.length; j++){
+          const point = part.points[j];
+          if(y > 700){
+            doc.addPage();
+            y = 40;
+          }
+
+          doc.setFont("helvetica","bold");
+          doc.setFontSize(11);
+          doc.text(`Punt ${j+1}: ${point.title || "Nieuw punt"}`, 50, y);
+          y += 14;
+
+          doc.setFont("helvetica","normal");
+          doc.setFontSize(10);
+          doc.text(`Status: ${point.status || "-"} | Collega: ${point.colleague || "-"} | Positie: ${Math.round(point.x)}%/${Math.round(point.y)}%`, 60, y);
+          y += 14;
+          doc.text(`Algemene opmerking: ${truncatePdf(point.remark || "-", 100)}`, 60, y);
+          y += 14;
+
+          PHASES.forEach(phase => {
+            const phaseData = point.phases[phase];
+            doc.text(`${capitalize(phase)} - datum: ${phaseData.date || "-"} - foto's: ${(phaseData.photos || []).length}`, 70, y);
+            y += 12;
+            doc.text(`Opmerking: ${truncatePdf(phaseData.note || "-", 100)}`, 70, y);
+            y += 14;
+          });
+
+          y += 8;
+        }
+
+        y += 8;
+      }
+
+      doc.save(`${sanitizeFileName(project.name)}-rapport.pdf`);
+    }
+
+    function truncatePdf(text, max){
+      const t = String(text || "");
+      return t.length > max ? t.slice(0, max - 3) + "..." : t;
+    }
+
+    function capitalize(t){
+      return t.charAt(0).toUpperCase() + t.slice(1);
     }
 
     boardFrame.addEventListener("click", (e) => {
-      const part = getCurrentPart();
-      if(!part) return;
+      if(draggingPointId) return;
+      if(state.moveMode) return;
+      addPointAtClick(e.clientX, e.clientY);
+    });
 
-      const rect = boardFrame.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
+    boardFrame.addEventListener("pointermove", (e) => {
+      if(!draggingPointId) return;
+      updateDraggedPoint(e.clientX, e.clientY);
+    });
 
-      const point = createPoint(x, y);
-      part.points.push(point);
-      state.currentPointId = point.id;
-
-      saveState();
-      redrawBoardMarkers();
-      renderPointList();
-      selectPoint(point.id);
-      renderProjectDetail();
+    window.addEventListener("pointerup", () => {
+      if(draggingPointId){
+        const point = getCurrentPointById(draggingPointId);
+        if(point){
+          state.currentPointId = point.id;
+          saveState();
+          renderProjectDetail();
+          renderPointList();
+          selectPoint(point.id);
+        }
+      }
+      draggingPointId = null;
     });
 
     phaseTabs.forEach(btn => {
@@ -1594,10 +1901,29 @@
       if(state.currentPointId) removePoint(state.currentPointId);
     });
 
+    duplicatePointBtn.addEventListener("click", duplicateCurrentPoint);
+    moveModeBtn.addEventListener("click", toggleMoveMode);
+
+    partImageUploadInput.addEventListener("change", e => {
+      const part = getCurrentPart();
+      const project = getCurrentProject();
+      const file = e.target.files[0];
+      if(!part || !project || !file) return;
+      readFileAsDataURL(file, dataUrl => {
+        part.image = dataUrl;
+        project.updatedAt = todayString();
+        if(!project.cover) project.cover = dataUrl;
+        saveState();
+        renderProjectDetail();
+        boardImage.src = dataUrl;
+      });
+    });
+
     refreshDashPhotosBtn.addEventListener("click", shuffleDashboardPhotos);
 
     navDashboardBtn.addEventListener("click", () => showView("dashboard"));
     navProjectsBtn.addEventListener("click", () => showView("projects"));
+    navHelpBtn.addEventListener("click", () => showView("help"));
     newProjectSideBtn.addEventListener("click", openProjectModal);
     openNewProjectBtn.addEventListener("click", openProjectModal);
     openNewProjectBtn2.addEventListener("click", openProjectModal);
@@ -1607,27 +1933,30 @@
     saveProjectBtn.addEventListener("click", saveProject);
 
     backToProjectsBtn.addEventListener("click", () => showView("projects"));
-    closePartModalBtn.addEventListener("click", closePartModal);
 
     planUploadInput.addEventListener("change", e => {
-      const project = getCurrentProject();
-      if(!project) return;
-
       const file = e.target.files[0];
-      if(!file) return;
+      const project = getCurrentProject();
+      if(!file || !project) return;
 
-      const reader = new FileReader();
-      reader.onload = ev => {
-        project.mainPlan = ev.target.result;
-        project.cover = ev.target.result;
-        project.parts.forEach(part => {
-          if(!part.image) part.image = ev.target.result;
-        });
+      readFileAsDataURL(file, dataUrl => {
+        project.mainPlan = dataUrl;
+        project.cover = dataUrl;
+        project.updatedAt = todayString();
         saveState();
-        renderAll();
-      };
-      reader.readAsDataURL(file);
+        renderProjectDetail();
+        renderProjects();
+      });
     });
+
+    splitPlanBtn.addEventListener("click", splitPlanToAllParts);
+    exportProjectBtn.addEventListener("click", () => {
+      const project = getCurrentProject();
+      if(project) exportSingleProject(project.id);
+    });
+    pdfProjectBtn.addEventListener("click", exportProjectPdf);
+
+    closePartModalBtn.addEventListener("click", closePartModal);
 
     lightboxCloseBtn.addEventListener("click", () => lightbox.classList.add("hidden"));
     lightboxPrevBtn.addEventListener("click", () => {
@@ -1641,14 +1970,22 @@
       updateLightbox();
     });
 
-    function renderAll(){
-      renderStats();
-      renderDashboardPhotos();
-      renderProjects();
-      if(state.currentProjectId){
-        renderProjectDetail();
+    importJsonInput.addEventListener("change", e => {
+      importProjectsFromJson(e.target.files[0]);
+      e.target.value = "";
+    });
+    exportAllBtn.addEventListener("click", exportAllProjects);
+
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape"){
+        partModal.classList.add("hidden");
+        lightbox.classList.add("hidden");
       }
-    }
+      if(!lightbox.classList.contains("hidden")){
+        if(e.key === "ArrowLeft") lightboxPrevBtn.click();
+        if(e.key === "ArrowRight") lightboxNextBtn.click();
+      }
+    });
 
     loadState();
     renderAll();
@@ -1656,10 +1993,12 @@
 
     window.openProject = openProject;
     window.deleteProject = deleteProject;
-    window.openPart = openPart;
+    window.exportSingleProject = exportSingleProject;
     window.selectPoint = selectPoint;
     window.removePoint = removePoint;
     window.openLightboxForPhase = openLightboxForPhase;
+    window.removePhotoFromPhase = removePhotoFromPhase;
+    window.openPart = openPart;
   </script>
 </body>
 </html>
