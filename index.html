@@ -1,9 +1,12 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bouwherstel Tool</title>
+  <title>bouwherstel-tool-2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#08131d;
@@ -11,6 +14,7 @@
       --panel:rgba(15,27,40,.88);
       --panel2:rgba(18,32,47,.95);
       --line:rgba(255,255,255,.08);
+      --line-strong:rgba(255,255,255,.16);
       --text:#f2f7fb;
       --muted:#9eb1c3;
       --primary:#26c6ee;
@@ -20,12 +24,31 @@
       --radius:22px;
       --shadow:0 20px 60px rgba(0,0,0,.35), 0 10px 30px rgba(0,0,0,.18);
       --shadow-sm:0 10px 24px rgba(0,0,0,.18);
+      --glass:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
     }
 
-    *{box-sizing:border-box;margin:0;padding:0}
+    html[data-theme="light"]{
+      --bg:#eef6fb;
+      --bg2:#dbeaf3;
+      --panel:rgba(255,255,255,.78);
+      --panel2:rgba(255,255,255,.94);
+      --line:rgba(7,22,34,.10);
+      --line-strong:rgba(7,22,34,.20);
+      --text:#13222f;
+      --muted:#5c7488;
+      --primary:#0496ba;
+      --primary2:#66daf5;
+      --danger:#d83b59;
+      --ok:#1b9d57;
+      --shadow:0 18px 44px rgba(7,22,34,.12), 0 8px 24px rgba(7,22,34,.08);
+      --shadow-sm:0 8px 20px rgba(7,22,34,.08);
+      --glass:linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,255,255,.56));
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
     body{
-      font-family:Arial,Helvetica,sans-serif;
+      font-family:'Manrope',Arial,Helvetica,sans-serif;
       color:var(--text);
       background:
         radial-gradient(circle at 12% 14%, rgba(38,198,238,.16), transparent 18%),
@@ -33,548 +56,128 @@
         linear-gradient(180deg, var(--bg2), var(--bg));
       min-height:100vh;
     }
-
     button,input,textarea,select{font:inherit}
     button{cursor:pointer;border:none}
     img{display:block;max-width:100%}
+    .hidden{display:none !important}
 
-    .app{
-      max-width:1380px;
-      margin:0 auto;
-      padding:18px;
+    .app{max-width:1380px;margin:0 auto;padding:18px}
+    .topbar,.panel,.map-card,.side-card,.points-card,.hero,.modal-card{
+      background:var(--glass);
+      border:1px solid var(--line);
+      backdrop-filter:blur(14px);
+      box-shadow:var(--shadow);
     }
 
     .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:18px;
-      padding:18px 20px;
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius:26px;
-      backdrop-filter:blur(14px);
-      box-shadow:var(--shadow);
+      display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+      margin-bottom:18px;padding:18px 20px;border-radius:26px;
     }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-    }
-
+    .brand{display:flex;align-items:center;gap:14px}
     .logo{
-      width:52px;
-      height:52px;
-      border-radius:18px;
-      background:linear-gradient(135deg, var(--primary2), var(--primary));
-      display:grid;
-      place-items:center;
-      color:#04131b;
-      box-shadow:0 12px 30px rgba(38,198,238,.22);
-      flex:none;
-      font-weight:bold;
-      font-size:20px;
+      width:52px;height:52px;border-radius:18px;
+      background:linear-gradient(135deg,var(--primary2),var(--primary));
+      display:grid;place-items:center;color:#04131b;
+      box-shadow:0 12px 30px rgba(38,198,238,.22);flex:none;font-weight:800;font-size:20px;
     }
-
-    .brand h1{
-      font-size:28px;
-      line-height:1;
-      margin-bottom:4px;
-    }
-
-    .brand p{
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .top-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
+    .brand h1{font-size:28px;line-height:1;margin-bottom:4px}
+    .brand p{color:var(--muted);font-size:14px}
+    .top-actions{display:flex;gap:10px;flex-wrap:wrap}
 
     .btn{
-      min-height:46px;
-      padding:0 16px;
-      border-radius:16px;
-      font-weight:700;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      transition:.18s ease;
-      text-decoration:none;
+      min-height:46px;padding:0 16px;border-radius:16px;font-weight:800;
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      transition:transform .18s ease, opacity .18s ease, box-shadow .18s ease;text-decoration:none;
     }
-
     .btn:hover{transform:translateY(-1px)}
-    .btn-primary{
-      color:#04131b;
-      background:linear-gradient(135deg, var(--primary2), var(--primary));
-      box-shadow:0 16px 32px rgba(38,198,238,.20);
-    }
-    .btn-secondary{
-      color:var(--text);
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      box-shadow:var(--shadow-sm);
-    }
-    .btn-danger{
-      color:#fff;
-      background:linear-gradient(180deg, #ff7280, #e13f51);
-    }
+    .btn:active{transform:translateY(0)}
+    .btn-primary{color:#04131b;background:linear-gradient(135deg,var(--primary2),var(--primary));box-shadow:0 16px 32px rgba(38,198,238,.20)}
+    .btn-secondary{color:var(--text);background:rgba(255,255,255,.04);border:1px solid var(--line);box-shadow:var(--shadow-sm)}
+    html[data-theme="light"] .btn-secondary{background:rgba(255,255,255,.72)}
+    .btn-danger{color:#fff;background:linear-gradient(180deg,#ff7280,#e13f51)}
 
-    .layout{
-      display:grid;
-      grid-template-columns:320px minmax(0,1fr);
-      gap:18px;
+    .layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px}
+    .panel,.map-card,.side-card,.points-card,.hero{border-radius:26px;padding:16px;min-width:0}
+    .panel h2,.map-card h2,.side-card h2,.points-card h2{font-size:22px;margin-bottom:8px}
+    .muted{color:var(--muted);font-size:14px}
+    .project-list,.points-list{display:grid;gap:10px;margin-top:14px}
+    .project-card,.point-card{
+      border:1px solid var(--line);border-radius:18px;padding:14px;background:rgba(255,255,255,.03);
+      box-shadow:var(--shadow-sm);display:grid;gap:10px;
     }
-
-    .panel{
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius:26px;
-      padding:16px;
-      backdrop-filter:blur(14px);
-      box-shadow:var(--shadow);
-      min-width:0;
+    html[data-theme="light"] .project-card, html[data-theme="light"] .point-card, html[data-theme="light"] .part-btn, html[data-theme="light"] .control, html[data-theme="light"] .phase-btn, html[data-theme="light"] .photo-item{
+      background:rgba(255,255,255,.66);
     }
+    .project-card.active,.point-card.active{outline:2px solid rgba(38,198,238,.35)}
+    .project-title{font-size:17px;font-weight:800}
+    .project-meta{color:var(--muted);font-size:13px}
+    .project-actions,.row{display:flex;gap:8px;flex-wrap:wrap}
 
-    .panel h2{
-      font-size:22px;
-      margin-bottom:8px;
-    }
+    .hero{margin-bottom:18px;padding:20px;border-radius:28px;background:radial-gradient(circle at top right, rgba(38,198,238,.14), transparent 20%), var(--glass)}
+    .hero h3{font-size:34px;line-height:1.05;margin-bottom:8px}
+    .hero p{color:var(--muted);font-size:15px;max-width:700px}
 
-    .muted{
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .project-list{
-      display:grid;
-      gap:10px;
-      margin-top:14px;
-    }
-
-    .project-card{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px;
-      background:rgba(255,255,255,.03);
-      box-shadow:var(--shadow-sm);
-      display:grid;
-      gap:10px;
-    }
-
-    .project-card.active{
-      outline:2px solid rgba(38,198,238,.35);
-    }
-
-    .project-title{
-      font-size:17px;
-      font-weight:700;
-    }
-
-    .project-meta{
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .project-actions{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .hero{
-      margin-bottom:18px;
-      padding:20px;
-      border-radius:28px;
-      border:1px solid var(--line);
-      background:
-        radial-gradient(circle at top right, rgba(38,198,238,.14), transparent 20%),
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      box-shadow:var(--shadow);
-    }
-
-    .hero h3{
-      font-size:34px;
-      line-height:1.05;
-      margin-bottom:8px;
-    }
-
-    .hero p{
-      color:var(--muted);
-      font-size:15px;
-      max-width:700px;
-    }
-
-    .parts{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:12px;
-      margin-top:14px;
-    }
-
+    .parts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
     .part-btn{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px;
-      text-align:left;
-      color:var(--text);
-      background:rgba(255,255,255,.03);
-      box-shadow:var(--shadow-sm);
+      border:1px solid var(--line);border-radius:18px;padding:16px;text-align:left;color:var(--text);
+      background:rgba(255,255,255,.03);box-shadow:var(--shadow-sm);
     }
+    .part-btn.active{outline:2px solid rgba(38,198,238,.28);background:linear-gradient(180deg, rgba(38,198,238,.16), rgba(255,255,255,.02))}
+    .part-btn strong{display:block;font-size:16px}
+    .part-btn span{display:block;margin-top:6px;font-size:13px;color:var(--muted)}
 
-    .part-btn.active{
-      outline:2px solid rgba(38,198,238,.28);
-      background:linear-gradient(180deg, rgba(38,198,238,.16), rgba(255,255,255,.02));
-    }
-
-    .part-btn strong{
-      display:block;
-      font-size:16px;
-    }
-
-    .part-btn span{
-      display:block;
-      margin-top:6px;
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .workspace-grid{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) 380px;
-      gap:18px;
-    }
-
-    .map-card,.side-card,.points-card{
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius:26px;
-      padding:16px;
-      box-shadow:var(--shadow);
-    }
-
+    .workspace-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px}
     .map-box{
-      position:relative;
-      aspect-ratio:16/9;
-      border-radius:20px;
-      overflow:hidden;
-      background:linear-gradient(135deg, #122333, #0b1620);
-      border:1px solid var(--line);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#bed0df;
-      font-weight:700;
-      cursor:crosshair;
-      margin-top:12px;
+      position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;
+      background:linear-gradient(135deg,#122333,#0b1620);border:1px solid var(--line);
+      display:flex;align-items:center;justify-content:center;color:#bed0df;font-weight:700;
+      cursor:crosshair;margin-top:12px;
     }
-
-    .map-box img{
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      background:#0e1822;
-    }
-
-    #markersLayer{
-      position:absolute;
-      inset:0;
-    }
-
-    .marker{
-      position:absolute;
-      width:28px;
-      height:28px;
-      transform:translate(-50%,-50%);
-      background:transparent;
-    }
-
-    .marker::before,.marker::after{
-      content:"";
-      position:absolute;
-      left:12px;
-      top:0;
-      width:4px;
-      height:28px;
-      background:var(--danger);
-      border-radius:4px;
-    }
-
+    .map-box img{width:100%;height:100%;object-fit:contain;background:#0e1822}
+    #markersLayer{position:absolute;inset:0}
+    .marker{position:absolute;width:28px;height:28px;transform:translate(-50%,-50%);background:transparent;z-index:2}
+    .marker::before,.marker::after{content:"";position:absolute;left:12px;top:0;width:4px;height:28px;background:var(--danger);border-radius:4px}
     .marker::before{transform:rotate(45deg)}
     .marker::after{transform:rotate(-45deg)}
+    .map-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 
-    .map-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:12px;
-    }
-
-    .field{
-      display:grid;
-      gap:8px;
-      margin-bottom:12px;
-    }
-
-    .field label{
-      font-weight:700;
-      font-size:14px;
-    }
-
+    .field{display:grid;gap:8px;margin-bottom:12px}
+    .field label{font-weight:800;font-size:14px}
     .control{
-      width:100%;
-      min-height:48px;
-      padding:0 14px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.05);
-      color:var(--text);
-      outline:none;
+      width:100%;min-height:48px;padding:0 14px;border-radius:16px;border:1px solid var(--line);
+      background:rgba(255,255,255,.05);color:var(--text);outline:none;
     }
+    .control::placeholder{color:var(--muted)}
+    textarea.control{min-height:92px;padding:14px;resize:vertical}
+    .phase-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+    .phase-btn{min-height:42px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--muted);font-weight:800}
+    .phase-btn.active{color:#04131b;background:linear-gradient(135deg,var(--primary2),var(--primary));border-color:transparent}
 
-    textarea.control{
-      min-height:92px;
-      padding:14px;
-      resize:vertical;
-    }
+    .photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+    .photo-item{position:relative;height:92px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#0d1720;cursor:pointer}
+    .photo-item img{width:100%;height:100%;object-fit:cover}
+    .photo-remove{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.68);color:#fff;font-weight:bold}
+    .empty{padding:16px;text-align:center;color:var(--muted);border-radius:18px;border:1px dashed rgba(38,198,238,.24);background:rgba(38,198,238,.04);margin-top:12px}
+    .point-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .status-tag{font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;background:rgba(38,198,238,.14);color:var(--primary2)}
 
-    .phase-tabs{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:8px;
-      margin-bottom:12px;
-    }
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50;backdrop-filter:blur(8px)}
+    .modal-card{width:min(560px,100%);border-radius:26px;padding:18px;background:var(--panel2)}
+    .modal-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+    .modal-top h3{font-size:24px}
+    .close-btn{width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text)}
 
-    .phase-btn{
-      min-height:42px;
-      border-radius:14px;
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
-      color:var(--muted);
-      font-weight:700;
-    }
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}
+    .lightbox-inner{width:min(1100px,100%);position:relative}
+    .lightbox-image-wrap{border-radius:20px;overflow:hidden;background:#091119;border:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow);min-height:70vh;display:flex;align-items:center;justify-content:center}
+    .lightbox-image-wrap img{max-width:100%;max-height:82vh;object-fit:contain}
+    .lb-btn,.lb-close{position:absolute;width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.10);color:#fff;font-size:24px;backdrop-filter:blur(8px)}
+    .lb-btn{top:50%;transform:translateY(-50%)}
+    .lb-prev{left:12px}.lb-next{right:12px}.lb-close{top:12px;right:12px}
 
-    .phase-btn.active{
-      color:#04131b;
-      background:linear-gradient(135deg, var(--primary2), var(--primary));
-      border-color:transparent;
-    }
-
-    .photo-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:8px;
-      margin-top:10px;
-    }
-
-    .photo-item{
-      position:relative;
-      height:92px;
-      border-radius:16px;
-      overflow:hidden;
-      border:1px solid var(--line);
-      background:#0d1720;
-      cursor:pointer;
-    }
-
-    .photo-item img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .photo-remove{
-      position:absolute;
-      top:6px;
-      right:6px;
-      width:26px;
-      height:26px;
-      border-radius:50%;
-      background:rgba(0,0,0,.68);
-      color:#fff;
-      font-weight:bold;
-    }
-
-    .empty{
-      padding:16px;
-      text-align:center;
-      color:var(--muted);
-      border-radius:18px;
-      border:1px dashed rgba(38,198,238,.24);
-      background:rgba(38,198,238,.04);
-      margin-top:12px;
-    }
-
-    .points-list{
-      display:grid;
-      gap:10px;
-      margin-top:12px;
-    }
-
-    .point-card{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:12px;
-      background:rgba(255,255,255,.03);
-      box-shadow:var(--shadow-sm);
-      display:grid;
-      gap:8px;
-    }
-
-    .point-card.active{
-      outline:2px solid rgba(38,198,238,.30);
-    }
-
-    .point-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-    }
-
-    .status-tag{
-      font-size:12px;
-      font-weight:700;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(38,198,238,.14);
-      color:var(--primary2);
-    }
-
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .hidden{display:none !important}
-
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.62);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      z-index:50;
-      backdrop-filter:blur(8px);
-    }
-
-    .modal-card{
-      width:min(560px,100%);
-      border-radius:26px;
-      border:1px solid var(--line);
-      background:var(--panel2);
-      padding:18px;
-      box-shadow:var(--shadow);
-    }
-
-    .modal-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-bottom:14px;
-    }
-
-    .modal-top h3{
-      font-size:24px;
-    }
-
-    .close-btn{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      color:var(--text);
-    }
-
-    .lightbox{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.88);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      z-index:60;
-    }
-
-    .lightbox-inner{
-      width:min(1100px,100%);
-      position:relative;
-    }
-
-    .lightbox-image-wrap{
-      border-radius:20px;
-      overflow:hidden;
-      background:#091119;
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow);
-      min-height:70vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .lightbox-image-wrap img{
-      max-width:100%;
-      max-height:82vh;
-      object-fit:contain;
-    }
-
-    .lb-btn{
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
-      width:52px;
-      height:52px;
-      border-radius:18px;
-      background:rgba(255,255,255,.10);
-      color:#fff;
-      font-size:24px;
-      backdrop-filter:blur(8px);
-    }
-
-    .lb-prev{left:12px}
-    .lb-next{right:12px}
-    .lb-close{
-      position:absolute;
-      top:12px;
-      right:12px;
-      width:52px;
-      height:52px;
-      border-radius:18px;
-      background:rgba(255,255,255,.10);
-      color:#fff;
-      font-size:24px;
-      backdrop-filter:blur(8px);
-    }
-
-    @media (max-width:1100px){
-      .workspace-grid{grid-template-columns:1fr}
-    }
-
-    @media (max-width:900px){
-      .layout{grid-template-columns:1fr}
-      .parts{grid-template-columns:repeat(2,minmax(0,1fr))}
-    }
-
-    @media (max-width:640px){
-      .app{padding:12px}
-      .topbar,.panel,.map-card,.side-card,.points-card,.hero{padding:14px}
-      .parts,.photo-grid{grid-template-columns:1fr 1fr}
-      .brand h1{font-size:24px}
-      .hero h3{font-size:28px}
-    }
+    @media (max-width:1100px){.workspace-grid{grid-template-columns:1fr}}
+    @media (max-width:900px){.layout{grid-template-columns:1fr}.parts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:640px){.app{padding:12px}.topbar,.panel,.map-card,.side-card,.points-card,.hero{padding:14px}.parts,.photo-grid{grid-template-columns:1fr 1fr}.brand h1{font-size:24px}.hero h3{font-size:28px}}
   </style>
 </head>
 <body>
@@ -723,9 +326,10 @@
 
   <script>
     const PART_NAMES = ['Deel 1','Deel 2','Deel 3','Deel 4'];
+    const SAMPLE_MAP = 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80';
+    const STORAGE_KEY = 'bouwherstel_simple_v3';
 
-    const SAMPLE_MAP =
-      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80';
+    const memoryStore = { value: null };
 
     const state = {
       theme: 'dark',
@@ -781,20 +385,65 @@
       return Math.random().toString(36).slice(2, 10);
     }
 
+    function getStorage() {
+      try {
+        const t = '__test__';
+        window.localStorage.setItem(t, '1');
+        window.localStorage.removeItem(t);
+        return window.localStorage;
+      } catch (e) {
+        return {
+          getItem(key) { return memoryStore.value && memoryStore.value[key] ? memoryStore.value[key] : null; },
+          setItem(key, value) { memoryStore.value = memoryStore.value || {}; memoryStore.value[key] = String(value); },
+          removeItem(key) { if (memoryStore.value) delete memoryStore.value[key]; }
+        };
+      }
+    }
+
+    const storage = getStorage();
+
+    function normalizeProject(project) {
+      return {
+        id: project.id || uid(),
+        name: project.name || 'Naamloos project',
+        location: project.location || '',
+        createdAt: project.createdAt || new Date().toISOString(),
+        parts: Array.isArray(project.parts) && project.parts.length ? project.parts.map((part, index) => ({
+          id: part.id || uid(),
+          name: part.name || PART_NAMES[index] || `Deel ${index + 1}`,
+          map: part.map || SAMPLE_MAP,
+          points: Array.isArray(part.points) ? part.points.map(normalizePoint) : []
+        })) : PART_NAMES.map(partName => ({ id: uid(), name: partName, map: SAMPLE_MAP, points: [] }))
+      };
+    }
+
+    function normalizePoint(point) {
+      return {
+        id: point.id || uid(),
+        x: typeof point.x === 'number' ? point.x : 50,
+        y: typeof point.y === 'number' ? point.y : 50,
+        title: point.title || 'Nieuw punt',
+        desc: point.desc || '',
+        status: point.status || 'Open',
+        photos: {
+          start: Array.isArray(point.photos && point.photos.start) ? point.photos.start : [],
+          middle: Array.isArray(point.photos && point.photos.middle) ? point.photos.middle : [],
+          end: Array.isArray(point.photos && point.photos.end) ? point.photos.end : []
+        }
+      };
+    }
+
     function saveStorage() {
-      localStorage.setItem('bouwherstel_simple_v2', JSON.stringify({
-        theme: state.theme,
-        projects: state.projects
-      }));
+      storage.setItem(STORAGE_KEY, JSON.stringify({ theme: state.theme, projects: state.projects }));
     }
 
     function loadStorage() {
-      const raw = localStorage.getItem('bouwherstel_simple_v2');
+      const raw = storage.getItem(STORAGE_KEY);
       if (!raw) return;
       try {
         const data = JSON.parse(raw);
         state.theme = data.theme || 'dark';
-        state.projects = Array.isArray(data.projects) ? data.projects : [];
+        state.projects = Array.isArray(data.projects) ? data.projects.map(normalizeProject) : [];
       } catch (e) {}
     }
 
@@ -803,18 +452,13 @@
     }
 
     function createProject(name, location) {
-      return {
+      return normalizeProject({
         id: uid(),
         name,
         location,
         createdAt: new Date().toISOString(),
-        parts: PART_NAMES.map(partName => ({
-          id: uid(),
-          name: partName,
-          map: SAMPLE_MAP,
-          points: []
-        }))
-      };
+        parts: PART_NAMES.map(partName => ({ id: uid(), name: partName, map: SAMPLE_MAP, points: [] }))
+      });
     }
 
     function getCurrentProject() {
@@ -831,6 +475,12 @@
       const part = getCurrentPart();
       if (!part) return null;
       return part.points.find(p => p.id === state.currentPointId) || null;
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' })[m];
+      });
     }
 
     function renderProjects() {
@@ -862,7 +512,7 @@
         el.emptyState.classList.remove('hidden');
         el.projectWorkspace.classList.add('hidden');
         el.heroTitle.textContent = 'Open een project';
-        el.heroText.textContent = 'Kies links een project. Daarna kies je één van de 4 delen, klik je op de tekening voor een rood kruis en voeg je foto\\'s toe in Start, Midden of Eind.';
+        el.heroText.textContent = "Kies links een project. Daarna kies je één van de 4 delen, klik je op de tekening voor een rood kruis en voeg je foto's toe in Start, Midden of Eind.";
         return;
       }
 
@@ -879,17 +529,14 @@
     function renderParts() {
       const project = getCurrentProject();
       el.partsGrid.innerHTML = '';
-
       project.parts.forEach((part, index) => {
         const btn = document.createElement('button');
         btn.className = 'part-btn' + (index === state.currentPartIndex ? ' active' : '');
-        btn.innerHTML = `
-          <strong>${escapeHtml(part.name)}</strong>
-          <span>${part.points.length} punten</span>
-        `;
+        btn.innerHTML = `<strong>${escapeHtml(part.name)}</strong><span>${part.points.length} punten</span>`;
         btn.onclick = () => {
           state.currentPartIndex = index;
           state.currentPointId = null;
+          state.currentPhase = 'start';
           renderWorkspace();
         };
         el.partsGrid.appendChild(btn);
@@ -898,13 +545,15 @@
 
     function renderMap() {
       const part = getCurrentPart();
+      if (!part) return;
       el.mapTitle.textContent = 'Tekening · ' + part.name;
-      el.mapImage.src = part.map;
+      el.mapImage.src = part.map || SAMPLE_MAP;
       el.markersLayer.innerHTML = '';
 
       part.points.forEach(point => {
         const marker = document.createElement('button');
         marker.className = 'marker';
+        marker.type = 'button';
         marker.style.left = point.x + '%';
         marker.style.top = point.y + '%';
         marker.title = point.title || 'Punt';
@@ -920,6 +569,7 @@
 
     function renderPointsList() {
       const part = getCurrentPart();
+      if (!part) return;
       el.pointsList.innerHTML = '';
 
       if (!part.points.length) {
@@ -944,7 +594,6 @@
 
     function renderPointEditor() {
       const point = getCurrentPoint();
-
       if (!point) {
         el.noPointState.classList.remove('hidden');
         el.pointEditor.classList.add('hidden');
@@ -967,11 +616,16 @@
 
     function renderPhotoGrid() {
       const point = getCurrentPoint();
+      if (!point) {
+        el.photoGrid.innerHTML = '';
+        return;
+      }
+
       el.photoGrid.innerHTML = '';
-      const list = point.photos[state.currentPhase];
+      const list = point.photos[state.currentPhase] || [];
 
       if (!list.length) {
-        el.photoGrid.innerHTML = '<div class="empty" style="grid-column:1/-1;">Nog geen foto\\'s in deze tab.</div>';
+        el.photoGrid.innerHTML = '<div class="empty" style="grid-column:1/-1;">Nog geen foto\'s in deze tab.</div>';
         return;
       }
 
@@ -980,7 +634,7 @@
         item.className = 'photo-item';
         item.innerHTML = `
           <img src="${src}" alt="Foto">
-          <button class="photo-remove" data-remove-photo="${index}">×</button>
+          <button type="button" class="photo-remove" data-remove-photo="${index}">×</button>
         `;
         item.querySelector('img').onclick = () => openLightbox(list, index);
         el.photoGrid.appendChild(item);
@@ -989,19 +643,18 @@
 
     function addPoint(x, y) {
       const part = getCurrentPart();
-      const point = {
+      if (!part) return;
+
+      const point = normalizePoint({
         id: uid(),
         x,
         y,
         title: 'Nieuw punt',
         desc: '',
         status: 'Open',
-        photos: {
-          start: [],
-          middle: [],
-          end: []
-        }
-      };
+        photos: { start: [], middle: [], end: [] }
+      });
+
       part.points.push(point);
       state.currentPointId = point.id;
       saveStorage();
@@ -1042,11 +695,14 @@
 
     function exportJson() {
       const blob = new Blob([JSON.stringify(state.projects, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
+      a.href = url;
       a.download = 'bouwherstel-projecten.json';
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(a.href);
+      a.remove();
+      URL.revokeObjectURL(url);
     }
 
     function openLightbox(photos, index) {
@@ -1074,22 +730,11 @@
     }
 
     function fileToDataUrl(file) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
         reader.readAsDataURL(file);
-      });
-    }
-
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, function(m) {
-        return ({
-          '&':'&amp;',
-          '<':'&lt;',
-          '>':'&gt;',
-          '"':'&quot;',
-          "'":'&#039;'
-        })[m];
       });
     }
 
@@ -1099,16 +744,14 @@
       saveStorage();
     };
 
-    el.newProjectBtn.onclick = () => {
-      el.projectModal.classList.remove('hidden');
-    };
-
+    el.newProjectBtn.onclick = () => { el.projectModal.classList.remove('hidden'); };
     el.closeProjectModal.onclick = () => el.projectModal.classList.add('hidden');
     el.cancelProjectBtn.onclick = () => el.projectModal.classList.add('hidden');
 
     el.createProjectBtn.onclick = () => {
       const name = el.projectNameInput.value.trim();
       const location = el.projectLocationInput.value.trim();
+
       if (!name) {
         alert('Vul een projectnaam in.');
         return;
@@ -1134,18 +777,20 @@
       const openBtn = e.target.closest('[data-open-project]');
       const deleteBtn = e.target.closest('[data-delete-project]');
 
-      if (openBtn) {
-        openProject(openBtn.dataset.openProject);
-      }
+      if (openBtn) openProject(openBtn.dataset.openProject);
 
       if (deleteBtn) {
         const id = deleteBtn.dataset.deleteProject;
         if (!confirm('Project verwijderen?')) return;
+
         state.projects = state.projects.filter(p => p.id !== id);
+
         if (state.currentProjectId === id) {
-          state.currentProjectId = null;
+          state.currentProjectId = state.projects[0]?.id || null;
           state.currentPointId = null;
+          state.currentPartIndex = 0;
         }
+
         saveStorage();
         renderProjects();
         renderWorkspace();
@@ -1161,6 +806,7 @@
     };
 
     el.mapBox.onclick = (e) => {
+      if (e.target.closest('.marker')) return;
       const project = getCurrentProject();
       if (!project) return;
 
@@ -1192,6 +838,7 @@
         const dataUrl = await fileToDataUrl(file);
         point.photos[state.currentPhase].push(dataUrl);
       }
+
       e.target.value = '';
       saveStorage();
       renderPhotoGrid();
@@ -1201,6 +848,8 @@
       const removeBtn = e.target.closest('[data-remove-photo]');
       if (!removeBtn) return;
       const point = getCurrentPoint();
+      if (!point) return;
+
       const index = Number(removeBtn.dataset.removePhoto);
       point.photos[state.currentPhase].splice(index, 1);
       saveStorage();
@@ -1211,6 +860,7 @@
       const file = e.target.files[0];
       const part = getCurrentPart();
       if (!file || !part) return;
+
       part.map = await fileToDataUrl(file);
       e.target.value = '';
       saveStorage();
@@ -1227,11 +877,13 @@
         const text = await file.text();
         const data = JSON.parse(text);
         if (!Array.isArray(data)) throw new Error('invalid');
-        state.projects = data;
-        state.currentProjectId = data[0]?.id || null;
+
+        state.projects = data.map(normalizeProject);
+        state.currentProjectId = state.projects[0]?.id || null;
         state.currentPartIndex = 0;
         state.currentPointId = null;
         state.currentPhase = 'start';
+
         saveStorage();
         renderProjects();
         renderWorkspace();
@@ -1245,15 +897,18 @@
     el.lbClose.onclick = closeLightbox;
     el.lbPrev.onclick = () => nextLightbox(-1);
     el.lbNext.onclick = () => nextLightbox(1);
-    el.lightbox.onclick = (e) => {
-      if (e.target === el.lightbox) closeLightbox();
-    };
+    el.lightbox.onclick = (e) => { if (e.target === el.lightbox) closeLightbox(); };
 
     document.addEventListener('keydown', (e) => {
-      if (el.lightbox.classList.contains('hidden')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') nextLightbox(-1);
-      if (e.key === 'ArrowRight') nextLightbox(1);
+      if (!el.lightbox.classList.contains('hidden')) {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') nextLightbox(-1);
+        if (e.key === 'ArrowRight') nextLightbox(1);
+      }
+
+      if (e.key === 'Escape' && !el.projectModal.classList.contains('hidden')) {
+        el.projectModal.classList.add('hidden');
+      }
     });
 
     loadStorage();
