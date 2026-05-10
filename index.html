@@ -1,930 +1,591 @@
 <!doctype html>
-<html lang="nl" data-theme="dark">
+<html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>bouwherstel-tool-2026</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#08131d;
-      --bg2:#0d1b28;
-      --panel:rgba(15,27,40,.88);
-      --panel2:rgba(18,32,47,.95);
-      --line:rgba(255,255,255,.08);
-      --line-strong:rgba(255,255,255,.16);
-      --text:#f2f7fb;
-      --muted:#9eb1c3;
-      --primary:#26c6ee;
-      --primary2:#7cecff;
-      --danger:#ff5c6c;
-      --ok:#35c977;
-      --radius:22px;
-      --shadow:0 20px 60px rgba(0,0,0,.35), 0 10px 30px rgba(0,0,0,.18);
-      --shadow-sm:0 10px 24px rgba(0,0,0,.18);
-      --glass:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-    }
-
-    html[data-theme="light"]{
-      --bg:#eef6fb;
-      --bg2:#dbeaf3;
-      --panel:rgba(255,255,255,.78);
-      --panel2:rgba(255,255,255,.94);
-      --line:rgba(7,22,34,.10);
-      --line-strong:rgba(7,22,34,.20);
-      --text:#13222f;
-      --muted:#5c7488;
-      --primary:#0496ba;
-      --primary2:#66daf5;
-      --danger:#d83b59;
-      --ok:#1b9d57;
-      --shadow:0 18px 44px rgba(7,22,34,.12), 0 8px 24px rgba(7,22,34,.08);
-      --shadow-sm:0 8px 20px rgba(7,22,34,.08);
-      --glass:linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,255,255,.56));
-    }
-
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%}
-    body{
-      font-family:'Manrope',Arial,Helvetica,sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at 12% 14%, rgba(38,198,238,.16), transparent 18%),
-        radial-gradient(circle at 84% 14%, rgba(38,198,238,.10), transparent 16%),
-        linear-gradient(180deg, var(--bg2), var(--bg));
-      min-height:100vh;
-    }
-    button,input,textarea,select{font:inherit}
-    button{cursor:pointer;border:none}
-    img{display:block;max-width:100%}
-    .hidden{display:none !important}
-
-    .app{max-width:1380px;margin:0 auto;padding:18px}
-    .topbar,.panel,.map-card,.side-card,.points-card,.hero,.modal-card{
-      background:var(--glass);
-      border:1px solid var(--line);
-      backdrop-filter:blur(14px);
-      box-shadow:var(--shadow);
-    }
-
-    .topbar{
-      display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
-      margin-bottom:18px;padding:18px 20px;border-radius:26px;
-    }
-    .brand{display:flex;align-items:center;gap:14px}
-    .logo{
-      width:52px;height:52px;border-radius:18px;
-      background:linear-gradient(135deg,var(--primary2),var(--primary));
-      display:grid;place-items:center;color:#04131b;
-      box-shadow:0 12px 30px rgba(38,198,238,.22);flex:none;font-weight:800;font-size:20px;
-    }
-    .brand h1{font-size:28px;line-height:1;margin-bottom:4px}
-    .brand p{color:var(--muted);font-size:14px}
-    .top-actions{display:flex;gap:10px;flex-wrap:wrap}
-
-    .btn{
-      min-height:46px;padding:0 16px;border-radius:16px;font-weight:800;
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      transition:transform .18s ease, opacity .18s ease, box-shadow .18s ease;text-decoration:none;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn:active{transform:translateY(0)}
-    .btn-primary{color:#04131b;background:linear-gradient(135deg,var(--primary2),var(--primary));box-shadow:0 16px 32px rgba(38,198,238,.20)}
-    .btn-secondary{color:var(--text);background:rgba(255,255,255,.04);border:1px solid var(--line);box-shadow:var(--shadow-sm)}
-    html[data-theme="light"] .btn-secondary{background:rgba(255,255,255,.72)}
-    .btn-danger{color:#fff;background:linear-gradient(180deg,#ff7280,#e13f51)}
-
-    .layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px}
-    .panel,.map-card,.side-card,.points-card,.hero{border-radius:26px;padding:16px;min-width:0}
-    .panel h2,.map-card h2,.side-card h2,.points-card h2{font-size:22px;margin-bottom:8px}
-    .muted{color:var(--muted);font-size:14px}
-    .project-list,.points-list{display:grid;gap:10px;margin-top:14px}
-    .project-card,.point-card{
-      border:1px solid var(--line);border-radius:18px;padding:14px;background:rgba(255,255,255,.03);
-      box-shadow:var(--shadow-sm);display:grid;gap:10px;
-    }
-    html[data-theme="light"] .project-card, html[data-theme="light"] .point-card, html[data-theme="light"] .part-btn, html[data-theme="light"] .control, html[data-theme="light"] .phase-btn, html[data-theme="light"] .photo-item{
-      background:rgba(255,255,255,.66);
-    }
-    .project-card.active,.point-card.active{outline:2px solid rgba(38,198,238,.35)}
-    .project-title{font-size:17px;font-weight:800}
-    .project-meta{color:var(--muted);font-size:13px}
-    .project-actions,.row{display:flex;gap:8px;flex-wrap:wrap}
-
-    .hero{margin-bottom:18px;padding:20px;border-radius:28px;background:radial-gradient(circle at top right, rgba(38,198,238,.14), transparent 20%), var(--glass)}
-    .hero h3{font-size:34px;line-height:1.05;margin-bottom:8px}
-    .hero p{color:var(--muted);font-size:15px;max-width:700px}
-
-    .parts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
-    .part-btn{
-      border:1px solid var(--line);border-radius:18px;padding:16px;text-align:left;color:var(--text);
-      background:rgba(255,255,255,.03);box-shadow:var(--shadow-sm);
-    }
-    .part-btn.active{outline:2px solid rgba(38,198,238,.28);background:linear-gradient(180deg, rgba(38,198,238,.16), rgba(255,255,255,.02))}
-    .part-btn strong{display:block;font-size:16px}
-    .part-btn span{display:block;margin-top:6px;font-size:13px;color:var(--muted)}
-
-    .workspace-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px}
-    .map-box{
-      position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;
-      background:linear-gradient(135deg,#122333,#0b1620);border:1px solid var(--line);
-      display:flex;align-items:center;justify-content:center;color:#bed0df;font-weight:700;
-      cursor:crosshair;margin-top:12px;
-    }
-    .map-box img{width:100%;height:100%;object-fit:contain;background:#0e1822}
-    #markersLayer{position:absolute;inset:0}
-    .marker{position:absolute;width:28px;height:28px;transform:translate(-50%,-50%);background:transparent;z-index:2}
-    .marker::before,.marker::after{content:"";position:absolute;left:12px;top:0;width:4px;height:28px;background:var(--danger);border-radius:4px}
-    .marker::before{transform:rotate(45deg)}
-    .marker::after{transform:rotate(-45deg)}
-    .map-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-
-    .field{display:grid;gap:8px;margin-bottom:12px}
-    .field label{font-weight:800;font-size:14px}
-    .control{
-      width:100%;min-height:48px;padding:0 14px;border-radius:16px;border:1px solid var(--line);
-      background:rgba(255,255,255,.05);color:var(--text);outline:none;
-    }
-    .control::placeholder{color:var(--muted)}
-    textarea.control{min-height:92px;padding:14px;resize:vertical}
-    .phase-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-    .phase-btn{min-height:42px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--muted);font-weight:800}
-    .phase-btn.active{color:#04131b;background:linear-gradient(135deg,var(--primary2),var(--primary));border-color:transparent}
-
-    .photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
-    .photo-item{position:relative;height:92px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#0d1720;cursor:pointer}
-    .photo-item img{width:100%;height:100%;object-fit:cover}
-    .photo-remove{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.68);color:#fff;font-weight:bold}
-    .empty{padding:16px;text-align:center;color:var(--muted);border-radius:18px;border:1px dashed rgba(38,198,238,.24);background:rgba(38,198,238,.04);margin-top:12px}
-    .point-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
-    .status-tag{font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;background:rgba(38,198,238,.14);color:var(--primary2)}
-
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50;backdrop-filter:blur(8px)}
-    .modal-card{width:min(560px,100%);border-radius:26px;padding:18px;background:var(--panel2)}
-    .modal-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-    .modal-top h3{font-size:24px}
-    .close-btn{width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text)}
-
-    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}
-    .lightbox-inner{width:min(1100px,100%);position:relative}
-    .lightbox-image-wrap{border-radius:20px;overflow:hidden;background:#091119;border:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow);min-height:70vh;display:flex;align-items:center;justify-content:center}
-    .lightbox-image-wrap img{max-width:100%;max-height:82vh;object-fit:contain}
-    .lb-btn,.lb-close{position:absolute;width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.10);color:#fff;font-size:24px;backdrop-filter:blur(8px)}
-    .lb-btn{top:50%;transform:translateY(-50%)}
-    .lb-prev{left:12px}.lb-next{right:12px}.lb-close{top:12px;right:12px}
-
-    @media (max-width:1100px){.workspace-grid{grid-template-columns:1fr}}
-    @media (max-width:900px){.layout{grid-template-columns:1fr}.parts{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media (max-width:640px){.app{padding:12px}.topbar,.panel,.map-card,.side-card,.points-card,.hero{padding:14px}.parts,.photo-grid{grid-template-columns:1fr 1fr}.brand h1{font-size:24px}.hero h3{font-size:28px}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bouwherstel Tool V3</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Manrope',system-ui,sans-serif}
+body{
+  background:radial-gradient(ellipse at 10% 0%,rgba(56,210,255,.18),transparent 30%),
+             radial-gradient(ellipse at 90% 0%,rgba(250,200,60,.12),transparent 25%),
+             linear-gradient(160deg,#071320 0%,#0a1a2c 60%,#06101a 100%);
+  color:#ecf3ff;min-height:100vh;padding:16px;
+}
+.hidden{display:none!important}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:14px;font-size:15px;font-weight:800;border:none;cursor:pointer;transition:transform .14s,box-shadow .14s;white-space:nowrap;}
+.btn:active{transform:scale(.97)}
+.btn-blue{background:linear-gradient(135deg,#7ef4ff,#28c8f0);color:#04131e;box-shadow:0 8px 24px rgba(40,200,240,.25)}
+.btn-gold{background:linear-gradient(135deg,#ffe680,#f5be30);color:#2b1900;box-shadow:0 8px 24px rgba(245,190,48,.25)}
+.btn-red{background:linear-gradient(135deg,#ff8494,#e83d52);color:#fff;box-shadow:0 8px 24px rgba(232,61,82,.22)}
+.btn-ghost{background:rgba(255,255,255,.06);color:#c8daea;border:1px solid rgba(255,255,255,.10);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.022));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.09);border-radius:24px;box-shadow:0 24px 64px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.06);padding:20px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.09);border-radius:24px;padding:16px 20px;margin-bottom:16px;box-shadow:0 16px 48px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.07);}
+.logo{width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,#7ef4ff,#28c8f0);display:grid;place-items:center;font-weight:800;font-size:20px;color:#04131e;box-shadow:0 10px 28px rgba(40,200,240,.28)}
+.brand-info h1{font-size:24px;line-height:1.1}
+.brand-info p{font-size:13px;color:#7a9ab4;margin-top:3px}
+.brand{display:flex;align-items:center;gap:14px}
+.topbar-actions{display:flex;gap:10px;flex-wrap:wrap}
+.layout{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
+.proj-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px;margin-top:12px;transition:outline .12s;}
+.proj-item.active{outline:2px solid rgba(126,244,255,.3)}
+.proj-item-name{font-size:16px;font-weight:800}
+.proj-item-sub{font-size:13px;color:#7a9ab4;margin:4px 0 10px}
+.proj-btns{display:flex;gap:8px}
+.main-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.main-header h2{font-size:22px}
+.main-header p{font-size:14px;color:#7a9ab4;margin-top:4px}
+.map-section{margin-bottom:16px}
+.map-section h3{font-size:18px;margin-bottom:8px}
+.map-wrap{position:relative;border-radius:20px;overflow:hidden;background:#0c1824;border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 2px 8px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.28);aspect-ratio:16/9;}
+.map-wrap img{width:100%;height:100%;object-fit:contain;display:block}
+.map-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#4a6a82;font-weight:700;font-size:16px;}
+.map-placeholder svg{opacity:.4}
+.balloons-layer{position:absolute;inset:0;pointer-events:none}
+.balloon-btn{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;}
+.balloon-head{min-width:32px;height:32px;padding:0 9px;background:linear-gradient(180deg,#ffe680,#f5be30);border:2px solid rgba(255,255,255,.35);border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#2b1900;box-shadow:0 8px 20px rgba(245,190,48,.35);transition:transform .14s;}
+.balloon-btn:hover .balloon-head{transform:scale(1.12)}
+.balloon-btn.done .balloon-head{background:linear-gradient(180deg,#a3ffd4,#2ec97a);color:#073018;box-shadow:0 8px 20px rgba(46,201,122,.3)}
+.balloon-tail{width:2px;height:14px;background:linear-gradient(180deg,#f5be30,transparent);margin:0 auto}
+.balloon-btn.done .balloon-tail{background:linear-gradient(180deg,#2ec97a,transparent)}
+.quad-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.quad-card h4{font-size:16px;font-weight:800;margin-bottom:10px}
+.quad-map-wrap{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:4/3;background:#0c1824;border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 2px 6px rgba(0,0,0,.28),0 8px 22px rgba(0,0,0,.22);cursor:crosshair;}
+.quad-map-img{position:absolute;width:200%;height:200%;object-fit:cover;pointer-events:none;user-select:none;}
+.q1 .quad-map-img{left:0;top:0}
+.q2 .quad-map-img{left:-100%;top:0}
+.q3 .quad-map-img{left:0;top:-100%}
+.q4 .quad-map-img{left:-100%;top:-100%}
+.quad-click-layer{position:absolute;inset:0;z-index:2;background:transparent}
+.quad-markers-layer{position:absolute;inset:0;z-index:3;pointer-events:none}
+.qmarker{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;background:none;border:none;cursor:pointer;width:28px;height:28px;}
+.qmarker::before,.qmarker::after{content:"";position:absolute;left:12px;top:0;width:4px;height:28px;border-radius:3px;background:linear-gradient(180deg,#ff9aaa,#e83d52);box-shadow:0 0 10px rgba(232,61,82,.4);}
+.qmarker::before{transform:rotate(45deg)}
+.qmarker::after{transform:rotate(-45deg)}
+.qmarker.done::before,.qmarker.done::after{background:linear-gradient(180deg,#a3ffd4,#2ec97a);box-shadow:0 0 10px rgba(46,201,122,.4);}
+.quad-no-map{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:#4a6a82;font-weight:700}
+.points-table{display:grid;gap:10px;margin-top:10px}
+.point-row{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.point-row.selected-row{outline:2px solid rgba(126,244,255,.28)}
+.point-row-num{font-size:22px;font-weight:800;color:#7ef4ff;min-width:28px}
+.point-row-info{flex:1;min-width:0}
+.point-row-info strong{display:block;font-size:15px}
+.point-row-info span{font-size:13px;color:#7a9ab4}
+.pill{display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800}
+.pill-open{background:rgba(245,190,48,.15);color:#ffe273}
+.pill-done{background:rgba(46,201,122,.15);color:#7ff0be}
+.modal-bg{position:fixed;inset:0;background:rgba(3,10,18,.78);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100;backdrop-filter:blur(14px);}
+.modal-box{background:linear-gradient(180deg,rgba(15,28,42,.98),rgba(10,20,32,.98));border:1px solid rgba(255,255,255,.10);border-radius:26px;padding:22px;box-shadow:0 40px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.07);width:100%;max-width:540px;max-height:90vh;overflow-y:auto;}
+.modal-box.wide{max-width:940px}
+.modal-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.modal-top h3{font-size:22px}
+.close-x{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#c8daea;cursor:pointer;font-size:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:700;color:#aabdcf;margin-bottom:7px}
+.inp,.txta,.sel{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:14px;color:#ecf3ff;outline:none;font:inherit;}
+.inp,.sel{min-height:46px;padding:0 14px}
+.txta{min-height:88px;padding:12px 14px;resize:vertical}
+.inp:focus,.txta:focus,.sel:focus{border-color:rgba(126,244,255,.36)}
+.phase-tabs{display:flex;gap:8px;margin-bottom:14px}
+.phase-tab{flex:1;min-height:40px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#7a9ab4;font-weight:800;cursor:pointer;font-size:14px;}
+.phase-tab.on{background:linear-gradient(135deg,#7ef4ff,#28c8f0);color:#04131e;border:none}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.photo-thumb{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#0c1824;border:1px solid rgba(255,255,255,.09)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-del{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.72);color:#fff;border:none;cursor:pointer;font-size:14px;display:grid;place-items:center;}
+.upload-label{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);color:#c8daea;font-weight:700;cursor:pointer;font-size:14px;margin-bottom:12px;transition:background .14s;}
+.upload-label:hover{background:rgba(255,255,255,.10)}
+.phase-count{font-size:12px;font-weight:600;color:#7a9ab4;margin-left:auto}
+.modal-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.report-body{background:#fff;color:#111;padding:22px;border-radius:16px;max-height:62vh;overflow:auto}
+.report-body h2{font-size:24px;margin-bottom:4px}
+.report-body h3{font-size:18px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px}
+.report-block{margin-bottom:18px;padding:14px;border:1px solid #e0e0e0;border-radius:12px}
+.report-block strong{display:block;margin-bottom:6px}
+.rphoto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.rphoto-grid img{width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid #ddd}
+.toast{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#7ef4ff,#28c8f0);color:#04131e;font-weight:800;padding:12px 22px;border-radius:16px;box-shadow:0 14px 36px rgba(40,200,240,.32);z-index:200;font-size:14px;transition:opacity .4s;}
+.empty-state{padding:20px;text-align:center;color:#4a6a82;font-weight:700;border:1px dashed rgba(126,244,255,.18);border-radius:18px;background:rgba(126,244,255,.03)}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.quad-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">ED</div>
-        <div>
-          <h1>Bouwherstel Tool</h1>
-          <p>Simpel werken op de bouw, met nette 2026 premium look.</p>
-        </div>
-      </div>
-      <div class="top-actions">
-        <button class="btn btn-secondary" id="themeBtn">Thema</button>
-        <button class="btn btn-primary" id="newProjectBtn">Nieuw project</button>
-      </div>
-    </div>
 
-    <div class="layout">
-      <aside class="panel">
-        <h2>Projecten</h2>
-        <div class="muted">Open een project of maak een nieuwe aan.</div>
-        <div class="project-list" id="projectList"></div>
-      </aside>
-
-      <main>
-        <div class="hero">
-          <h3 id="heroTitle">Open een project</h3>
-          <p id="heroText">Kies links een project. Daarna kies je één van de 4 delen, klik je op de tekening voor een rood kruis en voeg je foto's toe in Start, Midden of Eind.</p>
-        </div>
-
-        <div id="emptyState" class="panel">
-          <div class="empty">Nog geen project geopend.</div>
-        </div>
-
-        <div id="projectWorkspace" class="hidden">
-          <div class="panel" style="margin-bottom:18px;">
-            <h2>Delen</h2>
-            <div class="parts" id="partsGrid"></div>
-          </div>
-
-          <div class="workspace-grid">
-            <section class="map-card">
-              <h2 id="mapTitle">Tekening</h2>
-              <div class="muted">Klik op de tekening om een nieuw punt te zetten.</div>
-
-              <div class="map-box" id="mapBox">
-                <img id="mapImage" alt="Plattegrond" />
-                <div id="markersLayer"></div>
-              </div>
-
-              <div class="map-actions">
-                <label class="btn btn-secondary" for="mapUploadInput">Upload tekening</label>
-                <input type="file" id="mapUploadInput" class="hidden" accept="image/*">
-                <button class="btn btn-secondary" id="exportBtn">Export JSON</button>
-                <label class="btn btn-secondary" for="importInput">Import JSON</label>
-                <input type="file" id="importInput" class="hidden" accept=".json,application/json">
-              </div>
-            </section>
-
-            <aside class="side-card">
-              <h2>Punt</h2>
-              <div id="noPointState" class="empty">Klik op een rood kruis of zet eerst een nieuw punt.</div>
-
-              <div id="pointEditor" class="hidden">
-                <div class="field">
-                  <label for="pointTitle">Titel</label>
-                  <input id="pointTitle" class="control" placeholder="Bijv. Scheur in wand">
-                </div>
-
-                <div class="field">
-                  <label for="pointDesc">Opmerking</label>
-                  <textarea id="pointDesc" class="control" placeholder="Korte opmerking"></textarea>
-                </div>
-
-                <div class="field">
-                  <label for="pointStatus">Status</label>
-                  <select id="pointStatus" class="control">
-                    <option value="Open">Open</option>
-                    <option value="Gereed">Gereed</option>
-                  </select>
-                </div>
-
-                <div class="phase-tabs">
-                  <button class="phase-btn active" data-phase="start">Start</button>
-                  <button class="phase-btn" data-phase="middle">Midden</button>
-                  <button class="phase-btn" data-phase="end">Eind</button>
-                </div>
-
-                <label class="btn btn-secondary" for="photoUploadInput" style="width:100%;">Foto's toevoegen</label>
-                <input type="file" id="photoUploadInput" class="hidden" accept="image/*" multiple>
-
-                <div class="photo-grid" id="photoGrid"></div>
-
-                <div class="row" style="margin-top:12px;">
-                  <button class="btn btn-primary" id="savePointBtn">Opslaan</button>
-                  <button class="btn btn-danger" id="deletePointBtn">Verwijderen</button>
-                </div>
-              </div>
-            </aside>
-          </div>
-
-          <section class="points-card" style="margin-top:18px;">
-            <h2>Punten in dit deel</h2>
-            <div class="points-list" id="pointsList"></div>
-          </section>
-        </div>
-      </main>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">BH</div>
+    <div class="brand-info">
+      <h1>Bouwherstel Tool</h1>
+      <p>Start · Midden · Einde — alles in één PDF rapport</p>
     </div>
   </div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost" id="btnTheme">☀ Thema</button>
+    <button class="btn btn-gold" id="btnPdf">⬇ PDF Rapport</button>
+    <button class="btn btn-blue" id="btnNewProject">+ Nieuw project</button>
+  </div>
+</header>
 
-  <div class="modal hidden" id="projectModal">
-    <div class="modal-card">
-      <div class="modal-top">
-        <h3>Nieuw project</h3>
-        <button class="close-btn" id="closeProjectModal">✕</button>
+<div class="layout">
+  <aside class="card">
+    <h2>Projecten</h2>
+    <p style="font-size:13px;color:#7a9ab4;margin-top:4px">Open een project en begin direct.</p>
+    <div id="projectList"></div>
+  </aside>
+
+  <main>
+    <div id="emptyMain" class="card" style="padding:30px;text-align:center">
+      <div style="font-size:28px;font-weight:800;margin-bottom:10px">Welkom 👷</div>
+      <div style="color:#7a9ab4;max-width:400px;margin:0 auto">Maak een nieuw project aan of open een bestaand project links.</div>
+    </div>
+
+    <div id="mainContent" class="hidden">
+      <div class="card" style="margin-bottom:16px">
+        <div class="main-header">
+          <div>
+            <h2 id="mainTitle">Project</h2>
+            <p id="mainSub"></p>
+          </div>
+          <div style="display:flex;gap:10px">
+            <label class="btn btn-blue" for="mapUploadInput" style="cursor:pointer">📷 Upload plattegrond</label>
+            <input type="file" id="mapUploadInput" accept="image/*" class="hidden">
+          </div>
+        </div>
+        <div class="map-section">
+          <h3>Hoofdplattegrond</h3>
+          <p style="font-size:13px;color:#7a9ab4;margin-bottom:10px">Geel = open punt · Groen = compleet (start+midden+einde)</p>
+          <div class="map-wrap" id="mainMapWrap">
+            <div class="map-placeholder" id="mainMapPlaceholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              Nog geen plattegrond — klik op Upload
+            </div>
+            <img id="mainMapImg" class="hidden" alt="Plattegrond">
+            <div class="balloons-layer" id="balloonsLayer"></div>
+          </div>
+        </div>
       </div>
 
-      <div class="field">
-        <label for="projectNameInput">Projectnaam</label>
-        <input id="projectNameInput" class="control" placeholder="Bijv. Project Utrecht">
+      <div class="card" style="margin-bottom:16px">
+        <h3 style="font-size:18px;margin-bottom:4px">4 Delen</h3>
+        <p style="font-size:13px;color:#7a9ab4;margin-bottom:14px">Klik in een deel om een punt te plaatsen. Klik op een rood kruis om het te openen.</p>
+        <div class="quad-grid" id="quadGrid"></div>
       </div>
 
-      <div class="field">
-        <label for="projectLocationInput">Locatie</label>
-        <input id="projectLocationInput" class="control" placeholder="Bijv. Utrecht">
+      <div class="card">
+        <h3 style="font-size:18px;margin-bottom:4px">Alle punten</h3>
+        <p style="font-size:13px;color:#7a9ab4;margin-bottom:10px">Klik op Open om foto's en opmerkingen te bewerken.</p>
+        <div class="points-table" id="pointsTable"></div>
       </div>
+    </div>
+  </main>
+</div>
 
-      <div class="row" style="justify-content:flex-end; margin-top:12px;">
-        <button class="btn btn-secondary" id="cancelProjectBtn">Annuleren</button>
-        <button class="btn btn-primary" id="createProjectBtn">Maken</button>
+<!-- MODAL NIEUW PROJECT -->
+<div class="modal-bg hidden" id="modalNewProject">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3>Nieuw project</h3>
+      <button class="close-x" data-close="modalNewProject">✕</button>
+    </div>
+    <div class="field">
+      <label>Projectnaam *</label>
+      <input id="inpProjectName" class="inp" placeholder="Bijv. Woning Utrecht">
+    </div>
+    <div class="field">
+      <label>Locatie</label>
+      <input id="inpProjectLocation" class="inp" placeholder="Bijv. Utrecht">
+    </div>
+    <div class="modal-row" style="justify-content:flex-end">
+      <button class="btn btn-ghost" data-close="modalNewProject">Annuleren</button>
+      <button class="btn btn-blue" id="btnCreateProject">Aanmaken</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PUNT -->
+<div class="modal-bg hidden" id="modalPoint">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3 id="modalPointTitle">Punt</h3>
+      <button class="close-x" data-close="modalPoint">✕</button>
+    </div>
+    <div class="field">
+      <label>Omschrijving</label>
+      <textarea id="inpPointNote" class="txta" placeholder="Bijv. Scheur in wand boven deur..."></textarea>
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select id="inpPointStatus" class="sel">
+        <option value="open">Open</option>
+        <option value="done">Gereed</option>
+      </select>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:#aabdcf;margin-bottom:8px">Fase</div>
+    <div class="phase-tabs" id="phaseTabs">
+      <button class="phase-tab on" data-phase="start">Start <span class="phase-count" id="cnt-start"></span></button>
+      <button class="phase-tab" data-phase="middle">Midden <span class="phase-count" id="cnt-middle"></span></button>
+      <button class="phase-tab" data-phase="end">Einde <span class="phase-count" id="cnt-end"></span></button>
+    </div>
+    <label class="upload-label" for="inpPhoto">📷 Foto's uploaden voor deze fase</label>
+    <input type="file" id="inpPhoto" accept="image/*" multiple class="hidden">
+    <div class="photo-grid" id="modalPhotoGrid"></div>
+    <div class="modal-row" style="justify-content:space-between">
+      <button class="btn btn-red" id="btnDeletePoint">Verwijder punt</button>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" data-close="modalPoint">Sluiten</button>
+        <button class="btn btn-blue" id="btnSavePoint">Opslaan</button>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="lightbox hidden" id="lightbox">
-    <div class="lightbox-inner">
-      <button class="lb-close" id="lbClose">✕</button>
-      <button class="lb-btn lb-prev" id="lbPrev">‹</button>
-      <button class="lb-btn lb-next" id="lbNext">›</button>
-      <div class="lightbox-image-wrap">
-        <img id="lightboxImage" alt="Vergrote foto">
-      </div>
+<!-- MODAL PDF -->
+<div class="modal-bg hidden" id="modalReport">
+  <div class="modal-box wide">
+    <div class="modal-top">
+      <h3>PDF Rapport</h3>
+      <button class="close-x" data-close="modalReport">✕</button>
     </div>
+    <div style="margin-bottom:12px;display:flex;justify-content:flex-end">
+      <button class="btn btn-gold" id="btnDownloadPdf">⬇ Download PDF</button>
+    </div>
+    <div class="report-body" id="reportBody"></div>
   </div>
+</div>
 
-  <script>
-    const PART_NAMES = ['Deel 1','Deel 2','Deel 3','Deel 4'];
-    const SAMPLE_MAP = 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80';
-    const STORAGE_KEY = 'bouwherstel_simple_v3';
+<!-- TOAST -->
+<div class="toast hidden" id="toast">Opgeslagen!</div>
 
-    const memoryStore = { value: null };
+<script>
+const SK='bh_v3';
+let DB={projects:[]};
+function saveDB(){try{localStorage.setItem(SK,JSON.stringify(DB));}catch(e){}}
+function loadDB(){try{const r=localStorage.getItem(SK);if(r)DB=JSON.parse(r);}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg||'Opgeslagen!';t.classList.remove('hidden');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('hidden'),2200);}
 
-    const state = {
-      theme: 'dark',
-      projects: [],
-      currentProjectId: null,
-      currentPartIndex: 0,
-      currentPointId: null,
-      currentPhase: 'start',
-      lightboxPhotos: [],
-      lightboxIndex: 0
-    };
+let curProjId=null,curPointId=null,curPhase='start';
+function getProj(){return DB.projects.find(p=>p.id===curProjId)||null;}
+function getPoint(){const p=getProj();return p?p.points.find(x=>x.id===curPointId)||null:null;}
+function pointDone(pt){return pt.photos.start.length>0&&pt.photos.middle.length>0&&pt.photos.end.length>0;}
 
-    const el = {
-      projectList: document.getElementById('projectList'),
-      heroTitle: document.getElementById('heroTitle'),
-      heroText: document.getElementById('heroText'),
-      emptyState: document.getElementById('emptyState'),
-      projectWorkspace: document.getElementById('projectWorkspace'),
-      partsGrid: document.getElementById('partsGrid'),
-      mapTitle: document.getElementById('mapTitle'),
-      mapBox: document.getElementById('mapBox'),
-      mapImage: document.getElementById('mapImage'),
-      markersLayer: document.getElementById('markersLayer'),
-      pointsList: document.getElementById('pointsList'),
-      noPointState: document.getElementById('noPointState'),
-      pointEditor: document.getElementById('pointEditor'),
-      pointTitle: document.getElementById('pointTitle'),
-      pointDesc: document.getElementById('pointDesc'),
-      pointStatus: document.getElementById('pointStatus'),
-      photoGrid: document.getElementById('photoGrid'),
-      photoUploadInput: document.getElementById('photoUploadInput'),
-      mapUploadInput: document.getElementById('mapUploadInput'),
-      themeBtn: document.getElementById('themeBtn'),
-      newProjectBtn: document.getElementById('newProjectBtn'),
-      projectModal: document.getElementById('projectModal'),
-      closeProjectModal: document.getElementById('closeProjectModal'),
-      cancelProjectBtn: document.getElementById('cancelProjectBtn'),
-      createProjectBtn: document.getElementById('createProjectBtn'),
-      projectNameInput: document.getElementById('projectNameInput'),
-      projectLocationInput: document.getElementById('projectLocationInput'),
-      savePointBtn: document.getElementById('savePointBtn'),
-      deletePointBtn: document.getElementById('deletePointBtn'),
-      importInput: document.getElementById('importInput'),
-      exportBtn: document.getElementById('exportBtn'),
-      lightbox: document.getElementById('lightbox'),
-      lightboxImage: document.getElementById('lightboxImage'),
-      lbClose: document.getElementById('lbClose'),
-      lbPrev: document.getElementById('lbPrev'),
-      lbNext: document.getElementById('lbNext')
-    };
+function renderProjects(){
+  const el=document.getElementById('projectList');
+  if(!DB.projects.length){el.innerHTML='<div class="empty-state" style="margin-top:12px">Nog geen projecten.</div>';return;}
+  el.innerHTML=DB.projects.map(p=>{
+    const done=p.points.filter(pointDone).length;
+    return `<div class="proj-item${p.id===curProjId?' active':''}">
+      <div class="proj-item-name">${esc(p.name)}</div>
+      <div class="proj-item-sub">${esc(p.location||'Geen locatie')} · ${p.points.length} punt(en) · ${done} compleet</div>
+      <div class="proj-btns">
+        <button class="btn btn-blue" style="font-size:13px;min-height:36px" onclick="openProject('${p.id}')">Open</button>
+        <button class="btn btn-ghost" style="font-size:13px;min-height:36px" onclick="deleteProject('${p.id}')">Verwijder</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-    function uid() {
-      return Math.random().toString(36).slice(2, 10);
-    }
+function renderWorkspace(){
+  const proj=getProj();
+  document.getElementById('emptyMain').classList.toggle('hidden',!!proj);
+  document.getElementById('mainContent').classList.toggle('hidden',!proj);
+  if(!proj)return;
+  document.getElementById('mainTitle').textContent=proj.name;
+  document.getElementById('mainSub').textContent=(proj.location?proj.location+' · ':'')+proj.points.length+' punt(en)';
+  const img=document.getElementById('mainMapImg');
+  const ph=document.getElementById('mainMapPlaceholder');
+  if(proj.map){img.src=proj.map;img.classList.remove('hidden');ph.classList.add('hidden');}
+  else{img.classList.add('hidden');ph.classList.remove('hidden');}
+  renderBalloons();
+  renderQuads();
+  renderPointsTable();
+}
 
-    function getStorage() {
-      try {
-        const t = '__test__';
-        window.localStorage.setItem(t, '1');
-        window.localStorage.removeItem(t);
-        return window.localStorage;
-      } catch (e) {
-        return {
-          getItem(key) { return memoryStore.value && memoryStore.value[key] ? memoryStore.value[key] : null; },
-          setItem(key, value) { memoryStore.value = memoryStore.value || {}; memoryStore.value[key] = String(value); },
-          removeItem(key) { if (memoryStore.value) delete memoryStore.value[key]; }
-        };
-      }
-    }
+function renderBalloons(){
+  const proj=getProj();
+  const layer=document.getElementById('balloonsLayer');
+  layer.innerHTML='';
+  if(!proj)return;
+  proj.points.forEach((pt,idx)=>{
+    const pos=quadToMain(pt.quad,pt.x,pt.y);
+    const btn=document.createElement('button');
+    btn.className='balloon-btn'+(pointDone(pt)?' done':'');
+    btn.style.left=pos.x+'%';
+    btn.style.top=pos.y+'%';
+    btn.innerHTML=`<div class="balloon-head">${idx+1}</div><div class="balloon-tail"></div>`;
+    btn.title=pt.note?esc(pt.note):`Punt ${idx+1}`;
+    btn.onclick=()=>openPointModal(pt.id);
+    layer.appendChild(btn);
+  });
+}
 
-    const storage = getStorage();
+function quadToMain(quad,x,y){
+  if(quad===1)return{x:x/2,y:y/2};
+  if(quad===2)return{x:50+x/2,y:y/2};
+  if(quad===3)return{x:x/2,y:50+y/2};
+  return{x:50+x/2,y:50+y/2};
+}
 
-    function normalizeProject(project) {
-      return {
-        id: project.id || uid(),
-        name: project.name || 'Naamloos project',
-        location: project.location || '',
-        createdAt: project.createdAt || new Date().toISOString(),
-        parts: Array.isArray(project.parts) && project.parts.length ? project.parts.map((part, index) => ({
-          id: part.id || uid(),
-          name: part.name || PART_NAMES[index] || `Deel ${index + 1}`,
-          map: part.map || SAMPLE_MAP,
-          points: Array.isArray(part.points) ? part.points.map(normalizePoint) : []
-        })) : PART_NAMES.map(partName => ({ id: uid(), name: partName, map: SAMPLE_MAP, points: [] }))
-      };
-    }
-
-    function normalizePoint(point) {
-      return {
-        id: point.id || uid(),
-        x: typeof point.x === 'number' ? point.x : 50,
-        y: typeof point.y === 'number' ? point.y : 50,
-        title: point.title || 'Nieuw punt',
-        desc: point.desc || '',
-        status: point.status || 'Open',
-        photos: {
-          start: Array.isArray(point.photos && point.photos.start) ? point.photos.start : [],
-          middle: Array.isArray(point.photos && point.photos.middle) ? point.photos.middle : [],
-          end: Array.isArray(point.photos && point.photos.end) ? point.photos.end : []
-        }
-      };
-    }
-
-    function saveStorage() {
-      storage.setItem(STORAGE_KEY, JSON.stringify({ theme: state.theme, projects: state.projects }));
-    }
-
-    function loadStorage() {
-      const raw = storage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      try {
-        const data = JSON.parse(raw);
-        state.theme = data.theme || 'dark';
-        state.projects = Array.isArray(data.projects) ? data.projects.map(normalizeProject) : [];
-      } catch (e) {}
-    }
-
-    function applyTheme() {
-      document.documentElement.setAttribute('data-theme', state.theme);
-    }
-
-    function createProject(name, location) {
-      return normalizeProject({
-        id: uid(),
-        name,
-        location,
-        createdAt: new Date().toISOString(),
-        parts: PART_NAMES.map(partName => ({ id: uid(), name: partName, map: SAMPLE_MAP, points: [] }))
-      });
-    }
-
-    function getCurrentProject() {
-      return state.projects.find(p => p.id === state.currentProjectId) || null;
-    }
-
-    function getCurrentPart() {
-      const project = getCurrentProject();
-      if (!project) return null;
-      return project.parts[state.currentPartIndex] || null;
-    }
-
-    function getCurrentPoint() {
-      const part = getCurrentPart();
-      if (!part) return null;
-      return part.points.find(p => p.id === state.currentPointId) || null;
-    }
-
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, function(m) {
-        return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' })[m];
-      });
-    }
-
-    function renderProjects() {
-      el.projectList.innerHTML = '';
-      if (!state.projects.length) {
-        el.projectList.innerHTML = '<div class="empty">Nog geen projecten.</div>';
-        return;
-      }
-
-      state.projects.forEach(project => {
-        const totalPoints = project.parts.reduce((sum, part) => sum + part.points.length, 0);
-        const card = document.createElement('div');
-        card.className = 'project-card' + (project.id === state.currentProjectId ? ' active' : '');
-        card.innerHTML = `
-          <div class="project-title">${escapeHtml(project.name)}</div>
-          <div class="project-meta">${escapeHtml(project.location || 'Geen locatie')} · ${totalPoints} punten</div>
-          <div class="project-actions">
-            <button class="btn btn-primary" data-open-project="${project.id}">Open</button>
-            <button class="btn btn-secondary" data-delete-project="${project.id}">Verwijder</button>
-          </div>
-        `;
-        el.projectList.appendChild(card);
-      });
-    }
-
-    function renderWorkspace() {
-      const project = getCurrentProject();
-      if (!project) {
-        el.emptyState.classList.remove('hidden');
-        el.projectWorkspace.classList.add('hidden');
-        el.heroTitle.textContent = 'Open een project';
-        el.heroText.textContent = "Kies links een project. Daarna kies je één van de 4 delen, klik je op de tekening voor een rood kruis en voeg je foto's toe in Start, Midden of Eind.";
-        return;
-      }
-
-      el.emptyState.classList.add('hidden');
-      el.projectWorkspace.classList.remove('hidden');
-      el.heroTitle.textContent = project.name;
-      el.heroText.textContent = (project.location ? project.location + ' · ' : '') + 'Kies een deel en werk direct verder.';
-      renderParts();
-      renderMap();
-      renderPointsList();
-      renderPointEditor();
-    }
-
-    function renderParts() {
-      const project = getCurrentProject();
-      el.partsGrid.innerHTML = '';
-      project.parts.forEach((part, index) => {
-        const btn = document.createElement('button');
-        btn.className = 'part-btn' + (index === state.currentPartIndex ? ' active' : '');
-        btn.innerHTML = `<strong>${escapeHtml(part.name)}</strong><span>${part.points.length} punten</span>`;
-        btn.onclick = () => {
-          state.currentPartIndex = index;
-          state.currentPointId = null;
-          state.currentPhase = 'start';
-          renderWorkspace();
-        };
-        el.partsGrid.appendChild(btn);
-      });
-    }
-
-    function renderMap() {
-      const part = getCurrentPart();
-      if (!part) return;
-      el.mapTitle.textContent = 'Tekening · ' + part.name;
-      el.mapImage.src = part.map || SAMPLE_MAP;
-      el.markersLayer.innerHTML = '';
-
-      part.points.forEach(point => {
-        const marker = document.createElement('button');
-        marker.className = 'marker';
-        marker.type = 'button';
-        marker.style.left = point.x + '%';
-        marker.style.top = point.y + '%';
-        marker.title = point.title || 'Punt';
-        marker.onclick = (e) => {
-          e.stopPropagation();
-          state.currentPointId = point.id;
-          renderPointEditor();
-          renderPointsList();
-        };
-        el.markersLayer.appendChild(marker);
-      });
-    }
-
-    function renderPointsList() {
-      const part = getCurrentPart();
-      if (!part) return;
-      el.pointsList.innerHTML = '';
-
-      if (!part.points.length) {
-        el.pointsList.innerHTML = '<div class="empty">Nog geen punten in dit deel.</div>';
-        return;
-      }
-
-      part.points.forEach(point => {
-        const card = document.createElement('div');
-        card.className = 'point-card' + (point.id === state.currentPointId ? ' active' : '');
-        card.innerHTML = `
-          <div class="point-head">
-            <strong>${escapeHtml(point.title || 'Nieuw punt')}</strong>
-            <span class="status-tag">${escapeHtml(point.status || 'Open')}</span>
-          </div>
-          <div class="muted">${escapeHtml(point.desc || 'Geen opmerking')}</div>
-          <button class="btn btn-secondary" data-open-point="${point.id}">Open punt</button>
-        `;
-        el.pointsList.appendChild(card);
-      });
-    }
-
-    function renderPointEditor() {
-      const point = getCurrentPoint();
-      if (!point) {
-        el.noPointState.classList.remove('hidden');
-        el.pointEditor.classList.add('hidden');
-        return;
-      }
-
-      el.noPointState.classList.add('hidden');
-      el.pointEditor.classList.remove('hidden');
-
-      el.pointTitle.value = point.title || '';
-      el.pointDesc.value = point.desc || '';
-      el.pointStatus.value = point.status || 'Open';
-
-      document.querySelectorAll('.phase-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.phase === state.currentPhase);
-      });
-
-      renderPhotoGrid();
-    }
-
-    function renderPhotoGrid() {
-      const point = getCurrentPoint();
-      if (!point) {
-        el.photoGrid.innerHTML = '';
-        return;
-      }
-
-      el.photoGrid.innerHTML = '';
-      const list = point.photos[state.currentPhase] || [];
-
-      if (!list.length) {
-        el.photoGrid.innerHTML = '<div class="empty" style="grid-column:1/-1;">Nog geen foto\'s in deze tab.</div>';
-        return;
-      }
-
-      list.forEach((src, index) => {
-        const item = document.createElement('div');
-        item.className = 'photo-item';
-        item.innerHTML = `
-          <img src="${src}" alt="Foto">
-          <button type="button" class="photo-remove" data-remove-photo="${index}">×</button>
-        `;
-        item.querySelector('img').onclick = () => openLightbox(list, index);
-        el.photoGrid.appendChild(item);
-      });
-    }
-
-    function addPoint(x, y) {
-      const part = getCurrentPart();
-      if (!part) return;
-
-      const point = normalizePoint({
-        id: uid(),
-        x,
-        y,
-        title: 'Nieuw punt',
-        desc: '',
-        status: 'Open',
-        photos: { start: [], middle: [], end: [] }
-      });
-
-      part.points.push(point);
-      state.currentPointId = point.id;
-      saveStorage();
+function renderQuads(){
+  const proj=getProj();
+  const grid=document.getElementById('quadGrid');
+  grid.innerHTML='';
+  const QUADS=[{num:1,label:'Deel 1 – Links boven'},{num:2,label:'Deel 2 – Rechts boven'},{num:3,label:'Deel 3 – Links onder'},{num:4,label:'Deel 4 – Rechts onder'}];
+  QUADS.forEach(({num,label})=>{
+    const points=proj?proj.points.filter(p=>p.quad===num):[];
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`
+      <h4>${esc(label)} <span style="font-size:13px;color:#7a9ab4;font-weight:600">${points.length} punt(en)</span></h4>
+      <div class="quad-map-wrap q${num}" id="qwrap${num}">
+        ${proj&&proj.map?`<img class="quad-map-img" src="${proj.map}" alt="Deel ${num}">`:'<div class="quad-no-map">Upload eerst plattegrond</div>'}
+        <div class="quad-click-layer" id="qclick${num}"></div>
+        <div class="quad-markers-layer" id="qmarkers${num}"></div>
+      </div>`;
+    grid.appendChild(card);
+    const cl=card.querySelector('#qclick'+num);
+    cl.addEventListener('click',function(e){
+      const p2=getProj();
+      if(!p2||!p2.map){alert('Upload eerst de hoofdplattegrond.');return;}
+      const rect=this.getBoundingClientRect();
+      const x=+((e.clientX-rect.left)/rect.width*100).toFixed(1);
+      const y=+((e.clientY-rect.top)/rect.height*100).toFixed(1);
+      const pt={id:uid(),quad:num,x,y,note:'',status:'open',photos:{start:[],middle:[],end:[]}};
+      p2.points.push(pt);
+      saveDB();
+      curPointId=pt.id;
+      curPhase='start';
       renderWorkspace();
-    }
-
-    function saveCurrentPoint() {
-      const point = getCurrentPoint();
-      if (!point) return;
-      point.title = el.pointTitle.value.trim() || 'Nieuw punt';
-      point.desc = el.pointDesc.value.trim();
-      point.status = el.pointStatus.value;
-      saveStorage();
       renderProjects();
-      renderPointsList();
-      renderMap();
-      renderPointEditor();
-    }
-
-    function deleteCurrentPoint() {
-      const part = getCurrentPart();
-      if (!part || !state.currentPointId) return;
-      part.points = part.points.filter(p => p.id !== state.currentPointId);
-      state.currentPointId = null;
-      saveStorage();
-      renderProjects();
-      renderWorkspace();
-    }
-
-    function openProject(projectId) {
-      state.currentProjectId = projectId;
-      state.currentPartIndex = 0;
-      state.currentPointId = null;
-      state.currentPhase = 'start';
-      renderProjects();
-      renderWorkspace();
-    }
-
-    function exportJson() {
-      const blob = new Blob([JSON.stringify(state.projects, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'bouwherstel-projecten.json';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    function openLightbox(photos, index) {
-      state.lightboxPhotos = photos.slice();
-      state.lightboxIndex = index;
-      updateLightbox();
-      el.lightbox.classList.remove('hidden');
-    }
-
-    function updateLightbox() {
-      const src = state.lightboxPhotos[state.lightboxIndex];
-      el.lightboxImage.src = src || '';
-    }
-
-    function nextLightbox(step) {
-      if (!state.lightboxPhotos.length) return;
-      state.lightboxIndex += step;
-      if (state.lightboxIndex < 0) state.lightboxIndex = state.lightboxPhotos.length - 1;
-      if (state.lightboxIndex >= state.lightboxPhotos.length) state.lightboxIndex = 0;
-      updateLightbox();
-    }
-
-    function closeLightbox() {
-      el.lightbox.classList.add('hidden');
-    }
-
-    function fileToDataUrl(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    el.themeBtn.onclick = () => {
-      state.theme = state.theme === 'dark' ? 'light' : 'dark';
-      applyTheme();
-      saveStorage();
-    };
-
-    el.newProjectBtn.onclick = () => { el.projectModal.classList.remove('hidden'); };
-    el.closeProjectModal.onclick = () => el.projectModal.classList.add('hidden');
-    el.cancelProjectBtn.onclick = () => el.projectModal.classList.add('hidden');
-
-    el.createProjectBtn.onclick = () => {
-      const name = el.projectNameInput.value.trim();
-      const location = el.projectLocationInput.value.trim();
-
-      if (!name) {
-        alert('Vul een projectnaam in.');
-        return;
-      }
-
-      const project = createProject(name, location);
-      state.projects.unshift(project);
-      state.currentProjectId = project.id;
-      state.currentPartIndex = 0;
-      state.currentPointId = null;
-      state.currentPhase = 'start';
-
-      el.projectNameInput.value = '';
-      el.projectLocationInput.value = '';
-      el.projectModal.classList.add('hidden');
-
-      saveStorage();
-      renderProjects();
-      renderWorkspace();
-    };
-
-    el.projectList.onclick = (e) => {
-      const openBtn = e.target.closest('[data-open-project]');
-      const deleteBtn = e.target.closest('[data-delete-project]');
-
-      if (openBtn) openProject(openBtn.dataset.openProject);
-
-      if (deleteBtn) {
-        const id = deleteBtn.dataset.deleteProject;
-        if (!confirm('Project verwijderen?')) return;
-
-        state.projects = state.projects.filter(p => p.id !== id);
-
-        if (state.currentProjectId === id) {
-          state.currentProjectId = state.projects[0]?.id || null;
-          state.currentPointId = null;
-          state.currentPartIndex = 0;
-        }
-
-        saveStorage();
-        renderProjects();
-        renderWorkspace();
-      }
-    };
-
-    el.pointsList.onclick = (e) => {
-      const openBtn = e.target.closest('[data-open-point]');
-      if (!openBtn) return;
-      state.currentPointId = openBtn.dataset.openPoint;
-      renderPointEditor();
-      renderPointsList();
-    };
-
-    el.mapBox.onclick = (e) => {
-      if (e.target.closest('.marker')) return;
-      const project = getCurrentProject();
-      if (!project) return;
-
-      const rect = el.mapBox.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      addPoint(+x.toFixed(2), +y.toFixed(2));
-    };
-
-    el.pointTitle.oninput = saveCurrentPoint;
-    el.pointDesc.oninput = saveCurrentPoint;
-    el.pointStatus.onchange = saveCurrentPoint;
-    el.savePointBtn.onclick = saveCurrentPoint;
-    el.deletePointBtn.onclick = deleteCurrentPoint;
-
-    document.querySelectorAll('.phase-btn').forEach(btn => {
-      btn.onclick = () => {
-        state.currentPhase = btn.dataset.phase;
-        renderPointEditor();
-      };
+      openPointModal(pt.id);
     });
-
-    el.photoUploadInput.onchange = async (e) => {
-      const point = getCurrentPoint();
-      if (!point) return;
-
-      const files = Array.from(e.target.files || []);
-      for (const file of files) {
-        const dataUrl = await fileToDataUrl(file);
-        point.photos[state.currentPhase].push(dataUrl);
-      }
-
-      e.target.value = '';
-      saveStorage();
-      renderPhotoGrid();
-    };
-
-    el.photoGrid.onclick = (e) => {
-      const removeBtn = e.target.closest('[data-remove-photo]');
-      if (!removeBtn) return;
-      const point = getCurrentPoint();
-      if (!point) return;
-
-      const index = Number(removeBtn.dataset.removePhoto);
-      point.photos[state.currentPhase].splice(index, 1);
-      saveStorage();
-      renderPhotoGrid();
-    };
-
-    el.mapUploadInput.onchange = async (e) => {
-      const file = e.target.files[0];
-      const part = getCurrentPart();
-      if (!file || !part) return;
-
-      part.map = await fileToDataUrl(file);
-      e.target.value = '';
-      saveStorage();
-      renderMap();
-    };
-
-    el.exportBtn.onclick = exportJson;
-
-    el.importInput.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      try {
-        const text = await file.text();
-        const data = JSON.parse(text);
-        if (!Array.isArray(data)) throw new Error('invalid');
-
-        state.projects = data.map(normalizeProject);
-        state.currentProjectId = state.projects[0]?.id || null;
-        state.currentPartIndex = 0;
-        state.currentPointId = null;
-        state.currentPhase = 'start';
-
-        saveStorage();
-        renderProjects();
-        renderWorkspace();
-      } catch (err) {
-        alert('Ongeldig JSON-bestand.');
-      }
-
-      e.target.value = '';
-    };
-
-    el.lbClose.onclick = closeLightbox;
-    el.lbPrev.onclick = () => nextLightbox(-1);
-    el.lbNext.onclick = () => nextLightbox(1);
-    el.lightbox.onclick = (e) => { if (e.target === el.lightbox) closeLightbox(); };
-
-    document.addEventListener('keydown', (e) => {
-      if (!el.lightbox.classList.contains('hidden')) {
-        if (e.key === 'Escape') closeLightbox();
-        if (e.key === 'ArrowLeft') nextLightbox(-1);
-        if (e.key === 'ArrowRight') nextLightbox(1);
-      }
-
-      if (e.key === 'Escape' && !el.projectModal.classList.contains('hidden')) {
-        el.projectModal.classList.add('hidden');
-      }
+    const ml=card.querySelector('#qmarkers'+num);
+    points.forEach(pt=>{
+      const m=document.createElement('button');
+      m.className='qmarker'+(pointDone(pt)?' done':'');
+      m.style.left=pt.x+'%';
+      m.style.top=pt.y+'%';
+      m.title=pt.note||'Punt';
+      m.onclick=(e)=>{e.stopPropagation();openPointModal(pt.id);};
+      ml.appendChild(m);
     });
+  });
+}
 
-    loadStorage();
-    applyTheme();
+function renderPointsTable(){
+  const proj=getProj();
+  const table=document.getElementById('pointsTable');
+  if(!proj||!proj.points.length){table.innerHTML='<div class="empty-state">Nog geen punten. Klik in een van de 4 delen om te beginnen.</div>';return;}
+  table.innerHTML=proj.points.map((pt,idx)=>{
+    const done=pointDone(pt);
+    const sel=pt.id===curPointId?' selected-row':'';
+    return `<div class="point-row${sel}">
+      <span class="point-row-num">${idx+1}</span>
+      <div class="point-row-info">
+        <strong>Deel ${pt.quad} · ${esc(pt.note?pt.note.slice(0,45)+(pt.note.length>45?'…':''):'Geen omschrijving')}</strong>
+        <span>Start: ${pt.photos.start.length} · Midden: ${pt.photos.middle.length} · Einde: ${pt.photos.end.length}</span>
+      </div>
+      <span class="pill ${done?'pill-done':'pill-open'}">${done?'Compleet':'Open'}</span>
+      <button class="btn btn-ghost" style="font-size:13px;min-height:36px" onclick="openPointModal('${pt.id}')">Open</button>
+    </div>`;
+  }).join('');
+}
 
-    if (!state.projects.length) {
-      const demo = createProject('Voorbeeldproject', 'Lelystad');
-      state.projects.push(demo);
-      state.currentProjectId = demo.id;
-      saveStorage();
-    } else {
-      state.currentProjectId = state.projects[0]?.id || null;
-    }
+function openPointModal(pointId){
+  curPointId=pointId;
+  const pt=getPoint();
+  if(!pt)return;
+  const proj=getProj();
+  const idx=proj.points.findIndex(p=>p.id===pointId);
+  document.getElementById('modalPointTitle').textContent=`Punt ${idx+1} – Deel ${pt.quad}`;
+  document.getElementById('inpPointNote').value=pt.note||'';
+  document.getElementById('inpPointStatus').value=pt.status||'open';
+  updatePhaseTabs();
+  renderModalPhotos();
+  showModal('modalPoint');
+}
 
-    renderProjects();
-    renderWorkspace();
-  </script>
+function updatePhaseTabs(){
+  const pt=getPoint();
+  document.querySelectorAll('.phase-tab').forEach(tab=>{
+    const ph=tab.dataset.phase;
+    tab.classList.toggle('on',ph===curPhase);
+    const c=document.getElementById('cnt-'+ph);
+    if(c&&pt)c.textContent='('+pt.photos[ph].length+')';
+  });
+}
+
+function renderModalPhotos(){
+  const pt=getPoint();
+  const grid=document.getElementById('modalPhotoGrid');
+  if(!pt){grid.innerHTML='';return;}
+  const photos=pt.photos[curPhase];
+  if(!photos.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1;margin-bottom:8px">Geen foto\'s voor deze fase.</div>';return;}
+  grid.innerHTML=photos.map((src,i)=>`<div class="photo-thumb"><img src="${src}" alt="Foto"><button class="photo-del" onclick="deletePhoto(${i})">✕</button></div>`).join('');
+}
+
+function deletePhoto(i){
+  const pt=getPoint();
+  if(!pt)return;
+  pt.photos[curPhase].splice(i,1);
+  saveDB();updatePhaseTabs();renderModalPhotos();
+}
+
+function savePoint(){
+  const pt=getPoint();
+  if(!pt)return;
+  pt.note=document.getElementById('inpPointNote').value.trim();
+  pt.status=document.getElementById('inpPointStatus').value;
+  saveDB();renderWorkspace();renderProjects();toast('Punt opgeslagen!');
+}
+
+function deletePoint(){
+  if(!confirm('Punt verwijderen?'))return;
+  const proj=getProj();
+  if(!proj)return;
+  proj.points=proj.points.filter(p=>p.id!==curPointId);
+  curPointId=null;
+  saveDB();closeModal('modalPoint');renderWorkspace();renderProjects();toast('Punt verwijderd.');
+}
+
+function buildReportHTML(){
+  const proj=getProj();
+  if(!proj)return'<div>Geen project.</div>';
+  const date=new Date().toLocaleDateString('nl-NL');
+  let html=`<h2>${esc(proj.name)}</h2><p>Locatie: ${esc(proj.location||'–')} | Datum: ${date} | Punten: ${proj.points.length}</p><hr style="margin:12px 0;border-color:#e0e0e0">`;
+  if(!proj.points.length)return html+'<p>Geen punten aanwezig.</p>';
+  proj.points.forEach((pt,idx)=>{
+    const done=pointDone(pt);
+    html+=`<div class="report-block"><strong>Punt ${idx+1} – Deel ${pt.quad} <span style="float:right;font-size:12px;color:${done?'#2a9d6a':'#c07000'}">${done?'✓ Compleet':'⏳ Open'}</span></strong><p style="color:#555;font-size:14px;margin-top:4px">${esc(pt.note||'Geen omschrijving')}</p>`;
+    ['start','middle','end'].forEach(phase=>{
+      const ph=pt.photos[phase];
+      html+=`<div style="margin-top:10px"><strong style="font-size:13px;text-transform:capitalize">${phase} (${ph.length} foto's)</strong>`;
+      if(ph.length)html+=`<div class="rphoto-grid">${ph.slice(0,6).map(s=>`<img src="${s}" alt="${phase}">`).join('')}</div>`;
+      else html+=`<div style="font-size:12px;color:#aaa;margin-top:4px">Geen foto's</div>`;
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  });
+  return html;
+}
+
+function openReport(){
+  const proj=getProj();
+  if(!proj){alert('Open eerst een project.');return;}
+  document.getElementById('reportBody').innerHTML=buildReportHTML();
+  showModal('modalReport');
+}
+
+async function downloadPdf(){
+  const rb=document.getElementById('reportBody');
+  const proj=getProj();
+  if(!proj)return;
+  toast('PDF wordt gemaakt...');
+  try{
+    const canvas=await html2canvas(rb,{scale:2,backgroundColor:'#ffffff',useCORS:true});
+    const imgData=canvas.toDataURL('image/png');
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF('p','mm','a4');
+    const pW=210,pH=297,m=10,iW=pW-m*2;
+    const iH=canvas.height*iW/canvas.width;
+    let rem=iH,yPos=m;
+    pdf.addImage(imgData,'PNG',m,yPos,iW,iH);
+    rem-=(pH-m*2);
+    while(rem>0){yPos=rem-iH+m;pdf.addPage();pdf.addImage(imgData,'PNG',m,yPos,iW,iH);rem-=(pH-m*2);}
+    pdf.save((proj.name||'rapport')+'-bouwherstel.pdf');
+    toast('PDF gedownload!');
+  }catch(err){alert('PDF fout: '+err.message);}
+}
+
+function openProject(id){curProjId=id;curPointId=null;curPhase='start';renderProjects();renderWorkspace();}
+function deleteProject(id){
+  if(!confirm('Project verwijderen?'))return;
+  DB.projects=DB.projects.filter(p=>p.id!==id);
+  if(curProjId===id){curProjId=DB.projects[0]?.id||null;curPointId=null;}
+  saveDB();renderProjects();renderWorkspace();
+}
+function createProject(){
+  const name=document.getElementById('inpProjectName').value.trim();
+  const loc=document.getElementById('inpProjectLocation').value.trim();
+  if(!name){alert('Vul een projectnaam in.');return;}
+  const proj={id:uid(),name,location:loc,map:'',points:[]};
+  DB.projects.unshift(proj);
+  curProjId=proj.id;curPointId=null;curPhase='start';
+  document.getElementById('inpProjectName').value='';
+  document.getElementById('inpProjectLocation').value='';
+  saveDB();closeModal('modalNewProject');renderProjects();renderWorkspace();
+  toast('Project aangemaakt!');
+}
+
+document.getElementById('mapUploadInput').addEventListener('change',function(){
+  const proj=getProj();
+  if(!proj||!this.files[0])return;
+  const reader=new FileReader();
+  reader.onload=e=>{proj.map=e.target.result;saveDB();renderWorkspace();toast('Plattegrond geladen!');};
+  reader.readAsDataURL(this.files[0]);
+  this.value='';
+});
+
+document.getElementById('inpPhoto').addEventListener('change',function(){
+  const pt=getPoint();
+  if(!pt)return;
+  const files=Array.from(this.files);
+  let done=0;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      pt.photos[curPhase].push(e.target.result);
+      done++;
+      if(done===files.length){
+        saveDB();updatePhaseTabs();renderModalPhotos();
+        renderBalloons();renderQuads();renderPointsTable();
+        toast(files.length+' foto\'s toegevoegd!');
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  this.value='';
+});
+
+function showModal(id){document.getElementById(id).classList.remove('hidden');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+
+document.addEventListener('click',function(e){
+  const cb=e.target.closest('[data-close]');
+  if(cb){closeModal(cb.dataset.close);return;}
+  if(e.target.classList.contains('modal-bg'))e.target.classList.add('hidden');
+  const pt=e.target.closest('.phase-tab');
+  if(pt&&pt.dataset.phase){curPhase=pt.dataset.phase;updatePhaseTabs();renderModalPhotos();}
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.modal-bg').forEach(m=>m.classList.add('hidden'));
+});
+
+document.getElementById('btnNewProject').onclick=()=>showModal('modalNewProject');
+document.getElementById('btnCreateProject').onclick=createProject;
+document.getElementById('btnSavePoint').onclick=savePoint;
+document.getElementById('btnDeletePoint').onclick=deletePoint;
+document.getElementById('btnPdf').onclick=openReport;
+document.getElementById('btnDownloadPdf').onclick=downloadPdf;
+document.getElementById('btnTheme').onclick=function(){
+  const b=document.body;
+  const on=b.style.filter==='invert(1) hue-rotate(180deg)';
+  b.style.filter=on?'':'invert(1) hue-rotate(180deg)';
+  this.textContent=on?'☀ Thema':'🌙 Thema';
+};
+document.getElementById('inpProjectName').addEventListener('keydown',e=>{if(e.key==='Enter')createProject();});
+
+loadDB();
+if(!DB.projects.length){DB.projects.push({id:uid(),name:'Demo project',location:'Lelystad',map:'',points:[]});saveDB();}
+curProjId=DB.projects[0].id;
+renderProjects();
+renderWorkspace();
+</script>
 </body>
 </html>
