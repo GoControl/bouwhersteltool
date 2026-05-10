@@ -1,1253 +1,385 @@
 <!doctype html>
-<html lang="nl" data-theme="dark">
+<html lang="nl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ED Controls — Bouwherstel Tool 2026</title>
-
-  <link rel="preconnect" href="https://api.fontshare.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+  <title>Bouwherstel Tool</title>
   <style>
-    :root,
-    [data-theme="light"]{
-      --font-display:'Satoshi', 'Inter', sans-serif;
-      --font-body:'General Sans', 'Inter', sans-serif;
-
-      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
-      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
-      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.2rem);
-
-      --space-1: .25rem;
-      --space-2: .5rem;
-      --space-3: .75rem;
-      --space-4: 1rem;
-      --space-5: 1.25rem;
-      --space-6: 1.5rem;
-      --space-8: 2rem;
-      --space-10: 2.5rem;
-      --space-12: 3rem;
-      --space-16: 4rem;
-
-      --color-bg: #f4f6f8;
-      --color-bg-top: #eef4f6;
-      --color-surface: rgba(255,255,255,.72);
-      --color-surface-2: rgba(255,255,255,.84);
-      --color-panel-solid: #ffffff;
-      --color-border: rgba(16,24,40,.10);
-      --color-divider: rgba(16,24,40,.08);
-      --color-text: #101828;
-      --color-text-muted: #667085;
-      --color-text-faint: #98a2b3;
-      --color-text-inverse: #f8fafc;
-
-      --color-primary: #0e7490;
-      --color-primary-hover: #0a5e76;
-      --color-primary-active: #084c61;
-      --color-primary-soft: rgba(14,116,144,.12);
-      --color-primary-glow: rgba(34,211,238,.20);
-
-      --color-success: #15803d;
-      --color-warning: #b45309;
-      --color-error: #b42318;
-
-      --shadow-sm: 0 1px 2px rgba(16,24,40,.05), 0 1px 1px rgba(16,24,40,.04);
-      --shadow-md: 0 8px 20px rgba(16,24,40,.08), 0 2px 6px rgba(16,24,40,.05);
-      --shadow-lg: 0 20px 48px rgba(15,23,42,.14), 0 8px 24px rgba(15,23,42,.08);
-      --shadow-xl: 0 36px 80px rgba(15,23,42,.18), 0 16px 40px rgba(15,23,42,.10);
-
-      --radius-sm: .75rem;
-      --radius-md: 1rem;
-      --radius-lg: 1.25rem;
-      --radius-xl: 1.6rem;
-      --radius-full: 999px;
-
-      --sidebar-bg: linear-gradient(180deg, rgba(4,14,21,.95), rgba(9,18,31,.92));
-      --sidebar-border: rgba(255,255,255,.08);
-
-      --bg-mesh:
-        radial-gradient(circle at 12% 18%, rgba(34,211,238,.10), transparent 24%),
-        radial-gradient(circle at 85% 12%, rgba(14,116,144,.12), transparent 22%),
-        radial-gradient(circle at 70% 80%, rgba(125,211,252,.10), transparent 18%),
-        linear-gradient(180deg, var(--color-bg-top), var(--color-bg));
+    :root{
+      --bg:#08131d;
+      --bg2:#0d1b28;
+      --panel:rgba(15,27,40,.88);
+      --panel2:rgba(18,32,47,.95);
+      --line:rgba(255,255,255,.08);
+      --text:#f2f7fb;
+      --muted:#9eb1c3;
+      --primary:#26c6ee;
+      --primary2:#7cecff;
+      --danger:#ff5c6c;
+      --ok:#35c977;
+      --radius:22px;
+      --shadow:0 20px 60px rgba(0,0,0,.35), 0 10px 30px rgba(0,0,0,.18);
+      --shadow-sm:0 10px 24px rgba(0,0,0,.18);
     }
 
-    [data-theme="dark"]{
-      --font-display:'Satoshi', 'Inter', sans-serif;
-      --font-body:'General Sans', 'Inter', sans-serif;
-
-      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
-      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
-      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.2rem);
-
-      --space-1: .25rem;
-      --space-2: .5rem;
-      --space-3: .75rem;
-      --space-4: 1rem;
-      --space-5: 1.25rem;
-      --space-6: 1.5rem;
-      --space-8: 2rem;
-      --space-10: 2.5rem;
-      --space-12: 3rem;
-      --space-16: 4rem;
-
-      --color-bg: #07111a;
-      --color-bg-top: #0b1622;
-      --color-surface: rgba(10,19,30,.62);
-      --color-surface-2: rgba(15,25,38,.82);
-      --color-panel-solid: #0e1824;
-      --color-border: rgba(255,255,255,.08);
-      --color-divider: rgba(255,255,255,.07);
-      --color-text: #f3f7fb;
-      --color-text-muted: #a7b6c8;
-      --color-text-faint: #7c8ba1;
-      --color-text-inverse: #08111a;
-
-      --color-primary: #22c7ee;
-      --color-primary-hover: #14add1;
-      --color-primary-active: #0e8aaa;
-      --color-primary-soft: rgba(34,199,238,.14);
-      --color-primary-glow: rgba(34,199,238,.24);
-
-      --color-success: #2dcc70;
-      --color-warning: #f59e0b;
-      --color-error: #ff5e6c;
-
-      --shadow-sm: 0 1px 2px rgba(0,0,0,.24), 0 1px 1px rgba(0,0,0,.18);
-      --shadow-md: 0 10px 24px rgba(0,0,0,.28), 0 3px 8px rgba(0,0,0,.20);
-      --shadow-lg: 0 24px 60px rgba(0,0,0,.40), 0 10px 30px rgba(0,0,0,.24);
-      --shadow-xl: 0 44px 100px rgba(0,0,0,.50), 0 18px 48px rgba(0,0,0,.28);
-
-      --radius-sm: .75rem;
-      --radius-md: 1rem;
-      --radius-lg: 1.25rem;
-      --radius-xl: 1.6rem;
-      --radius-full: 999px;
-
-      --sidebar-bg: linear-gradient(180deg, rgba(2,9,16,.98), rgba(7,16,26,.95));
-      --sidebar-border: rgba(255,255,255,.06);
-
-      --bg-mesh:
-        radial-gradient(circle at 14% 18%, rgba(34,199,238,.16), transparent 22%),
-        radial-gradient(circle at 82% 16%, rgba(18,93,122,.22), transparent 24%),
-        radial-gradient(circle at 68% 82%, rgba(59,130,246,.10), transparent 18%),
-        linear-gradient(180deg, var(--color-bg-top), var(--color-bg));
-    }
-
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{
-      -webkit-text-size-adjust:none;
-      text-size-adjust:none;
-      scroll-behavior:smooth;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
     body{
+      font-family:Arial,Helvetica,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 12% 14%, rgba(38,198,238,.16), transparent 18%),
+        radial-gradient(circle at 84% 14%, rgba(38,198,238,.10), transparent 16%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
       min-height:100vh;
-      font-family:var(--font-body);
-      font-size:var(--text-base);
-      color:var(--color-text);
-      background:var(--bg-mesh);
-      line-height:1.6;
-      overflow-x:hidden;
-    }
-    img,svg,video,canvas{display:block;max-width:100%;height:auto}
-    button,input,textarea,select{font:inherit;color:inherit}
-    button{
-      border:none;
-      background:none;
-      cursor:pointer;
-    }
-    input,textarea,select{
-      border:none;
-      outline:none;
-      background:transparent;
-    }
-    a,button,input,textarea,select{
-      transition:
-        transform 180ms cubic-bezier(.16,1,.3,1),
-        background 180ms cubic-bezier(.16,1,.3,1),
-        border-color 180ms cubic-bezier(.16,1,.3,1),
-        color 180ms cubic-bezier(.16,1,.3,1),
-        box-shadow 180ms cubic-bezier(.16,1,.3,1);
-    }
-    :focus-visible{
-      outline:2px solid var(--color-primary);
-      outline-offset:3px;
-      border-radius:10px;
-    }
-    .hidden{display:none!important}
-
-    .app-shell{
-      display:grid;
-      grid-template-columns: 300px minmax(0,1fr);
-      min-height:100vh;
-      position:relative;
     }
 
-    .app-shell::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.04), transparent 20%),
-        radial-gradient(circle at top, rgba(255,255,255,.05), transparent 28%);
-      mix-blend-mode:screen;
-      opacity:.65;
-    }
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer;border:none}
+    img{display:block;max-width:100%}
 
-    .sidebar{
-      position:sticky;
-      top:0;
-      height:100vh;
-      padding:24px 18px;
-      background:var(--sidebar-bg);
-      border-right:1px solid var(--sidebar-border);
-      backdrop-filter: blur(20px) saturate(135%);
-      -webkit-backdrop-filter: blur(20px) saturate(135%);
-      box-shadow: inset -1px 0 0 rgba(255,255,255,.03);
-      z-index:10;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-
-    .brand{
-      position:relative;
-      padding:18px 18px 16px;
-      border-radius:24px;
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.10),
-        0 20px 40px rgba(0,0,0,.22);
-      overflow:hidden;
-    }
-
-    .brand::after{
-      content:"";
-      position:absolute;
-      inset:auto -10% -30% 18%;
-      height:80px;
-      background:radial-gradient(circle, var(--color-primary-glow), transparent 62%);
-      filter:blur(10px);
-      opacity:.9;
-      pointer-events:none;
-    }
-
-    .brand-top{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      margin-bottom:10px;
-      position:relative;
-      z-index:1;
-    }
-
-    .brand-mark{
-      width:46px;
-      height:46px;
-      border-radius:16px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.04)),
-        linear-gradient(135deg, rgba(34,199,238,.32), rgba(34,199,238,.08));
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.16),
-        0 10px 26px rgba(34,199,238,.18);
-      display:grid;
-      place-items:center;
-      color:#fff;
-      transform:translateZ(0);
-    }
-
-    .brand-mark svg{width:24px;height:24px}
-    .brand h1{
-      font-family:var(--font-display);
-      font-size:1.15rem;
-      font-weight:800;
-      letter-spacing:.02em;
-      line-height:1.15;
-      color:#f8fbff;
-    }
-    .brand p{
-      position:relative;
-      z-index:1;
-      color:#9fb2c6;
-      font-size:var(--text-sm);
-      max-width:26ch;
-    }
-
-    .theme-toggle{
-      width:100%;
-      padding:12px 14px;
-      border-radius:16px;
-      color:#d8e4ef;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.08);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      font-weight:700;
-    }
-    .theme-toggle:hover{
-      transform:translateY(-1px);
-      background:rgba(255,255,255,.08);
-      box-shadow:var(--shadow-md);
-    }
-
-    .nav{
-      display:grid;
-      gap:10px;
-    }
-
-    .nav-btn{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      width:100%;
-      text-align:left;
-      padding:14px 16px;
-      border-radius:18px;
-      color:#dce7f3;
-      background:rgba(255,255,255,.035);
-      border:1px solid rgba(255,255,255,.05);
-      font-weight:700;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
-    }
-
-    .nav-btn svg{
-      width:18px;
-      height:18px;
-      opacity:.95;
-      flex:none;
-    }
-
-    .nav-btn.active{
-      color:#ffffff;
-      background:
-        linear-gradient(180deg, rgba(34,199,238,.20), rgba(34,199,238,.08)),
-        rgba(255,255,255,.05);
-      border-color:rgba(34,199,238,.22);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.12),
-        0 14px 30px rgba(34,199,238,.14);
-    }
-
-    .nav-btn:hover{
-      transform:translateY(-1px);
-      background:rgba(255,255,255,.07);
-    }
-
-    .sidebar-footer{
-      margin-top:auto;
-      display:grid;
-      gap:10px;
-    }
-
-    .sidebar-note{
-      padding:16px;
-      border-radius:20px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.06);
-      color:#9db1c4;
-      font-size:var(--text-sm);
-    }
-
-    .main{
-      padding:26px;
-      min-width:0;
+    .app{
+      max-width:1380px;
+      margin:0 auto;
+      padding:18px;
     }
 
     .topbar{
       display:flex;
       justify-content:space-between;
-      align-items:flex-start;
-      gap:16px;
-      flex-wrap:wrap;
-      margin-bottom:24px;
-    }
-
-    .headline h2{
-      font-family:var(--font-display);
-      font-size:var(--text-xl);
-      font-weight:900;
-      letter-spacing:-.03em;
-      line-height:1.02;
-      margin-bottom:10px;
-    }
-
-    .headline p{
-      color:var(--color-text-muted);
-      max-width:70ch;
-      font-size:var(--text-sm);
-    }
-
-    .action-row{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
       align-items:center;
-    }
-
-    .glass,
-    .card,
-    .modal-card,
-    .empty-state,
-    .input-shell,
-    .board-wrap,
-    .part-card,
-    .project-card{
-      background:var(--color-surface);
-      border:1px solid var(--color-border);
-      box-shadow:var(--shadow-lg);
-      backdrop-filter: blur(18px) saturate(150%);
-      -webkit-backdrop-filter: blur(18px) saturate(150%);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .glass::before,
-    .card::before,
-    .modal-card::before,
-    .board-wrap::before,
-    .part-card::before,
-    .project-card::before{
-      content:"";
-      position:absolute;
-      inset:0 0 auto 0;
-      height:1px;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
-      pointer-events:none;
-      z-index:0;
-    }
-
-    .card{
-      border-radius:28px;
-      padding:22px;
-    }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns: 1.4fr .8fr;
-      gap:18px;
-      margin-bottom:18px;
-    }
-
-    .hero-card{
-      min-height:220px;
-      border-radius:30px;
-      padding:28px;
-      background:
-        radial-gradient(circle at top right, rgba(34,199,238,.18), transparent 26%),
-        linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.02)),
-        var(--color-surface);
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    }
-
-    .hero-card h3{
-      font-family:var(--font-display);
-      font-size:clamp(2rem, 1.3rem + 1.8vw, 3rem);
-      line-height:1;
-      letter-spacing:-.045em;
-      max-width:10ch;
-      margin-bottom:14px;
-    }
-
-    .hero-card p{
-      color:var(--color-text-muted);
-      max-width:54ch;
-    }
-
-    .hero-badges{
-      display:flex;
+      gap:14px;
       flex-wrap:wrap;
-      gap:10px;
-      margin-top:18px;
-    }
-
-    .status-chip,
-    .small-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:var(--text-xs);
-      font-weight:800;
-      letter-spacing:.02em;
-      border:1px solid var(--color-border);
-      background:rgba(255,255,255,.05);
-      color:var(--color-text);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-    }
-
-    .status-chip::before{
-      content:"";
-      width:8px;
-      height:8px;
-      border-radius:999px;
-      background:var(--color-primary);
-      box-shadow:0 0 14px var(--color-primary);
-    }
-
-    .mini-panel{
-      border-radius:28px;
-      padding:22px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      min-height:220px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)),
-        var(--color-surface);
-    }
-
-    .mini-panel h4{
-      font-size:var(--text-sm);
-      color:var(--color-text-muted);
-      margin-bottom:10px;
-      font-weight:700;
-    }
-
-    .mini-big{
-      font-family:var(--font-display);
-      font-size:clamp(2rem, 1.5rem + 1.6vw, 3rem);
-      line-height:1;
-      letter-spacing:-.04em;
-      font-weight:900;
-      margin-bottom:10px;
-    }
-
-    .mini-panel p{
-      color:var(--color-text-muted);
-      font-size:var(--text-sm);
-    }
-
-    .stats-grid{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:18px;
       margin-bottom:18px;
+      padding:18px 20px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:26px;
+      backdrop-filter:blur(14px);
+      box-shadow:var(--shadow);
     }
 
-    .stat-card{
-      border-radius:24px;
-      padding:22px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
-        var(--color-surface);
-      border:1px solid var(--color-border);
-      box-shadow:var(--shadow-lg);
-      backdrop-filter: blur(18px) saturate(145%);
-      -webkit-backdrop-filter: blur(18px) saturate(145%);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .stat-card::after{
-      content:"";
-      position:absolute;
-      inset:auto -15% -30% auto;
-      width:120px;
-      height:120px;
-      background:radial-gradient(circle, rgba(34,199,238,.16), transparent 60%);
-      filter:blur(10px);
-      opacity:.95;
-      pointer-events:none;
-    }
-
-    .stat-top{
+    .brand{
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:18px;
+      gap:14px;
     }
 
-    .stat-top span{
-      color:var(--color-text-muted);
-      font-size:var(--text-sm);
-      font-weight:700;
-    }
-
-    .stat-icon{
-      width:42px;
-      height:42px;
-      border-radius:14px;
+    .logo{
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      background:linear-gradient(135deg, var(--primary2), var(--primary));
       display:grid;
       place-items:center;
-      background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
-      color:var(--color-primary);
+      color:#04131b;
+      box-shadow:0 12px 30px rgba(38,198,238,.22);
+      flex:none;
+      font-weight:bold;
+      font-size:20px;
     }
 
-    .stat-icon svg{width:20px;height:20px}
-    .stat-value{
-      font-family:var(--font-display);
-      font-size:clamp(2rem,1.4rem + 1vw,2.8rem);
+    .brand h1{
+      font-size:28px;
       line-height:1;
-      letter-spacing:-.045em;
-      font-weight:900;
-      margin-bottom:10px;
-      font-variant-numeric: tabular-nums;
+      margin-bottom:4px;
     }
 
-    .stat-sub{
-      color:var(--color-text-faint);
-      font-size:var(--text-xs);
+    .brand p{
+      color:var(--muted);
+      font-size:14px;
     }
 
-    .section-card{
-      border-radius:28px;
-      padding:22px;
-      margin-bottom:18px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
-        var(--color-surface);
-      border:1px solid var(--color-border);
-      box-shadow:var(--shadow-lg);
-      backdrop-filter: blur(18px) saturate(150%);
-      -webkit-backdrop-filter: blur(18px) saturate(150%);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .section-head{
+    .top-actions{
       display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:12px;
+      gap:10px;
       flex-wrap:wrap;
-      margin-bottom:18px;
-    }
-
-    .section-head h3{
-      font-family:var(--font-display);
-      font-size:1.35rem;
-      line-height:1.05;
-      letter-spacing:-.03em;
-      margin-bottom:6px;
-    }
-
-    .section-head p{
-      color:var(--color-text-muted);
-      font-size:var(--text-sm);
     }
 
     .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
       min-height:46px;
       padding:0 16px;
       border-radius:16px;
-      font-size:var(--text-sm);
-      font-weight:800;
-      letter-spacing:.01em;
-      border:1px solid transparent;
-      position:relative;
-      isolation:isolate;
-      white-space:nowrap;
+      font-weight:700;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition:.18s ease;
+      text-decoration:none;
     }
 
     .btn:hover{transform:translateY(-1px)}
-    .btn:active{transform:translateY(1px) scale(.995)}
-
     .btn-primary{
-      color:#03131a;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.10)),
-        linear-gradient(135deg, #58ddfa, #21c7ee 55%, #0e94b7);
-      border-color:rgba(255,255,255,.16);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.34),
-        0 18px 34px rgba(34,199,238,.18);
+      color:#04131b;
+      background:linear-gradient(135deg, var(--primary2), var(--primary));
+      box-shadow:0 16px 32px rgba(38,198,238,.20);
     }
-    .btn-primary:hover{
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.38),
-        0 22px 42px rgba(34,199,238,.22);
-    }
-
     .btn-secondary{
-      color:var(--color-text);
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border-color:var(--color-border);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), var(--shadow-sm);
+      color:var(--text);
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-sm);
     }
-
     .btn-danger{
       color:#fff;
-      background:linear-gradient(180deg, rgba(255,110,120,.95), rgba(219,55,75,.96));
-      border-color:rgba(255,255,255,.12);
-      box-shadow:0 18px 34px rgba(180,35,24,.22), inset 0 1px 0 rgba(255,255,255,.18);
+      background:linear-gradient(180deg, #ff7280, #e13f51);
     }
 
-    .btn-ghost{
-      color:var(--color-text-muted);
-      background:transparent;
-      border-color:var(--color-border);
-    }
-
-    .dashboard-photo-grid{
+    .layout{
       display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:16px;
+      grid-template-columns:320px minmax(0,1fr);
+      gap:18px;
     }
 
-    .photo-card{
-      height:220px;
-      border-radius:24px;
-      overflow:hidden;
-      position:relative;
-      border:1px solid var(--color-border);
-      box-shadow:var(--shadow-lg);
-      background:#0f1720;
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:16px;
+      backdrop-filter:blur(14px);
+      box-shadow:var(--shadow);
+      min-width:0;
     }
 
-    .photo-card img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      transform:scale(1.02);
+    .panel h2{
+      font-size:22px;
+      margin-bottom:8px;
     }
 
-    .photo-card::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.04), transparent 30%),
-        linear-gradient(0deg, rgba(0,0,0,.35), transparent 35%);
-      pointer-events:none;
+    .muted{
+      color:var(--muted);
+      font-size:14px;
     }
 
     .project-list{
       display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
-      gap:18px;
-    }
-
-    .project-card{
-      border-radius:28px;
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      min-height:340px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
-        var(--color-surface);
-    }
-
-    .project-cover{
-      height:190px;
-      position:relative;
-      background:linear-gradient(135deg, #163447, #0b1724);
-      overflow:hidden;
-    }
-
-    .project-cover img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      transform:scale(1.03);
-    }
-
-    .project-cover::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.04), transparent 28%),
-        linear-gradient(0deg, rgba(3,8,13,.55), transparent 38%);
-      pointer-events:none;
-    }
-
-    .project-body{
-      padding:18px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      flex:1;
-    }
-
-    .project-body h4{
-      font-family:var(--font-display);
-      font-size:1.28rem;
-      line-height:1.06;
-      letter-spacing:-.03em;
-    }
-
-    .meta-line{
-      color:var(--color-text-muted);
-      font-size:var(--text-sm);
-    }
-
-    .project-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:auto;
-    }
-
-    .project-header{
-      border-radius:30px;
-      padding:22px;
-      margin-bottom:18px;
-      background:
-        radial-gradient(circle at top right, rgba(34,199,238,.12), transparent 20%),
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
-        var(--color-surface);
-      border:1px solid var(--color-border);
-      box-shadow:var(--shadow-lg);
-      backdrop-filter: blur(18px) saturate(150%);
-      -webkit-backdrop-filter: blur(18px) saturate(150%);
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:16px;
-      flex-wrap:wrap;
-    }
-
-    .project-header h3{
-      font-family:var(--font-display);
-      font-size:clamp(1.8rem, 1.2rem + 1vw, 2.4rem);
-      line-height:1;
-      letter-spacing:-.04em;
-      margin-bottom:10px;
-    }
-
-    .project-header p{
-      color:var(--color-text-muted);
-      font-size:var(--text-sm);
-    }
-
-    .plan-grid{
-      display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:16px;
-    }
-
-    .part-card{
-      border-radius:24px;
-      overflow:hidden;
-      cursor:pointer;
-      transform-style:preserve-3d;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
-        var(--color-surface);
-    }
-
-    .part-card:hover{
-      transform:translateY(-4px) rotateX(2deg);
-      box-shadow:var(--shadow-xl);
-    }
-
-    .part-thumb{
-      height:145px;
-      position:relative;
-      overflow:hidden;
-      background:linear-gradient(135deg, #163447, #0b1724);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#c7d7e6;
-      font-weight:700;
-    }
-
-    .part-thumb img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .part-thumb::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.04), transparent 30%),
-        linear-gradient(0deg, rgba(0,0,0,.34), transparent 40%);
-      pointer-events:none;
-    }
-
-    .part-label{
-      padding:14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      font-weight:800;
-      font-size:var(--text-sm);
-      position:relative;
-      z-index:1;
-    }
-
-    .badge-count{
-      min-width:34px;
-      height:34px;
-      padding:0 10px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:999px;
-      background:var(--color-primary-soft);
-      border:1px solid rgba(34,199,238,.16);
-      color:var(--color-primary);
-      font-size:var(--text-xs);
-      font-weight:900;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .markers-layer{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      z-index:2;
-    }
-
-    .marker-mini{
-      position:absolute;
-      width:18px;
-      height:18px;
-      transform:translate(-50%,-50%);
-      filter:drop-shadow(0 0 12px rgba(255,94,108,.30));
-    }
-
-    .marker-mini::before,
-    .marker-mini::after{
-      content:"";
-      position:absolute;
-      left:8px;
-      top:0;
-      width:3px;
-      height:18px;
-      background:#ff5e6c;
-      border-radius:2px;
-    }
-    .marker-mini::before{transform:rotate(45deg)}
-    .marker-mini::after{transform:rotate(-45deg)}
-
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(2,8,14,.64);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      z-index:100;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    .modal-card{
-      width:min(1260px, 100%);
-      max-height:92vh;
-      overflow:auto;
-      border-radius:32px;
-      padding:22px;
-      background:
-        radial-gradient(circle at top right, rgba(34,199,238,.14), transparent 18%),
-        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)),
-        var(--color-surface-2);
-      border:1px solid var(--color-border);
-      box-shadow:var(--shadow-xl);
-    }
-
-    .modal-card.small{max-width:700px}
-
-    .modal-head{
-      display:flex;
-      justify-content:space-between;
-      gap:14px;
-      align-items:flex-start;
-      margin-bottom:18px;
-    }
-
-    .modal-head h3{
-      font-family:var(--font-display);
-      font-size:1.8rem;
-      line-height:1.02;
-      letter-spacing:-.04em;
-      margin-bottom:8px;
-    }
-
-    .modal-head p{
-      color:var(--color-text-muted);
-      font-size:var(--text-sm);
-    }
-
-    .close-btn{
-      width:48px;
-      height:48px;
-      border-radius:18px;
-      flex:none;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border:1px solid var(--color-border);
-      color:var(--color-text);
-      font-size:1.5rem;
-      box-shadow:var(--shadow-sm);
-    }
-
-    .close-btn:hover{transform:translateY(-1px)}
-
-    .field{
-      display:grid;
-      gap:8px;
-      margin-bottom:14px;
-    }
-
-    .field label{
-      font-size:var(--text-sm);
-      font-weight:800;
-      color:var(--color-text);
-    }
-
-    .input-shell{
-      min-height:54px;
-      border-radius:18px;
-      padding:0 16px;
-      display:flex;
-      align-items:center;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)),
-        var(--color-surface);
-      border:1px solid var(--color-border);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-    }
-
-    .input-shell:focus-within{
-      border-color:rgba(34,199,238,.36);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.06),
-        0 0 0 4px rgba(34,199,238,.08);
-    }
-
-    .input-shell input,
-    .input-shell select{
-      width:100%;
-      height:100%;
-    }
-
-    .textarea-shell{
-      min-height:122px;
-      padding:14px 16px;
-      align-items:flex-start;
-    }
-
-    .textarea-shell textarea{
-      width:100%;
-      min-height:92px;
-      resize:vertical;
-    }
-
-    .map-shell{
-      display:grid;
-      grid-template-columns:1.15fr .95fr;
-      gap:18px;
-      align-items:start;
-    }
-
-    .board-wrap{
-      border-radius:28px;
-      padding:16px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
-        var(--color-surface);
-    }
-
-    .board-frame{
-      position:relative;
-      width:100%;
-      aspect-ratio:16 / 10;
-      border-radius:24px;
-      overflow:hidden;
-      background:linear-gradient(135deg, #102131, #07111a);
-      border:1px solid var(--color-border);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05), var(--shadow-lg);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#c9d6e3;
-      font-weight:800;
-      cursor:crosshair;
-      user-select:none;
-    }
-
-    .board-frame img{
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      background:#0f1b29;
-    }
-
-    .marker{
-      position:absolute;
-      width:30px;
-      height:30px;
-      transform:translate(-50%,-50%);
-      cursor:pointer;
-      filter:drop-shadow(0 0 14px rgba(255,94,108,.28));
-    }
-
-    .marker::before,
-    .marker::after{
-      content:"";
-      position:absolute;
-      left:13px;
-      top:0;
-      width:4px;
-      height:30px;
-      border-radius:4px;
-      background:#ff5e6c;
-    }
-    .marker::before{transform:rotate(45deg)}
-    .marker::after{transform:rotate(-45deg)}
-
-    .toolbar{
-      display:flex;
-      flex-wrap:wrap;
       gap:10px;
       margin-top:14px;
     }
 
-    .side-stack{
+    .project-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      background:rgba(255,255,255,.03);
+      box-shadow:var(--shadow-sm);
       display:grid;
-      gap:14px;
+      gap:10px;
     }
 
-    .stack-card{
-      border-radius:24px;
-      padding:16px;
+    .project-card.active{
+      outline:2px solid rgba(38,198,238,.35);
+    }
+
+    .project-title{
+      font-size:17px;
+      font-weight:700;
+    }
+
+    .project-meta{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .project-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .hero{
+      margin-bottom:18px;
+      padding:20px;
+      border-radius:28px;
+      border:1px solid var(--line);
       background:
-        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),
-        var(--color-surface);
-      border:1px solid var(--color-border);
-      box-shadow:var(--shadow-md);
+        radial-gradient(circle at top right, rgba(38,198,238,.14), transparent 20%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow:var(--shadow);
     }
 
-    .stack-card h4{
-      font-family:var(--font-display);
-      font-size:1.12rem;
-      letter-spacing:-.02em;
+    .hero h3{
+      font-size:34px;
+      line-height:1.05;
+      margin-bottom:8px;
+    }
+
+    .hero p{
+      color:var(--muted);
+      font-size:15px;
+      max-width:700px;
+    }
+
+    .parts{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .part-btn{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      text-align:left;
+      color:var(--text);
+      background:rgba(255,255,255,.03);
+      box-shadow:var(--shadow-sm);
+    }
+
+    .part-btn.active{
+      outline:2px solid rgba(38,198,238,.28);
+      background:linear-gradient(180deg, rgba(38,198,238,.16), rgba(255,255,255,.02));
+    }
+
+    .part-btn strong{
+      display:block;
+      font-size:16px;
+    }
+
+    .part-btn span{
+      display:block;
+      margin-top:6px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .workspace-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 380px;
+      gap:18px;
+    }
+
+    .map-card,.side-card,.points-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .map-box{
+      position:relative;
+      aspect-ratio:16/9;
+      border-radius:20px;
+      overflow:hidden;
+      background:linear-gradient(135deg, #122333, #0b1620);
+      border:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#bed0df;
+      font-weight:700;
+      cursor:crosshair;
+      margin-top:12px;
+    }
+
+    .map-box img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      background:#0e1822;
+    }
+
+    #markersLayer{
+      position:absolute;
+      inset:0;
+    }
+
+    .marker{
+      position:absolute;
+      width:28px;
+      height:28px;
+      transform:translate(-50%,-50%);
+      background:transparent;
+    }
+
+    .marker::before,.marker::after{
+      content:"";
+      position:absolute;
+      left:12px;
+      top:0;
+      width:4px;
+      height:28px;
+      background:var(--danger);
+      border-radius:4px;
+    }
+
+    .marker::before{transform:rotate(45deg)}
+    .marker::after{transform:rotate(-45deg)}
+
+    .map-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .field{
+      display:grid;
+      gap:8px;
       margin-bottom:12px;
     }
 
-    .point-list{
-      display:grid;
-      gap:10px;
-      max-height:320px;
-      overflow:auto;
-      padding-right:4px;
+    .field label{
+      font-weight:700;
+      font-size:14px;
     }
 
-    .point-item{
+    .control{
+      width:100%;
+      min-height:48px;
+      padding:0 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      outline:none;
+    }
+
+    textarea.control{
+      min-height:92px;
       padding:14px;
-      border-radius:18px;
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--color-border);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-      display:grid;
-      gap:8px;
-    }
-
-    .point-item.active{
-      border-color:rgba(34,199,238,.28);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.05),
-        0 0 0 4px rgba(34,199,238,.07);
-      background:linear-gradient(180deg, rgba(34,199,238,.08), rgba(255,255,255,.02));
-    }
-
-    .point-row{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .point-name{
-      font-weight:800;
-      color:var(--color-text);
-    }
-
-    .small{
-      font-size:var(--text-xs);
-      color:var(--color-text-muted);
-    }
-
-    .row-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
+      resize:vertical;
     }
 
     .phase-tabs{
       display:grid;
       grid-template-columns:repeat(3,1fr);
-      gap:10px;
-      margin-bottom:14px;
+      gap:8px;
+      margin-bottom:12px;
     }
 
-    .phase-tab{
-      min-height:46px;
-      border-radius:16px;
-      border:1px solid var(--color-border);
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      color:var(--color-text-muted);
-      font-weight:800;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    .phase-btn{
+      min-height:42px;
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      color:var(--muted);
+      font-weight:700;
     }
 
-    .phase-tab.active{
-      color:#041018;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.12)),
-        linear-gradient(135deg, #53dcf9, #22c7ee 58%, #0f95b8);
-      border-color:rgba(255,255,255,.16);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.3),
-        0 12px 24px rgba(34,199,238,.16);
+    .phase-btn.active{
+      color:#04131b;
+      background:linear-gradient(135deg, var(--primary2), var(--primary));
+      border-color:transparent;
     }
-
-    .phase-panel{display:none}
-    .phase-panel.active{display:block}
 
     .photo-grid{
       display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:10px;
-      margin-top:12px;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin-top:10px;
     }
 
     .photo-item{
-      height:110px;
-      border-radius:18px;
-      overflow:hidden;
       position:relative;
-      background:#0b1622;
-      border:1px solid var(--color-border);
-      box-shadow:var(--shadow-md);
+      height:92px;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      background:#0d1720;
       cursor:pointer;
     }
 
@@ -1259,1634 +391,885 @@
 
     .photo-remove{
       position:absolute;
-      top:8px;
-      right:8px;
-      min-width:28px;
-      height:28px;
-      padding:0 8px;
+      top:6px;
+      right:6px;
+      width:26px;
+      height:26px;
+      border-radius:50%;
+      background:rgba(0,0,0,.68);
+      color:#fff;
+      font-weight:bold;
+    }
+
+    .empty{
+      padding:16px;
+      text-align:center;
+      color:var(--muted);
+      border-radius:18px;
+      border:1px dashed rgba(38,198,238,.24);
+      background:rgba(38,198,238,.04);
+      margin-top:12px;
+    }
+
+    .points-list{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .point-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:12px;
+      background:rgba(255,255,255,.03);
+      box-shadow:var(--shadow-sm);
+      display:grid;
+      gap:8px;
+    }
+
+    .point-card.active{
+      outline:2px solid rgba(38,198,238,.30);
+    }
+
+    .point-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+
+    .status-tag{
+      font-size:12px;
+      font-weight:700;
+      padding:6px 10px;
       border-radius:999px;
-      display:inline-flex;
+      background:rgba(38,198,238,.14);
+      color:var(--primary2);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .hidden{display:none !important}
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.62);
+      display:flex;
       align-items:center;
       justify-content:center;
-      background:rgba(4,9,14,.72);
-      color:#fff;
-      font-size:12px;
-      font-weight:900;
-      border:1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      padding:18px;
+      z-index:50;
+      backdrop-filter:blur(8px);
     }
 
-    .photo-empty{
-      min-height:110px;
-      border-radius:18px;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding:14px;
-      color:var(--color-text-faint);
-      font-size:var(--text-sm);
-      border:1px dashed rgba(34,199,238,.24);
-      background:rgba(34,199,238,.04);
+    .modal-card{
+      width:min(560px,100%);
+      border-radius:26px;
+      border:1px solid var(--line);
+      background:var(--panel2);
+      padding:18px;
+      box-shadow:var(--shadow);
     }
 
-    .empty-state{
-      border-radius:28px;
-      padding:34px 22px;
-      text-align:center;
-      color:var(--color-text-muted);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),
-        var(--color-surface);
-      border:1px dashed rgba(34,199,238,.20);
+    .modal-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .modal-top h3{
+      font-size:24px;
+    }
+
+    .close-btn{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:var(--text);
     }
 
     .lightbox{
       position:fixed;
       inset:0;
-      z-index:120;
-      background:rgba(1,6,12,.90);
+      background:rgba(0,0,0,.88);
       display:flex;
       align-items:center;
       justify-content:center;
       padding:20px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      z-index:60;
     }
 
-    .lightbox-card{
+    .lightbox-inner{
       width:min(1100px,100%);
-      display:grid;
-      gap:12px;
+      position:relative;
     }
 
-    .lightbox-stage{
-      position:relative;
-      min-height:76vh;
+    .lightbox-image-wrap{
+      border-radius:20px;
+      overflow:hidden;
+      background:#091119;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
+      min-height:70vh;
       display:flex;
       align-items:center;
       justify-content:center;
-      border-radius:28px;
-      overflow:hidden;
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)), #09121c;
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow-xl);
     }
 
-    .lightbox-stage img{
+    .lightbox-image-wrap img{
       max-width:100%;
-      max-height:78vh;
+      max-height:82vh;
       object-fit:contain;
     }
 
     .lb-btn{
       position:absolute;
+      top:50%;
+      transform:translateY(-50%);
       width:52px;
       height:52px;
       border-radius:18px;
-      display:grid;
-      place-items:center;
       background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.10);
       color:#fff;
-      font-size:1.35rem;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-    .lb-close{top:14px;right:14px}
-    .lb-prev{left:14px;top:50%;transform:translateY(-50%)}
-    .lb-next{right:14px;top:50%;transform:translateY(-50%)}
-
-    .file-input{display:none}
-    .status-open{color:var(--color-warning)}
-    .status-done{color:var(--color-success)}
-
-    @media (max-width:1200px){
-      .plan-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-      .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .hero-grid{grid-template-columns:1fr}
-      .map-shell{grid-template-columns:1fr}
+      font-size:24px;
+      backdrop-filter:blur(8px);
     }
 
-    @media (max-width:920px){
-      .app-shell{grid-template-columns:1fr}
-      .sidebar{
-        position:relative;
-        height:auto;
-        border-right:none;
-        border-bottom:1px solid var(--sidebar-border);
-      }
-      .main{padding:18px}
-      .dashboard-photo-grid{grid-template-columns:1fr}
-      .plan-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .lb-prev{left:12px}
+    .lb-next{right:12px}
+    .lb-close{
+      position:absolute;
+      top:12px;
+      right:12px;
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      font-size:24px;
+      backdrop-filter:blur(8px);
     }
 
-    @media (max-width:620px){
-      .stats-grid{grid-template-columns:1fr}
-      .project-list{grid-template-columns:1fr}
-      .plan-grid{grid-template-columns:1fr}
-      .photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .phase-tabs{grid-template-columns:1fr 1fr 1fr}
-      .modal-card{padding:16px;border-radius:24px}
-      .project-header,.section-card,.card,.hero-card,.mini-panel{padding:18px}
-      .headline h2{font-size:1.9rem}
+    @media (max-width:1100px){
+      .workspace-grid{grid-template-columns:1fr}
     }
 
-    @media (prefers-reduced-motion: reduce){
-      *,*::before,*::after{
-        animation-duration:.01ms!important;
-        animation-iteration-count:1!important;
-        transition-duration:.01ms!important;
-        scroll-behavior:auto!important;
-      }
+    @media (max-width:900px){
+      .layout{grid-template-columns:1fr}
+      .parts{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media (max-width:640px){
+      .app{padding:12px}
+      .topbar,.panel,.map-card,.side-card,.points-card,.hero{padding:14px}
+      .parts,.photo-grid{grid-template-columns:1fr 1fr}
+      .brand h1{font-size:24px}
+      .hero h3{font-size:28px}
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
+  <div class="app">
+    <div class="topbar">
       <div class="brand">
-        <div class="brand-top">
-          <div class="brand-mark" aria-label="ED Controls logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M5 6.5h8.5a4 4 0 1 1 0 8H5z"></path>
-              <path d="M5 17.5h12.5"></path>
-              <path d="M5 12h9"></path>
-            </svg>
-          </div>
-          <div>
-            <h1>ED Controls<br>Bouwherstel</h1>
-          </div>
-        </div>
-        <p>2026 premium werktool voor bouwherstel, plattegronden, punten en fotofases.</p>
-      </div>
-
-      <button class="theme-toggle" data-theme-toggle aria-label="Wissel thema">
-        <span id="themeToggleIcon">☀</span>
-        <span id="themeToggleText">Licht thema</span>
-      </button>
-
-      <nav class="nav">
-        <button class="nav-btn active" id="navDashboardBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 13h8V3H3zM13 21h8v-6h-8zM13 11h8V3h-8zM3 21h8v-6H3z"/></svg>
-          Dashboard
-        </button>
-        <button class="nav-btn" id="navProjectsBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h7l2 2h9v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-          Projecten
-        </button>
-        <button class="nav-btn" id="navHelpBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4"/><path d="M12 17h.01"/></svg>
-          Werkwijze
-        </button>
-        <button class="nav-btn" id="newProjectSideBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          Nieuw project
-        </button>
-      </nav>
-
-      <div class="sidebar-footer">
-        <label class="btn btn-secondary" for="importJsonInput" style="width:100%;justify-content:center;">
-          Importeer JSON
-        </label>
-        <input type="file" id="importJsonInput" class="file-input" accept=".json">
-        <button class="btn btn-secondary" id="exportAllBtn" style="width:100%;">Exporteer JSON</button>
-
-        <div class="sidebar-note">
-          Snel werken op locatie: project openen, deel kiezen, rood kruis zetten, foto's toevoegen en opslaan.
+        <div class="logo">ED</div>
+        <div>
+          <h1>Bouwherstel Tool</h1>
+          <p>Simpel werken op de bouw, met nette 2026 premium look.</p>
         </div>
       </div>
-    </aside>
+      <div class="top-actions">
+        <button class="btn btn-secondary" id="themeBtn">Thema</button>
+        <button class="btn btn-primary" id="newProjectBtn">Nieuw project</button>
+      </div>
+    </div>
 
-    <main class="main">
-      <section id="dashboardView">
-        <div class="topbar">
-          <div class="headline">
-            <h2>Dashboard</h2>
-            <p>Professionele 2026 weergave met premium diepte, snelle workflow en direct overzicht van projecten, punten en beeldmateriaal.</p>
-          </div>
-          <div class="action-row">
-            <button class="btn btn-secondary" id="refreshDashPhotosBtn">Nieuwe testfoto's</button>
-            <button class="btn btn-primary" id="openNewProjectBtn">Nieuw project</button>
-          </div>
+    <div class="layout">
+      <aside class="panel">
+        <h2>Projecten</h2>
+        <div class="muted">Open een project of maak een nieuwe aan.</div>
+        <div class="project-list" id="projectList"></div>
+      </aside>
+
+      <main>
+        <div class="hero">
+          <h3 id="heroTitle">Open een project</h3>
+          <p id="heroText">Kies links een project. Daarna kies je één van de 4 delen, klik je op de tekening voor een rood kruis en voeg je foto's toe in Start, Midden of Eind.</p>
         </div>
 
-        <div class="hero-grid">
-          <div class="hero-card card">
-            <div>
-              <div class="small-badge">ED CONTROLS • 2026 INTERFACE</div>
-              <h3>Bouwherstel slim en strak organiseren.</h3>
-              <p>Gebruiksvriendelijk voor bouwvakkers, maar visueel op het niveau van een moderne premium webapp.</p>
-            </div>
-            <div class="hero-badges">
-              <span class="status-chip">Live projectoverzicht</span>
-              <span class="status-chip">3 fases per punt</span>
-              <span class="status-chip">Snelle fotologica</span>
-            </div>
-          </div>
-
-          <div class="mini-panel card">
-            <div>
-              <h4>Werkmodus</h4>
-              <div class="mini-big">Field ready</div>
-              <p>Simpel voor de werkvloer, sterk genoeg voor nette rapportage en projectopvolging.</p>
-            </div>
-            <div class="small">Zonder login/account in deze fase, later uitbreidbaar.</div>
-          </div>
+        <div id="emptyState" class="panel">
+          <div class="empty">Nog geen project geopend.</div>
         </div>
 
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-top">
-              <span>Totaal projecten</span>
-              <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h7l2 2h9v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <div id="projectWorkspace" class="hidden">
+          <div class="panel" style="margin-bottom:18px;">
+            <h2>Delen</h2>
+            <div class="parts" id="partsGrid"></div>
+          </div>
+
+          <div class="workspace-grid">
+            <section class="map-card">
+              <h2 id="mapTitle">Tekening</h2>
+              <div class="muted">Klik op de tekening om een nieuw punt te zetten.</div>
+
+              <div class="map-box" id="mapBox">
+                <img id="mapImage" alt="Plattegrond" />
+                <div id="markersLayer"></div>
               </div>
-            </div>
-            <div class="stat-value" id="statProjects">0</div>
-            <div class="stat-sub">Alle actieve projecten in deze tool</div>
-          </div>
 
-          <div class="stat-card">
-            <div class="stat-top">
-              <span>Totaal punten</span>
-              <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              <div class="map-actions">
+                <label class="btn btn-secondary" for="mapUploadInput">Upload tekening</label>
+                <input type="file" id="mapUploadInput" class="hidden" accept="image/*">
+                <button class="btn btn-secondary" id="exportBtn">Export JSON</button>
+                <label class="btn btn-secondary" for="importInput">Import JSON</label>
+                <input type="file" id="importInput" class="hidden" accept=".json,application/json">
               </div>
-            </div>
-            <div class="stat-value" id="statPoints">0</div>
-            <div class="stat-sub">Alle gemarkeerde herstelpunten</div>
-          </div>
+            </section>
 
-          <div class="stat-card">
-            <div class="stat-top">
-              <span>Open punten</span>
-              <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            <aside class="side-card">
+              <h2>Punt</h2>
+              <div id="noPointState" class="empty">Klik op een rood kruis of zet eerst een nieuw punt.</div>
+
+              <div id="pointEditor" class="hidden">
+                <div class="field">
+                  <label for="pointTitle">Titel</label>
+                  <input id="pointTitle" class="control" placeholder="Bijv. Scheur in wand">
+                </div>
+
+                <div class="field">
+                  <label for="pointDesc">Opmerking</label>
+                  <textarea id="pointDesc" class="control" placeholder="Korte opmerking"></textarea>
+                </div>
+
+                <div class="field">
+                  <label for="pointStatus">Status</label>
+                  <select id="pointStatus" class="control">
+                    <option value="Open">Open</option>
+                    <option value="Gereed">Gereed</option>
+                  </select>
+                </div>
+
+                <div class="phase-tabs">
+                  <button class="phase-btn active" data-phase="start">Start</button>
+                  <button class="phase-btn" data-phase="middle">Midden</button>
+                  <button class="phase-btn" data-phase="end">Eind</button>
+                </div>
+
+                <label class="btn btn-secondary" for="photoUploadInput" style="width:100%;">Foto's toevoegen</label>
+                <input type="file" id="photoUploadInput" class="hidden" accept="image/*" multiple>
+
+                <div class="photo-grid" id="photoGrid"></div>
+
+                <div class="row" style="margin-top:12px;">
+                  <button class="btn btn-primary" id="savePointBtn">Opslaan</button>
+                  <button class="btn btn-danger" id="deletePointBtn">Verwijderen</button>
+                </div>
               </div>
-            </div>
-            <div class="stat-value" id="statOpen">0</div>
-            <div class="stat-sub">Nog op te volgen herstelpunten</div>
+            </aside>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-top">
-              <span>Gereed</span>
-              <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>
-              </div>
-            </div>
-            <div class="stat-value" id="statDone">0</div>
-            <div class="stat-sub">Punten met status gereed</div>
-          </div>
+          <section class="points-card" style="margin-top:18px;">
+            <h2>Punten in dit deel</h2>
+            <div class="points-list" id="pointsList"></div>
+          </section>
         </div>
-
-        <div class="section-card">
-          <div class="section-head">
-            <div>
-              <h3>Dashboard foto's</h3>
-              <p>Wisselende testfoto’s om direct te zien dat de nieuwe 2026-interface actief is.</p>
-            </div>
-          </div>
-          <div class="dashboard-photo-grid">
-            <div class="photo-card"><img id="dashPhoto1" alt="Dashboard foto 1" loading="lazy"></div>
-            <div class="photo-card"><img id="dashPhoto2" alt="Dashboard foto 2" loading="lazy"></div>
-            <div class="photo-card"><img id="dashPhoto3" alt="Dashboard foto 3" loading="lazy"></div>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-head">
-            <div>
-              <h3>Projecten</h3>
-              <p>Klik direct op een project om verder te werken in plattegronden, punten en fotofases.</p>
-            </div>
-          </div>
-          <div class="project-list" id="dashboardProjectList"></div>
-        </div>
-      </section>
-
-      <section id="projectsView" class="hidden">
-        <div class="topbar">
-          <div class="headline">
-            <h2>Projecten</h2>
-            <p>Alle projecten overzichtelijk, modern en direct klaar om te openen of te exporteren.</p>
-          </div>
-          <div class="action-row">
-            <button class="btn btn-primary" id="openNewProjectBtn2">Nieuw project</button>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="project-list" id="projectsList"></div>
-        </div>
-      </section>
-
-      <section id="helpView" class="hidden">
-        <div class="topbar">
-          <div class="headline">
-            <h2>Werkwijze</h2>
-            <p>De tool blijft eenvoudig: project aanmaken, op tekening klikken, foto's toevoegen en opslaan.</p>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div style="display:grid;gap:12px;">
-            <div class="point-item"><strong>1.</strong> Maak een project aan of open een bestaand project.</div>
-            <div class="point-item"><strong>2.</strong> Upload een hoofdplattegrond of gebruik de voorbeeldafbeelding.</div>
-            <div class="point-item"><strong>3.</strong> Klik op één van de vijf delen.</div>
-            <div class="point-item"><strong>4.</strong> Klik op de juiste plek in de grote tekening voor een rood kruis.</div>
-            <div class="point-item"><strong>5.</strong> Vul puntnaam, status, collega en opmerkingen in.</div>
-            <div class="point-item"><strong>6.</strong> Werk per punt in Start, Midden en Eind.</div>
-            <div class="point-item"><strong>7.</strong> Voeg foto's toe, open ze groot en verwijder ze indien nodig.</div>
-            <div class="point-item"><strong>8.</strong> Exporteer het project als JSON of maak een PDF-rapport.</div>
-          </div>
-        </div>
-      </section>
-
-      <section id="projectDetailView" class="hidden">
-        <div class="project-header">
-          <div>
-            <div class="small-badge" style="margin-bottom:10px;">PROJECT DETAIL</div>
-            <h3 id="detailProjectName">Project</h3>
-            <p id="detailProjectMeta">Geen project geladen.</p>
-          </div>
-          <div class="action-row">
-            <button class="btn btn-secondary" id="backToProjectsBtn">Terug</button>
-            <label class="btn btn-secondary" for="planUploadInput">Hoofdplattegrond uploaden</label>
-            <input type="file" id="planUploadInput" class="file-input" accept="image/*">
-            <button class="btn btn-secondary" id="splitPlanBtn">Kopieer plan naar 5 delen</button>
-            <button class="btn btn-secondary" id="exportProjectBtn">Export project</button>
-            <button class="btn btn-primary" id="pdfProjectBtn">PDF rapport</button>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-head">
-            <div>
-              <h3>Project plattegrond</h3>
-              <p>Klik op een deel om het groot te openen en daar één of meerdere rode kruisen te zetten.</p>
-            </div>
-            <div class="badge-count" id="projectPointCountBadge">0</div>
-          </div>
-          <div class="plan-grid" id="planGrid"></div>
-        </div>
-      </section>
-    </main>
+      </main>
+    </div>
   </div>
 
   <div class="modal hidden" id="projectModal">
-    <div class="modal-card small">
-      <div class="modal-head">
-        <div>
-          <h3>Nieuw project</h3>
-          <p>Vul de basis in. De rest kun je later per project verder aanvullen.</p>
-        </div>
-        <button class="close-btn" id="closeProjectModalBtn" aria-label="Sluiten">&times;</button>
+    <div class="modal-card">
+      <div class="modal-top">
+        <h3>Nieuw project</h3>
+        <button class="close-btn" id="closeProjectModal">✕</button>
       </div>
 
       <div class="field">
         <label for="projectNameInput">Projectnaam</label>
-        <div class="input-shell">
-          <input id="projectNameInput" type="text" placeholder="Bijv. Werfkelder Utrecht 12">
-        </div>
+        <input id="projectNameInput" class="control" placeholder="Bijv. Project Utrecht">
       </div>
 
       <div class="field">
         <label for="projectLocationInput">Locatie</label>
-        <div class="input-shell">
-          <input id="projectLocationInput" type="text" placeholder="Bijv. Utrecht">
-        </div>
+        <input id="projectLocationInput" class="control" placeholder="Bijv. Utrecht">
       </div>
 
-      <div class="field">
-        <label for="projectClientInput">Opdrachtgever</label>
-        <div class="input-shell">
-          <input id="projectClientInput" type="text" placeholder="Bijv. Gemeente Utrecht">
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="projectNoteInput">Korte opmerking</label>
-        <div class="input-shell textarea-shell">
-          <textarea id="projectNoteInput" placeholder="Korte toelichting"></textarea>
-        </div>
-      </div>
-
-      <div class="row-actions">
-        <button class="btn btn-primary" id="saveProjectBtn">Project opslaan</button>
-        <button class="btn btn-danger" id="cancelProjectBtn">Annuleren</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal hidden" id="partModal">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div>
-          <h3 id="partModalTitle">Deel openen</h3>
-          <p>Klik eerst in de tekening om een punt te maken. Daarna vul je het dossier aan de rechterkant in.</p>
-        </div>
-        <button class="close-btn" id="closePartModalBtn" aria-label="Sluiten">&times;</button>
-      </div>
-
-      <div class="map-shell">
-        <div class="board-wrap">
-          <div class="board-frame" id="boardFrame">
-            <img id="boardImage" alt="Deel afbeelding">
-          </div>
-          <div class="toolbar">
-            <label class="btn btn-secondary" for="partImageUploadInput">Afbeelding voor dit deel</label>
-            <input type="file" id="partImageUploadInput" class="file-input" accept="image/*">
-            <button class="btn btn-secondary" id="duplicatePointBtn">Dupliceer punt</button>
-            <button class="btn btn-secondary" id="moveModeBtn">Verplaats modus: uit</button>
-          </div>
-        </div>
-
-        <div class="side-stack">
-          <div class="stack-card">
-            <h4>Punten in dit deel</h4>
-            <div id="pointList" class="point-list"></div>
-          </div>
-
-          <div class="stack-card hidden" id="pointEditorBox">
-            <h4>Punt dossier</h4>
-
-            <div class="field">
-              <label for="pointTitleInput">Naam punt</label>
-              <div class="input-shell">
-                <input id="pointTitleInput" type="text" placeholder="Bijv. Scheur linksboven">
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="pointStatusInput">Status</label>
-              <div class="input-shell">
-                <select id="pointStatusInput">
-                  <option value="Open">Open</option>
-                  <option value="Gereed">Gereed</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="pointColleagueInput">Naam collega</label>
-              <div class="input-shell">
-                <input id="pointColleagueInput" type="text" placeholder="Naam collega">
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="pointRemarkInput">Algemene opmerking punt</label>
-              <div class="input-shell textarea-shell">
-                <textarea id="pointRemarkInput" placeholder="Algemene opmerking over dit punt"></textarea>
-              </div>
-            </div>
-
-            <div class="phase-tabs">
-              <button class="phase-tab active" data-phase="start">Start</button>
-              <button class="phase-tab" data-phase="midden">Midden</button>
-              <button class="phase-tab" data-phase="eind">Eind</button>
-            </div>
-
-            <div class="phase-panel active" data-panel="start">
-              <div class="small" id="dateStartText"></div>
-              <div class="field">
-                <label>Opmerking start</label>
-                <div class="input-shell textarea-shell">
-                  <textarea id="noteStartInput" placeholder="Opmerking voor startfase"></textarea>
-                </div>
-              </div>
-              <label class="btn btn-secondary" for="photoStartInput">Foto's toevoegen</label>
-              <input type="file" id="photoStartInput" class="file-input" accept="image/*" multiple>
-              <div class="photo-grid" id="photoStartGrid"></div>
-            </div>
-
-            <div class="phase-panel" data-panel="midden">
-              <div class="small" id="dateMiddenText"></div>
-              <div class="field">
-                <label>Opmerking midden</label>
-                <div class="input-shell textarea-shell">
-                  <textarea id="noteMiddenInput" placeholder="Opmerking voor middenfase"></textarea>
-                </div>
-              </div>
-              <label class="btn btn-secondary" for="photoMiddenInput">Foto's toevoegen</label>
-              <input type="file" id="photoMiddenInput" class="file-input" accept="image/*" multiple>
-              <div class="photo-grid" id="photoMiddenGrid"></div>
-            </div>
-
-            <div class="phase-panel" data-panel="eind">
-              <div class="small" id="dateEindText"></div>
-              <div class="field">
-                <label>Opmerking eind</label>
-                <div class="input-shell textarea-shell">
-                  <textarea id="noteEindInput" placeholder="Opmerking voor eindfase"></textarea>
-                </div>
-              </div>
-              <label class="btn btn-secondary" for="photoEindInput">Foto's toevoegen</label>
-              <input type="file" id="photoEindInput" class="file-input" accept="image/*" multiple>
-              <div class="photo-grid" id="photoEindGrid"></div>
-            </div>
-
-            <div class="row-actions" style="margin-top:10px;">
-              <button class="btn btn-primary" id="savePointBtn">Punt opslaan</button>
-              <button class="btn btn-danger" id="deletePointBtn">Punt verwijderen</button>
-            </div>
-          </div>
-
-          <div class="stack-card" id="pointHintBox">
-            <h4>Werkwijze</h4>
-            <div class="small">
-              1. Klik op de tekening.<br>
-              2. Er komt een rood kruis.<br>
-              3. Vul puntgegevens en fases in.<br>
-              4. Voeg foto's toe.<br>
-              5. Sla het punt op.
-            </div>
-          </div>
-        </div>
+      <div class="row" style="justify-content:flex-end; margin-top:12px;">
+        <button class="btn btn-secondary" id="cancelProjectBtn">Annuleren</button>
+        <button class="btn btn-primary" id="createProjectBtn">Maken</button>
       </div>
     </div>
   </div>
 
   <div class="lightbox hidden" id="lightbox">
-    <div class="lightbox-card">
-      <div class="lightbox-stage">
-        <button class="lb-btn lb-close" id="lightboxCloseBtn" aria-label="Sluiten">&times;</button>
-        <button class="lb-btn lb-prev" id="lightboxPrevBtn" aria-label="Vorige">&#10094;</button>
+    <div class="lightbox-inner">
+      <button class="lb-close" id="lbClose">✕</button>
+      <button class="lb-btn lb-prev" id="lbPrev">‹</button>
+      <button class="lb-btn lb-next" id="lbNext">›</button>
+      <div class="lightbox-image-wrap">
         <img id="lightboxImage" alt="Vergrote foto">
-        <button class="lb-btn lb-next" id="lightboxNextBtn" aria-label="Volgende">&#10095;</button>
       </div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "ed_controls_bouwherstel_2026_premium_v1";
-    const DASH_KEY = "ed_controls_dash_seeds_2026_v1";
-    const PHASES = ["start", "midden", "eind"];
+    const PART_NAMES = ['Deel 1','Deel 2','Deel 3','Deel 4'];
+
+    const SAMPLE_MAP =
+      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80';
 
     const state = {
+      theme: 'dark',
       projects: [],
       currentProjectId: null,
-      currentPartIndex: null,
+      currentPartIndex: 0,
       currentPointId: null,
+      currentPhase: 'start',
       lightboxPhotos: [],
-      lightboxIndex: 0,
-      moveMode: false
+      lightboxIndex: 0
     };
 
-    let dashSeeds = [111, 222, 333];
-    let draggingPointId = null;
+    const el = {
+      projectList: document.getElementById('projectList'),
+      heroTitle: document.getElementById('heroTitle'),
+      heroText: document.getElementById('heroText'),
+      emptyState: document.getElementById('emptyState'),
+      projectWorkspace: document.getElementById('projectWorkspace'),
+      partsGrid: document.getElementById('partsGrid'),
+      mapTitle: document.getElementById('mapTitle'),
+      mapBox: document.getElementById('mapBox'),
+      mapImage: document.getElementById('mapImage'),
+      markersLayer: document.getElementById('markersLayer'),
+      pointsList: document.getElementById('pointsList'),
+      noPointState: document.getElementById('noPointState'),
+      pointEditor: document.getElementById('pointEditor'),
+      pointTitle: document.getElementById('pointTitle'),
+      pointDesc: document.getElementById('pointDesc'),
+      pointStatus: document.getElementById('pointStatus'),
+      photoGrid: document.getElementById('photoGrid'),
+      photoUploadInput: document.getElementById('photoUploadInput'),
+      mapUploadInput: document.getElementById('mapUploadInput'),
+      themeBtn: document.getElementById('themeBtn'),
+      newProjectBtn: document.getElementById('newProjectBtn'),
+      projectModal: document.getElementById('projectModal'),
+      closeProjectModal: document.getElementById('closeProjectModal'),
+      cancelProjectBtn: document.getElementById('cancelProjectBtn'),
+      createProjectBtn: document.getElementById('createProjectBtn'),
+      projectNameInput: document.getElementById('projectNameInput'),
+      projectLocationInput: document.getElementById('projectLocationInput'),
+      savePointBtn: document.getElementById('savePointBtn'),
+      deletePointBtn: document.getElementById('deletePointBtn'),
+      importInput: document.getElementById('importInput'),
+      exportBtn: document.getElementById('exportBtn'),
+      lightbox: document.getElementById('lightbox'),
+      lightboxImage: document.getElementById('lightboxImage'),
+      lbClose: document.getElementById('lbClose'),
+      lbPrev: document.getElementById('lbPrev'),
+      lbNext: document.getElementById('lbNext')
+    };
 
-    function uid(){
-      return "id-" + Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
+    function uid() {
+      return Math.random().toString(36).slice(2, 10);
     }
 
-    function todayString(){
-      const d = new Date();
-      const day = String(d.getDate()).padStart(2, "0");
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const year = d.getFullYear();
-      return `${day}-${month}-${year}`;
+    function saveStorage() {
+      localStorage.setItem('bouwherstel_simple_v2', JSON.stringify({
+        theme: state.theme,
+        projects: state.projects
+      }));
     }
 
-    function escapeHtml(text){
-      return String(text || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    function loadStorage() {
+      const raw = localStorage.getItem('bouwherstel_simple_v2');
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        state.theme = data.theme || 'dark';
+        state.projects = Array.isArray(data.projects) ? data.projects : [];
+      } catch (e) {}
     }
 
-    function createEmptyPart(index){
+    function applyTheme() {
+      document.documentElement.setAttribute('data-theme', state.theme);
+    }
+
+    function createProject(name, location) {
       return {
         id: uid(),
-        name: "Deel " + (index + 1),
-        image: "",
-        points: []
+        name,
+        location,
+        createdAt: new Date().toISOString(),
+        parts: PART_NAMES.map(partName => ({
+          id: uid(),
+          name: partName,
+          map: SAMPLE_MAP,
+          points: []
+        }))
       };
     }
 
-    function createProject(name, location, client, note){
-      return {
-        id: uid(),
-        name: name || "Nieuw project",
-        location: location || "",
-        client: client || "",
-        note: note || "",
-        createdAt: todayString(),
-        updatedAt: todayString(),
-        cover: "",
-        mainPlan: "",
-        parts: Array.from({length: 5}, (_, i) => createEmptyPart(i))
-      };
-    }
-
-    function createPoint(x, y){
-      return {
-        id: uid(),
-        title: "",
-        status: "Open",
-        colleague: "",
-        remark: "",
-        x,
-        y,
-        createdAt: todayString(),
-        updatedAt: todayString(),
-        phases: {
-          start: { date: todayString(), note: "", photos: [] },
-          midden: { date: todayString(), note: "", photos: [] },
-          eind: { date: todayString(), note: "", photos: [] }
-        }
-      };
-    }
-
-    function saveState(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.projects));
-    }
-
-    function loadState(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(raw){
-        try{
-          state.projects = JSON.parse(raw);
-        }catch(e){
-          state.projects = [];
-        }
-      }
-
-      const dashRaw = localStorage.getItem(DASH_KEY);
-      if(dashRaw){
-        try{
-          dashSeeds = JSON.parse(dashRaw);
-        }catch(e){}
-      }
-
-      if(state.projects.length === 0){
-        const demo = createProject("Demo project 2026", "Utrecht", "Gemeente Utrecht", "Voorbeeldproject voor de premium interface");
-        demo.mainPlan = "https://picsum.photos/seed/mainplan2026/1400/900";
-        demo.cover = demo.mainPlan;
-        demo.parts.forEach((part, i) => {
-          part.image = `https://picsum.photos/seed/deel-premium-${i + 1}/1200/800`;
-        });
-
-        const point = createPoint(35, 40);
-        point.title = "Scheur wand";
-        point.colleague = "Test collega";
-        point.remark = "Voorbeeldpunt";
-        point.phases.start.note = "Startschade vastgelegd";
-        demo.parts[0].points.push(point);
-
-        state.projects.push(demo);
-        saveState();
-      }
-    }
-
-    function persistDashSeeds(){
-      localStorage.setItem(DASH_KEY, JSON.stringify(dashSeeds));
-    }
-
-    function getCurrentProject(){
+    function getCurrentProject() {
       return state.projects.find(p => p.id === state.currentProjectId) || null;
     }
 
-    function getCurrentPart(){
+    function getCurrentPart() {
       const project = getCurrentProject();
-      if(!project || state.currentPartIndex === null) return null;
-      return project.parts[state.currentPartIndex];
+      if (!project) return null;
+      return project.parts[state.currentPartIndex] || null;
     }
 
-    function getCurrentPoint(){
+    function getCurrentPoint() {
       const part = getCurrentPart();
-      if(!part || !state.currentPointId) return null;
+      if (!part) return null;
       return part.points.find(p => p.id === state.currentPointId) || null;
     }
 
-    function countProjectPoints(project){
-      return project.parts.reduce((sum, part) => sum + part.points.length, 0);
-    }
+    function renderProjects() {
+      el.projectList.innerHTML = '';
+      if (!state.projects.length) {
+        el.projectList.innerHTML = '<div class="empty">Nog geen projecten.</div>';
+        return;
+      }
 
-    function countAllPoints(){
-      return state.projects.reduce((sum, project) => sum + countProjectPoints(project), 0);
-    }
-
-    function countStatus(status){
-      return state.projects.reduce((sum, project) => {
-        return sum + project.parts.reduce((sub, part) => {
-          return sub + part.points.filter(point => point.status === status).length;
-        }, 0);
-      }, 0);
-    }
-
-    const dashboardView = document.getElementById("dashboardView");
-    const projectsView = document.getElementById("projectsView");
-    const helpView = document.getElementById("helpView");
-    const projectDetailView = document.getElementById("projectDetailView");
-
-    const navDashboardBtn = document.getElementById("navDashboardBtn");
-    const navProjectsBtn = document.getElementById("navProjectsBtn");
-    const navHelpBtn = document.getElementById("navHelpBtn");
-    const newProjectSideBtn = document.getElementById("newProjectSideBtn");
-
-    const statProjects = document.getElementById("statProjects");
-    const statPoints = document.getElementById("statPoints");
-    const statOpen = document.getElementById("statOpen");
-    const statDone = document.getElementById("statDone");
-
-    const dashPhoto1 = document.getElementById("dashPhoto1");
-    const dashPhoto2 = document.getElementById("dashPhoto2");
-    const dashPhoto3 = document.getElementById("dashPhoto3");
-    const refreshDashPhotosBtn = document.getElementById("refreshDashPhotosBtn");
-
-    const dashboardProjectList = document.getElementById("dashboardProjectList");
-    const projectsList = document.getElementById("projectsList");
-
-    const projectModal = document.getElementById("projectModal");
-    const closeProjectModalBtn = document.getElementById("closeProjectModalBtn");
-    const saveProjectBtn = document.getElementById("saveProjectBtn");
-    const cancelProjectBtn = document.getElementById("cancelProjectBtn");
-    const projectNameInput = document.getElementById("projectNameInput");
-    const projectLocationInput = document.getElementById("projectLocationInput");
-    const projectClientInput = document.getElementById("projectClientInput");
-    const projectNoteInput = document.getElementById("projectNoteInput");
-
-    const openNewProjectBtn = document.getElementById("openNewProjectBtn");
-    const openNewProjectBtn2 = document.getElementById("openNewProjectBtn2");
-
-    const detailProjectName = document.getElementById("detailProjectName");
-    const detailProjectMeta = document.getElementById("detailProjectMeta");
-    const projectPointCountBadge = document.getElementById("projectPointCountBadge");
-    const planGrid = document.getElementById("planGrid");
-    const backToProjectsBtn = document.getElementById("backToProjectsBtn");
-    const planUploadInput = document.getElementById("planUploadInput");
-    const splitPlanBtn = document.getElementById("splitPlanBtn");
-    const exportProjectBtn = document.getElementById("exportProjectBtn");
-    const pdfProjectBtn = document.getElementById("pdfProjectBtn");
-
-    const partModal = document.getElementById("partModal");
-    const closePartModalBtn = document.getElementById("closePartModalBtn");
-    const partModalTitle = document.getElementById("partModalTitle");
-    const boardFrame = document.getElementById("boardFrame");
-    const boardImage = document.getElementById("boardImage");
-    const pointList = document.getElementById("pointList");
-    const pointEditorBox = document.getElementById("pointEditorBox");
-    const pointHintBox = document.getElementById("pointHintBox");
-    const duplicatePointBtn = document.getElementById("duplicatePointBtn");
-    const moveModeBtn = document.getElementById("moveModeBtn");
-    const partImageUploadInput = document.getElementById("partImageUploadInput");
-
-    const pointTitleInput = document.getElementById("pointTitleInput");
-    const pointStatusInput = document.getElementById("pointStatusInput");
-    const pointColleagueInput = document.getElementById("pointColleagueInput");
-    const pointRemarkInput = document.getElementById("pointRemarkInput");
-    const noteStartInput = document.getElementById("noteStartInput");
-    const noteMiddenInput = document.getElementById("noteMiddenInput");
-    const noteEindInput = document.getElementById("noteEindInput");
-    const dateStartText = document.getElementById("dateStartText");
-    const dateMiddenText = document.getElementById("dateMiddenText");
-    const dateEindText = document.getElementById("dateEindText");
-    const savePointBtn = document.getElementById("savePointBtn");
-    const deletePointBtn = document.getElementById("deletePointBtn");
-
-    const photoStartInput = document.getElementById("photoStartInput");
-    const photoMiddenInput = document.getElementById("photoMiddenInput");
-    const photoEindInput = document.getElementById("photoEindInput");
-    const photoStartGrid = document.getElementById("photoStartGrid");
-    const photoMiddenGrid = document.getElementById("photoMiddenGrid");
-    const photoEindGrid = document.getElementById("photoEindGrid");
-
-    const phaseTabs = Array.from(document.querySelectorAll(".phase-tab"));
-    const phasePanels = Array.from(document.querySelectorAll(".phase-panel"));
-
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImage = document.getElementById("lightboxImage");
-    const lightboxCloseBtn = document.getElementById("lightboxCloseBtn");
-    const lightboxPrevBtn = document.getElementById("lightboxPrevBtn");
-    const lightboxNextBtn = document.getElementById("lightboxNextBtn");
-
-    const importJsonInput = document.getElementById("importJsonInput");
-    const exportAllBtn = document.getElementById("exportAllBtn");
-
-    const themeToggleIcon = document.getElementById("themeToggleIcon");
-    const themeToggleText = document.getElementById("themeToggleText");
-    const themeToggleBtn = document.querySelector("[data-theme-toggle]");
-
-    function applyTheme(theme){
-      document.documentElement.setAttribute("data-theme", theme);
-      themeToggleIcon.textContent = theme === "dark" ? "☀" : "☾";
-      themeToggleText.textContent = theme === "dark" ? "Licht thema" : "Donker thema";
-    }
-
-    function initTheme(){
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      let currentTheme = prefersDark ? "dark" : "light";
-      applyTheme(currentTheme);
-
-      themeToggleBtn.addEventListener("click", () => {
-        currentTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-        applyTheme(currentTheme);
+      state.projects.forEach(project => {
+        const totalPoints = project.parts.reduce((sum, part) => sum + part.points.length, 0);
+        const card = document.createElement('div');
+        card.className = 'project-card' + (project.id === state.currentProjectId ? ' active' : '');
+        card.innerHTML = `
+          <div class="project-title">${escapeHtml(project.name)}</div>
+          <div class="project-meta">${escapeHtml(project.location || 'Geen locatie')} · ${totalPoints} punten</div>
+          <div class="project-actions">
+            <button class="btn btn-primary" data-open-project="${project.id}">Open</button>
+            <button class="btn btn-secondary" data-delete-project="${project.id}">Verwijder</button>
+          </div>
+        `;
+        el.projectList.appendChild(card);
       });
     }
 
-    function showView(name){
-      dashboardView.classList.add("hidden");
-      projectsView.classList.add("hidden");
-      helpView.classList.add("hidden");
-      projectDetailView.classList.add("hidden");
-
-      navDashboardBtn.classList.remove("active");
-      navProjectsBtn.classList.remove("active");
-      navHelpBtn.classList.remove("active");
-
-      if(name === "dashboard"){
-        dashboardView.classList.remove("hidden");
-        navDashboardBtn.classList.add("active");
-      }
-      if(name === "projects"){
-        projectsView.classList.remove("hidden");
-        navProjectsBtn.classList.add("active");
-      }
-      if(name === "help"){
-        helpView.classList.remove("hidden");
-        navHelpBtn.classList.add("active");
-      }
-      if(name === "detail"){
-        projectDetailView.classList.remove("hidden");
-        navProjectsBtn.classList.add("active");
-      }
-    }
-
-    function openProjectModal(){
-      projectModal.classList.remove("hidden");
-    }
-
-    function closeProjectModal(){
-      projectModal.classList.add("hidden");
-      projectNameInput.value = "";
-      projectLocationInput.value = "";
-      projectClientInput.value = "";
-      projectNoteInput.value = "";
-    }
-
-    function renderStats(){
-      statProjects.textContent = state.projects.length;
-      statPoints.textContent = countAllPoints();
-      statOpen.textContent = countStatus("Open");
-      statDone.textContent = countStatus("Gereed");
-    }
-
-    function renderDashboardPhotos(){
-      dashPhoto1.src = `https://picsum.photos/seed/${dashSeeds[0]}/1200/760`;
-      dashPhoto2.src = `https://picsum.photos/seed/${dashSeeds[1]}/1200/760`;
-      dashPhoto3.src = `https://picsum.photos/seed/${dashSeeds[2]}/1200/760`;
-    }
-
-    function shuffleDashboardPhotos(){
-      dashSeeds = [
-        Math.floor(Math.random() * 10000) + 1,
-        Math.floor(Math.random() * 10000) + 10001,
-        Math.floor(Math.random() * 10000) + 20001
-      ];
-      persistDashSeeds();
-      renderDashboardPhotos();
-    }
-
-    function projectCardHtml(project){
-      const points = countProjectPoints(project);
-      const cover = project.cover || project.mainPlan || project.parts[0]?.image || "";
-      return `
-        <div class="project-card">
-          <div class="project-cover">
-            ${cover ? `<img src="${cover}" alt="Project afbeelding" loading="lazy">` : ""}
-          </div>
-          <div class="project-body">
-            <h4>${escapeHtml(project.name)}</h4>
-            <div class="meta-line">${escapeHtml(project.location || "Geen locatie")} • ${points} punten</div>
-            <div class="meta-line">${escapeHtml(project.client || "Geen opdrachtgever")} • ${escapeHtml(project.createdAt || "")}</div>
-            <div class="project-actions">
-              <button class="btn btn-primary" onclick="openProject('${project.id}')">Open project</button>
-              <button class="btn btn-secondary" onclick="exportSingleProject('${project.id}')">Export</button>
-              <button class="btn btn-danger" onclick="deleteProject('${project.id}')">Verwijder</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderProjects(){
-      const html = state.projects.map(projectCardHtml).join("");
-      const empty = `<div class="empty-state">Nog geen projecten aangemaakt.</div>`;
-      dashboardProjectList.innerHTML = html || empty;
-      projectsList.innerHTML = html || empty;
-    }
-
-    function renderProjectDetail(){
+    function renderWorkspace() {
       const project = getCurrentProject();
-      if(!project) return;
+      if (!project) {
+        el.emptyState.classList.remove('hidden');
+        el.projectWorkspace.classList.add('hidden');
+        el.heroTitle.textContent = 'Open een project';
+        el.heroText.textContent = 'Kies links een project. Daarna kies je één van de 4 delen, klik je op de tekening voor een rood kruis en voeg je foto\\'s toe in Start, Midden of Eind.';
+        return;
+      }
 
-      detailProjectName.textContent = project.name;
-      detailProjectMeta.textContent = `${project.location || "Geen locatie"} • ${project.client || "Geen opdrachtgever"} • aangemaakt ${project.createdAt}`;
-      projectPointCountBadge.textContent = countProjectPoints(project);
+      el.emptyState.classList.add('hidden');
+      el.projectWorkspace.classList.remove('hidden');
+      el.heroTitle.textContent = project.name;
+      el.heroText.textContent = (project.location ? project.location + ' · ' : '') + 'Kies een deel en werk direct verder.';
+      renderParts();
+      renderMap();
+      renderPointsList();
+      renderPointEditor();
+    }
 
-      planGrid.innerHTML = project.parts.map((part, index) => {
-        const image = part.image || project.mainPlan || "";
-        return `
-          <div class="part-card" onclick="openPart(${index})">
-            <div class="part-thumb">
-              ${image ? `<img src="${image}" alt="${escapeHtml(part.name)}" loading="lazy">` : `${escapeHtml(part.name)}`}
-              <div class="markers-layer">
-                ${part.points.map(point => `
-                  <div class="marker-mini" style="left:${point.x}%;top:${point.y}%;"></div>
-                `).join("")}
-              </div>
-            </div>
-            <div class="part-label">
-              <span>${escapeHtml(part.name)}</span>
-              <span class="badge-count">${part.points.length}</span>
-            </div>
-          </div>
+    function renderParts() {
+      const project = getCurrentProject();
+      el.partsGrid.innerHTML = '';
+
+      project.parts.forEach((part, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'part-btn' + (index === state.currentPartIndex ? ' active' : '');
+        btn.innerHTML = `
+          <strong>${escapeHtml(part.name)}</strong>
+          <span>${part.points.length} punten</span>
         `;
-      }).join("");
-    }
-
-    function renderAll(){
-      renderStats();
-      renderDashboardPhotos();
-      renderProjects();
-      if(state.currentProjectId) renderProjectDetail();
-    }
-
-    function saveProject(){
-      const name = projectNameInput.value.trim();
-      if(!name){
-        alert("Vul een projectnaam in.");
-        return;
-      }
-
-      const project = createProject(
-        name,
-        projectLocationInput.value.trim(),
-        projectClientInput.value.trim(),
-        projectNoteInput.value.trim()
-      );
-
-      state.projects.unshift(project);
-      saveState();
-      closeProjectModal();
-      renderAll();
-      openProject(project.id);
-    }
-
-    function openProject(projectId){
-      state.currentProjectId = projectId;
-      renderProjectDetail();
-      showView("detail");
-    }
-
-    function deleteProject(projectId){
-      if(!confirm("Project verwijderen?")) return;
-      state.projects = state.projects.filter(p => p.id !== projectId);
-      if(state.currentProjectId === projectId){
-        state.currentProjectId = null;
-      }
-      saveState();
-      renderAll();
-      showView("projects");
-    }
-
-    function readFileAsDataURL(file, cb){
-      const reader = new FileReader();
-      reader.onload = e => cb(e.target.result);
-      reader.readAsDataURL(file);
-    }
-
-    function readFilesAsDataUrls(fileList, callback){
-      const files = Array.from(fileList || []);
-      if(files.length === 0){
-        callback([]);
-        return;
-      }
-      const results = [];
-      let done = 0;
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          results.push(e.target.result);
-          done++;
-          if(done === files.length) callback(results);
+        btn.onclick = () => {
+          state.currentPartIndex = index;
+          state.currentPointId = null;
+          renderWorkspace();
         };
+        el.partsGrid.appendChild(btn);
+      });
+    }
+
+    function renderMap() {
+      const part = getCurrentPart();
+      el.mapTitle.textContent = 'Tekening · ' + part.name;
+      el.mapImage.src = part.map;
+      el.markersLayer.innerHTML = '';
+
+      part.points.forEach(point => {
+        const marker = document.createElement('button');
+        marker.className = 'marker';
+        marker.style.left = point.x + '%';
+        marker.style.top = point.y + '%';
+        marker.title = point.title || 'Punt';
+        marker.onclick = (e) => {
+          e.stopPropagation();
+          state.currentPointId = point.id;
+          renderPointEditor();
+          renderPointsList();
+        };
+        el.markersLayer.appendChild(marker);
+      });
+    }
+
+    function renderPointsList() {
+      const part = getCurrentPart();
+      el.pointsList.innerHTML = '';
+
+      if (!part.points.length) {
+        el.pointsList.innerHTML = '<div class="empty">Nog geen punten in dit deel.</div>';
+        return;
+      }
+
+      part.points.forEach(point => {
+        const card = document.createElement('div');
+        card.className = 'point-card' + (point.id === state.currentPointId ? ' active' : '');
+        card.innerHTML = `
+          <div class="point-head">
+            <strong>${escapeHtml(point.title || 'Nieuw punt')}</strong>
+            <span class="status-tag">${escapeHtml(point.status || 'Open')}</span>
+          </div>
+          <div class="muted">${escapeHtml(point.desc || 'Geen opmerking')}</div>
+          <button class="btn btn-secondary" data-open-point="${point.id}">Open punt</button>
+        `;
+        el.pointsList.appendChild(card);
+      });
+    }
+
+    function renderPointEditor() {
+      const point = getCurrentPoint();
+
+      if (!point) {
+        el.noPointState.classList.remove('hidden');
+        el.pointEditor.classList.add('hidden');
+        return;
+      }
+
+      el.noPointState.classList.add('hidden');
+      el.pointEditor.classList.remove('hidden');
+
+      el.pointTitle.value = point.title || '';
+      el.pointDesc.value = point.desc || '';
+      el.pointStatus.value = point.status || 'Open';
+
+      document.querySelectorAll('.phase-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.phase === state.currentPhase);
+      });
+
+      renderPhotoGrid();
+    }
+
+    function renderPhotoGrid() {
+      const point = getCurrentPoint();
+      el.photoGrid.innerHTML = '';
+      const list = point.photos[state.currentPhase];
+
+      if (!list.length) {
+        el.photoGrid.innerHTML = '<div class="empty" style="grid-column:1/-1;">Nog geen foto\\'s in deze tab.</div>';
+        return;
+      }
+
+      list.forEach((src, index) => {
+        const item = document.createElement('div');
+        item.className = 'photo-item';
+        item.innerHTML = `
+          <img src="${src}" alt="Foto">
+          <button class="photo-remove" data-remove-photo="${index}">×</button>
+        `;
+        item.querySelector('img').onclick = () => openLightbox(list, index);
+        el.photoGrid.appendChild(item);
+      });
+    }
+
+    function addPoint(x, y) {
+      const part = getCurrentPart();
+      const point = {
+        id: uid(),
+        x,
+        y,
+        title: 'Nieuw punt',
+        desc: '',
+        status: 'Open',
+        photos: {
+          start: [],
+          middle: [],
+          end: []
+        }
+      };
+      part.points.push(point);
+      state.currentPointId = point.id;
+      saveStorage();
+      renderWorkspace();
+    }
+
+    function saveCurrentPoint() {
+      const point = getCurrentPoint();
+      if (!point) return;
+      point.title = el.pointTitle.value.trim() || 'Nieuw punt';
+      point.desc = el.pointDesc.value.trim();
+      point.status = el.pointStatus.value;
+      saveStorage();
+      renderProjects();
+      renderPointsList();
+      renderMap();
+      renderPointEditor();
+    }
+
+    function deleteCurrentPoint() {
+      const part = getCurrentPart();
+      if (!part || !state.currentPointId) return;
+      part.points = part.points.filter(p => p.id !== state.currentPointId);
+      state.currentPointId = null;
+      saveStorage();
+      renderProjects();
+      renderWorkspace();
+    }
+
+    function openProject(projectId) {
+      state.currentProjectId = projectId;
+      state.currentPartIndex = 0;
+      state.currentPointId = null;
+      state.currentPhase = 'start';
+      renderProjects();
+      renderWorkspace();
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(state.projects, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'bouwherstel-projecten.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function openLightbox(photos, index) {
+      state.lightboxPhotos = photos.slice();
+      state.lightboxIndex = index;
+      updateLightbox();
+      el.lightbox.classList.remove('hidden');
+    }
+
+    function updateLightbox() {
+      const src = state.lightboxPhotos[state.lightboxIndex];
+      el.lightboxImage.src = src || '';
+    }
+
+    function nextLightbox(step) {
+      if (!state.lightboxPhotos.length) return;
+      state.lightboxIndex += step;
+      if (state.lightboxIndex < 0) state.lightboxIndex = state.lightboxPhotos.length - 1;
+      if (state.lightboxIndex >= state.lightboxPhotos.length) state.lightboxIndex = 0;
+      updateLightbox();
+    }
+
+    function closeLightbox() {
+      el.lightbox.classList.add('hidden');
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
         reader.readAsDataURL(file);
       });
     }
 
-    function splitPlanToAllParts(){
-      const project = getCurrentProject();
-      if(!project){
-        alert("Open eerst een project.");
-        return;
-      }
-      if(!project.mainPlan){
-        alert("Upload eerst een hoofdplattegrond.");
-        return;
-      }
-      project.parts.forEach(part => {
-        part.image = project.mainPlan;
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return ({
+          '&':'&amp;',
+          '<':'&lt;',
+          '>':'&gt;',
+          '"':'&quot;',
+          "'":'&#039;'
+        })[m];
       });
-      project.cover = project.mainPlan;
-      project.updatedAt = todayString();
-      saveState();
-      renderProjectDetail();
+    }
+
+    el.themeBtn.onclick = () => {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      applyTheme();
+      saveStorage();
+    };
+
+    el.newProjectBtn.onclick = () => {
+      el.projectModal.classList.remove('hidden');
+    };
+
+    el.closeProjectModal.onclick = () => el.projectModal.classList.add('hidden');
+    el.cancelProjectBtn.onclick = () => el.projectModal.classList.add('hidden');
+
+    el.createProjectBtn.onclick = () => {
+      const name = el.projectNameInput.value.trim();
+      const location = el.projectLocationInput.value.trim();
+      if (!name) {
+        alert('Vul een projectnaam in.');
+        return;
+      }
+
+      const project = createProject(name, location);
+      state.projects.unshift(project);
+      state.currentProjectId = project.id;
+      state.currentPartIndex = 0;
+      state.currentPointId = null;
+      state.currentPhase = 'start';
+
+      el.projectNameInput.value = '';
+      el.projectLocationInput.value = '';
+      el.projectModal.classList.add('hidden');
+
+      saveStorage();
       renderProjects();
-    }
+      renderWorkspace();
+    };
 
-    function openPart(index){
-      state.currentPartIndex = index;
-      state.currentPointId = null;
-      state.moveMode = false;
-      draggingPointId = null;
-      moveModeBtn.textContent = "Verplaats modus: uit";
+    el.projectList.onclick = (e) => {
+      const openBtn = e.target.closest('[data-open-project]');
+      const deleteBtn = e.target.closest('[data-delete-project]');
 
+      if (openBtn) {
+        openProject(openBtn.dataset.openProject);
+      }
+
+      if (deleteBtn) {
+        const id = deleteBtn.dataset.deleteProject;
+        if (!confirm('Project verwijderen?')) return;
+        state.projects = state.projects.filter(p => p.id !== id);
+        if (state.currentProjectId === id) {
+          state.currentProjectId = null;
+          state.currentPointId = null;
+        }
+        saveStorage();
+        renderProjects();
+        renderWorkspace();
+      }
+    };
+
+    el.pointsList.onclick = (e) => {
+      const openBtn = e.target.closest('[data-open-point]');
+      if (!openBtn) return;
+      state.currentPointId = openBtn.dataset.openPoint;
+      renderPointEditor();
+      renderPointsList();
+    };
+
+    el.mapBox.onclick = (e) => {
       const project = getCurrentProject();
-      const part = getCurrentPart();
-      if(!project || !part) return;
+      if (!project) return;
 
-      partModalTitle.textContent = `${part.name} — klik op de juiste plek`;
-      boardImage.src = part.image || project.mainPlan || "https://picsum.photos/seed/defaultplan/1200/800";
-
-      redrawBoardMarkers();
-      renderPointList();
-      clearPointEditor();
-      partModal.classList.remove("hidden");
-    }
-
-    function closePartModal(){
-      partModal.classList.add("hidden");
-      state.currentPartIndex = null;
-      state.currentPointId = null;
-      state.moveMode = false;
-      draggingPointId = null;
-      clearPointEditor();
-    }
-
-    function drawMarker(point){
-      const marker = document.createElement("div");
-      marker.className = "marker";
-      marker.style.left = point.x + "%";
-      marker.style.top = point.y + "%";
-      marker.dataset.pointId = point.id;
-
-      marker.addEventListener("click", (e) => {
-        e.stopPropagation();
-        selectPoint(point.id);
-      });
-
-      marker.addEventListener("pointerdown", (e) => {
-        if(!state.moveMode) return;
-        e.preventDefault();
-        e.stopPropagation();
-        draggingPointId = point.id;
-      });
-
-      boardFrame.appendChild(marker);
-    }
-
-    function redrawBoardMarkers(){
-      boardFrame.querySelectorAll(".marker").forEach(el => el.remove());
-      const part = getCurrentPart();
-      if(!part) return;
-      part.points.forEach(drawMarker);
-    }
-
-    function boardClickCreatePoint(e){
-      if(state.moveMode) return;
-      if(e.target.closest(".marker")) return;
-      const part = getCurrentPart();
-      if(!part) return;
-
-      const rect = boardFrame.getBoundingClientRect();
+      const rect = el.mapBox.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
+      addPoint(+x.toFixed(2), +y.toFixed(2));
+    };
 
-      const point = createPoint(Number(x.toFixed(2)), Number(y.toFixed(2)));
-      part.points.push(point);
-      state.currentPointId = point.id;
-      saveState();
-      redrawBoardMarkers();
-      renderPointList();
-      fillPointEditor(point);
-    }
+    el.pointTitle.oninput = saveCurrentPoint;
+    el.pointDesc.oninput = saveCurrentPoint;
+    el.pointStatus.onchange = saveCurrentPoint;
+    el.savePointBtn.onclick = saveCurrentPoint;
+    el.deletePointBtn.onclick = deleteCurrentPoint;
 
-    function handleBoardMove(e){
-      if(!draggingPointId || !state.moveMode) return;
-      const part = getCurrentPart();
-      if(!part) return;
-
-      const point = part.points.find(p => p.id === draggingPointId);
-      if(!point) return;
-
-      const rect = boardFrame.getBoundingClientRect();
-      let x = ((e.clientX - rect.left) / rect.width) * 100;
-      let y = ((e.clientY - rect.top) / rect.height) * 100;
-
-      x = Math.max(1, Math.min(99, x));
-      y = Math.max(1, Math.min(99, y));
-
-      point.x = Number(x.toFixed(2));
-      point.y = Number(y.toFixed(2));
-      point.updatedAt = todayString();
-
-      redrawBoardMarkers();
-      renderPointList();
-    }
-
-    function stopDragging(){
-      if(draggingPointId){
-        saveState();
-        renderProjectDetail();
-      }
-      draggingPointId = null;
-    }
-
-    function renderPointList(){
-      const part = getCurrentPart();
-      if(!part) return;
-
-      if(part.points.length === 0){
-        pointList.innerHTML = `<div class="empty-state" style="padding:20px;">Nog geen punten in dit deel.</div>`;
-        return;
-      }
-
-      pointList.innerHTML = part.points.map(point => `
-        <div class="point-item ${state.currentPointId === point.id ? "active" : ""}">
-          <div class="point-row">
-            <div class="point-name">${escapeHtml(point.title || "Nieuw punt")}</div>
-            <div class="small ${point.status === "Gereed" ? "status-done" : "status-open"}">${escapeHtml(point.status)}</div>
-          </div>
-          <div class="small">Collega: ${escapeHtml(point.colleague || "-")}</div>
-          <div class="small">Positie: ${point.x}% • ${point.y}%</div>
-          <div class="row-actions">
-            <button class="btn btn-secondary" onclick="selectPoint('${point.id}')">Open</button>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function selectPoint(pointId){
-      const part = getCurrentPart();
-      if(!part) return;
-      const point = part.points.find(p => p.id === pointId);
-      if(!point) return;
-      state.currentPointId = pointId;
-      renderPointList();
-      fillPointEditor(point);
-    }
-
-    function clearPointEditor(){
-      pointEditorBox.classList.add("hidden");
-      pointHintBox.classList.remove("hidden");
-
-      pointTitleInput.value = "";
-      pointStatusInput.value = "Open";
-      pointColleagueInput.value = "";
-      pointRemarkInput.value = "";
-      noteStartInput.value = "";
-      noteMiddenInput.value = "";
-      noteEindInput.value = "";
-
-      dateStartText.textContent = "";
-      dateMiddenText.textContent = "";
-      dateEindText.textContent = "";
-
-      renderPhasePhotos("start");
-      renderPhasePhotos("midden");
-      renderPhasePhotos("eind");
-
-      activatePhase("start");
-    }
-
-    function fillPointEditor(point){
-      pointEditorBox.classList.remove("hidden");
-      pointHintBox.classList.add("hidden");
-
-      pointTitleInput.value = point.title || "";
-      pointStatusInput.value = point.status || "Open";
-      pointColleagueInput.value = point.colleague || "";
-      pointRemarkInput.value = point.remark || "";
-
-      noteStartInput.value = point.phases.start.note || "";
-      noteMiddenInput.value = point.phases.midden.note || "";
-      noteEindInput.value = point.phases.eind.note || "";
-
-      dateStartText.textContent = "Datum start: " + (point.phases.start.date || todayString());
-      dateMiddenText.textContent = "Datum midden: " + (point.phases.midden.date || todayString());
-      dateEindText.textContent = "Datum eind: " + (point.phases.eind.date || todayString());
-
-      renderPhasePhotos("start");
-      renderPhasePhotos("midden");
-      renderPhasePhotos("eind");
-      activatePhase("start");
-    }
-
-    function activatePhase(phase){
-      phaseTabs.forEach(tab => tab.classList.toggle("active", tab.dataset.phase === phase));
-      phasePanels.forEach(panel => panel.classList.toggle("active", panel.dataset.panel === phase));
-    }
-
-    function saveCurrentPoint(){
-      const point = getCurrentPoint();
-      if(!point){
-        alert("Selecteer eerst een punt.");
-        return;
-      }
-
-      point.title = pointTitleInput.value.trim();
-      point.status = pointStatusInput.value;
-      point.colleague = pointColleagueInput.value.trim();
-      point.remark = pointRemarkInput.value.trim();
-
-      point.phases.start.note = noteStartInput.value.trim();
-      point.phases.midden.note = noteMiddenInput.value.trim();
-      point.phases.eind.note = noteEindInput.value.trim();
-
-      point.updatedAt = todayString();
-
-      const part = getCurrentPart();
-      const project = getCurrentProject();
-      if(project) project.updatedAt = todayString();
-      if(part && !part.image && project?.mainPlan) part.image = project.mainPlan;
-
-      saveState();
-      renderPointList();
-      redrawBoardMarkers();
-      renderProjectDetail();
-      renderProjects();
-      renderStats();
-    }
-
-    function deleteCurrentPoint(){
-      const part = getCurrentPart();
-      if(!part || !state.currentPointId) return;
-      if(!confirm("Punt verwijderen?")) return;
-
-      part.points = part.points.filter(p => p.id !== state.currentPointId);
-      state.currentPointId = null;
-      saveState();
-      renderPointList();
-      redrawBoardMarkers();
-      clearPointEditor();
-      renderProjectDetail();
-      renderProjects();
-      renderStats();
-    }
-
-    function duplicateCurrentPoint(){
-      const part = getCurrentPart();
-      const point = getCurrentPoint();
-      if(!part || !point){
-        alert("Selecteer eerst een punt.");
-        return;
-      }
-
-      const copy = JSON.parse(JSON.stringify(point));
-      copy.id = uid();
-      copy.title = (copy.title || "Punt") + " kopie";
-      copy.x = Math.min(96, Number((copy.x + 4).toFixed(2)));
-      copy.y = Math.min(96, Number((copy.y + 4).toFixed(2)));
-      copy.createdAt = todayString();
-      copy.updatedAt = todayString();
-
-      part.points.push(copy);
-      state.currentPointId = copy.id;
-      saveState();
-      renderPointList();
-      redrawBoardMarkers();
-      fillPointEditor(copy);
-      renderProjectDetail();
-      renderStats();
-    }
-
-    function toggleMoveMode(){
-      state.moveMode = !state.moveMode;
-      moveModeBtn.textContent = "Verplaats modus: " + (state.moveMode ? "aan" : "uit");
-    }
-
-    function renderPhasePhotos(phase){
-      const point = getCurrentPoint();
-      const gridMap = {
-        start: photoStartGrid,
-        midden: photoMiddenGrid,
-        eind: photoEindGrid
+    document.querySelectorAll('.phase-btn').forEach(btn => {
+      btn.onclick = () => {
+        state.currentPhase = btn.dataset.phase;
+        renderPointEditor();
       };
-      const grid = gridMap[phase];
-      if(!grid) return;
-
-      if(!point){
-        grid.innerHTML = `<div class="photo-empty">Geen foto's</div>`;
-        return;
-      }
-
-      const photos = point.phases[phase].photos || [];
-      if(photos.length === 0){
-        grid.innerHTML = `<div class="photo-empty">Nog geen foto's in ${phase}</div>`;
-        return;
-      }
-
-      grid.innerHTML = photos.map((src, index) => `
-        <div class="photo-item" onclick="openLightboxForPhase('${phase}', ${index})">
-          <img src="${src}" alt="Foto ${phase} ${index + 1}" loading="lazy">
-          <button class="photo-remove" onclick="event.stopPropagation(); removePhasePhoto('${phase}', ${index})">×</button>
-        </div>
-      `).join("");
-    }
-
-    function addPhotosToPhase(phase, files){
-      const point = getCurrentPoint();
-      if(!point){
-        alert("Selecteer eerst een punt.");
-        return;
-      }
-
-      readFilesAsDataUrls(files, (images) => {
-        point.phases[phase].photos.push(...images);
-        point.phases[phase].date = todayString();
-        point.updatedAt = todayString();
-        saveState();
-        renderPhasePhotos(phase);
-      });
-    }
-
-    function removePhasePhoto(phase, index){
-      const point = getCurrentPoint();
-      if(!point) return;
-      point.phases[phase].photos.splice(index, 1);
-      point.updatedAt = todayString();
-      saveState();
-      renderPhasePhotos(phase);
-    }
-
-    function openLightboxForPhase(phase, index){
-      const point = getCurrentPoint();
-      if(!point) return;
-      state.lightboxPhotos = point.phases[phase].photos || [];
-      state.lightboxIndex = index;
-      updateLightbox();
-      lightbox.classList.remove("hidden");
-    }
-
-    function updateLightbox(){
-      if(!state.lightboxPhotos.length) return;
-      lightboxImage.src = state.lightboxPhotos[state.lightboxIndex];
-    }
-
-    function closeLightbox(){
-      lightbox.classList.add("hidden");
-      state.lightboxPhotos = [];
-      state.lightboxIndex = 0;
-    }
-
-    function lightboxPrev(){
-      if(!state.lightboxPhotos.length) return;
-      state.lightboxIndex = (state.lightboxIndex - 1 + state.lightboxPhotos.length) % state.lightboxPhotos.length;
-      updateLightbox();
-    }
-
-    function lightboxNext(){
-      if(!state.lightboxPhotos.length) return;
-      state.lightboxIndex = (state.lightboxIndex + 1) % state.lightboxPhotos.length;
-      updateLightbox();
-    }
-
-    function exportJsonData(filename, data){
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function exportAllProjects(){
-      exportJsonData("bouwherstel-projecten-2026.json", state.projects);
-    }
-
-    function exportSingleProject(projectId){
-      const project = state.projects.find(p => p.id === projectId);
-      if(!project) return;
-      const safeName = (project.name || "project").toLowerCase().replace(/[^a-z0-9]+/gi, "-");
-      exportJsonData(`${safeName}.json`, project);
-    }
-
-    function importProjectsFromJson(file){
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        try{
-          const data = JSON.parse(e.target.result);
-          if(Array.isArray(data)){
-            state.projects = data;
-          }else if(data && typeof data === "object"){
-            state.projects.unshift(data);
-          }else{
-            alert("Ongeldig JSON-bestand.");
-            return;
-          }
-          saveState();
-          renderAll();
-          showView("projects");
-        }catch(err){
-          alert("JSON kon niet worden ingelezen.");
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function exportCurrentProject(){
-      const project = getCurrentProject();
-      if(!project) return;
-      exportSingleProject(project.id);
-    }
-
-    async function createProjectPdf(){
-      const project = getCurrentProject();
-      if(!project){
-        alert("Open eerst een project.");
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF("p", "mm", "a4");
-      let y = 16;
-
-      function addLine(text, size = 11, color = [20, 24, 36]){
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(size);
-        doc.setTextColor(...color);
-        const lines = doc.splitTextToSize(text, 180);
-        doc.text(lines, 14, y);
-        y += lines.length * (size * 0.44) + 3;
-        if(y > 275){
-          doc.addPage();
-          y = 16;
-        }
-      }
-
-      doc.setFillColor(10, 25, 38);
-      doc.roundedRect(10, 10, 190, 20, 4, 4, "F");
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(18);
-      doc.setTextColor(255, 255, 255);
-      doc.text(project.name, 16, 23);
-
-      y = 38;
-      addLine(`Locatie: ${project.location || "-"}`);
-      addLine(`Opdrachtgever: ${project.client || "-"}`);
-      addLine(`Aangemaakt: ${project.createdAt || "-"}`);
-      addLine(`Opmerking: ${project.note || "-"}`);
-
-      project.parts.forEach((part, partIndex) => {
-        if(y > 245){
-          doc.addPage();
-          y = 16;
-        }
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
-        doc.setTextColor(14, 116, 144);
-        doc.text(`${part.name} (${part.points.length} punten)`, 14, y);
-        y += 8;
-
-        if(part.points.length === 0){
-          addLine("Geen punten in dit deel.", 10, [100, 110, 125]);
-          y += 3;
-        }
-
-        part.points.forEach((point, pointIndex) => {
-          if(y > 245){
-            doc.addPage();
-            y = 16;
-          }
-          doc.setDrawColor(220, 226, 232);
-          doc.roundedRect(14, y - 4, 182, 26, 3, 3);
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(11);
-          doc.setTextColor(16, 24, 40);
-          doc.text(`${partIndex + 1}.${pointIndex + 1} ${point.title || "Nieuw punt"}`, 18, y + 3);
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(9.5);
-          doc.setTextColor(90, 100, 118);
-          doc.text(`Status: ${point.status || "-"} • Collega: ${point.colleague || "-"} • Positie: ${point.x}% / ${point.y}%`, 18, y + 10);
-          doc.text(`Opmerking: ${point.remark || "-"}`, 18, y + 16);
-          y += 30;
-        });
-
-        y += 4;
-      });
-
-      const safeName = (project.name || "project").toLowerCase().replace(/[^a-z0-9]+/gi, "-");
-      doc.save(`${safeName}-rapport.pdf`);
-    }
-
-    boardFrame.addEventListener("click", boardClickCreatePoint);
-    boardFrame.addEventListener("pointermove", handleBoardMove);
-    window.addEventListener("pointerup", stopDragging);
-
-    phaseTabs.forEach(tab => {
-      tab.addEventListener("click", () => activatePhase(tab.dataset.phase));
     });
 
-    navDashboardBtn.addEventListener("click", () => showView("dashboard"));
-    navProjectsBtn.addEventListener("click", () => showView("projects"));
-    navHelpBtn.addEventListener("click", () => showView("help"));
+    el.photoUploadInput.onchange = async (e) => {
+      const point = getCurrentPoint();
+      if (!point) return;
 
-    newProjectSideBtn.addEventListener("click", openProjectModal);
-    openNewProjectBtn.addEventListener("click", openProjectModal);
-    openNewProjectBtn2.addEventListener("click", openProjectModal);
+      const files = Array.from(e.target.files || []);
+      for (const file of files) {
+        const dataUrl = await fileToDataUrl(file);
+        point.photos[state.currentPhase].push(dataUrl);
+      }
+      e.target.value = '';
+      saveStorage();
+      renderPhotoGrid();
+    };
 
-    closeProjectModalBtn.addEventListener("click", closeProjectModal);
-    cancelProjectBtn.addEventListener("click", closeProjectModal);
-    saveProjectBtn.addEventListener("click", saveProject);
+    el.photoGrid.onclick = (e) => {
+      const removeBtn = e.target.closest('[data-remove-photo]');
+      if (!removeBtn) return;
+      const point = getCurrentPoint();
+      const index = Number(removeBtn.dataset.removePhoto);
+      point.photos[state.currentPhase].splice(index, 1);
+      saveStorage();
+      renderPhotoGrid();
+    };
 
-    backToProjectsBtn.addEventListener("click", () => showView("projects"));
-    refreshDashPhotosBtn.addEventListener("click", shuffleDashboardPhotos);
-
-    planUploadInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      const project = getCurrentProject();
-      if(!file || !project) return;
-
-      readFileAsDataURL(file, (dataUrl) => {
-        project.mainPlan = dataUrl;
-        project.cover = dataUrl;
-        project.updatedAt = todayString();
-        saveState();
-        renderProjectDetail();
-        renderProjects();
-      });
-    });
-
-    splitPlanBtn.addEventListener("click", splitPlanToAllParts);
-    exportProjectBtn.addEventListener("click", exportCurrentProject);
-    pdfProjectBtn.addEventListener("click", createProjectPdf);
-
-    closePartModalBtn.addEventListener("click", closePartModal);
-    duplicatePointBtn.addEventListener("click", duplicateCurrentPoint);
-    moveModeBtn.addEventListener("click", toggleMoveMode);
-
-    partImageUploadInput.addEventListener("change", (e) => {
+    el.mapUploadInput.onchange = async (e) => {
       const file = e.target.files[0];
       const part = getCurrentPart();
-      const project = getCurrentProject();
-      if(!file || !part) return;
+      if (!file || !part) return;
+      part.map = await fileToDataUrl(file);
+      e.target.value = '';
+      saveStorage();
+      renderMap();
+    };
 
-      readFileAsDataURL(file, (dataUrl) => {
-        part.image = dataUrl;
-        if(project && !project.cover) project.cover = dataUrl;
-        saveState();
-        boardImage.src = dataUrl;
-        renderProjectDetail();
+    el.exportBtn.onclick = exportJson;
+
+    el.importInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!Array.isArray(data)) throw new Error('invalid');
+        state.projects = data;
+        state.currentProjectId = data[0]?.id || null;
+        state.currentPartIndex = 0;
+        state.currentPointId = null;
+        state.currentPhase = 'start';
+        saveStorage();
         renderProjects();
-      });
-    });
-
-    savePointBtn.addEventListener("click", saveCurrentPoint);
-    deletePointBtn.addEventListener("click", deleteCurrentPoint);
-
-    photoStartInput.addEventListener("change", (e) => addPhotosToPhase("start", e.target.files));
-    photoMiddenInput.addEventListener("change", (e) => addPhotosToPhase("midden", e.target.files));
-    photoEindInput.addEventListener("change", (e) => addPhotosToPhase("eind", e.target.files));
-
-    lightboxCloseBtn.addEventListener("click", closeLightbox);
-    lightboxPrevBtn.addEventListener("click", lightboxPrev);
-    lightboxNextBtn.addEventListener("click", lightboxNext);
-
-    exportAllBtn.addEventListener("click", exportAllProjects);
-    importJsonInput.addEventListener("change", (e) => importProjectsFromJson(e.target.files[0]));
-
-    window.addEventListener("keydown", (e) => {
-      if(!lightbox.classList.contains("hidden")){
-        if(e.key === "Escape") closeLightbox();
-        if(e.key === "ArrowLeft") lightboxPrev();
-        if(e.key === "ArrowRight") lightboxNext();
-      } else if(!partModal.classList.contains("hidden") && e.key === "Escape"){
-        closePartModal();
-      } else if(!projectModal.classList.contains("hidden") && e.key === "Escape"){
-        closeProjectModal();
+        renderWorkspace();
+      } catch (err) {
+        alert('Ongeldig JSON-bestand.');
       }
+
+      e.target.value = '';
+    };
+
+    el.lbClose.onclick = closeLightbox;
+    el.lbPrev.onclick = () => nextLightbox(-1);
+    el.lbNext.onclick = () => nextLightbox(1);
+    el.lightbox.onclick = (e) => {
+      if (e.target === el.lightbox) closeLightbox();
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (el.lightbox.classList.contains('hidden')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') nextLightbox(-1);
+      if (e.key === 'ArrowRight') nextLightbox(1);
     });
 
-    window.openProject = openProject;
-    window.deleteProject = deleteProject;
-    window.exportSingleProject = exportSingleProject;
-    window.openPart = openPart;
-    window.selectPoint = selectPoint;
-    window.openLightboxForPhase = openLightboxForPhase;
-    window.removePhasePhoto = removePhasePhoto;
+    loadStorage();
+    applyTheme();
 
-    loadState();
-    initTheme();
-    renderAll();
-    showView("dashboard");
+    if (!state.projects.length) {
+      const demo = createProject('Voorbeeldproject', 'Lelystad');
+      state.projects.push(demo);
+      state.currentProjectId = demo.id;
+      saveStorage();
+    } else {
+      state.currentProjectId = state.projects[0]?.id || null;
+    }
+
+    renderProjects();
+    renderWorkspace();
   </script>
 </body>
 </html>
