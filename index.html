@@ -11,23 +11,19 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;background:#f0f2f5;color:#1a1a2e}
 .hidden{display:none!important}
-
-/* TOPBAR */
 .topbar{height:56px;background:#0f1c2e;display:flex;align-items:center;gap:12px;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.3)}
-.top-logo{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer}
-.top-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:grid;place-items:center;font-weight:700;font-size:14px;color:#fff;box-shadow:0 3px 10px rgba(26,115,232,.4);flex-shrink:0}
+.top-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:grid;place-items:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
 .top-name{color:#fff;font-weight:700;font-size:15px}
+.top-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
 .top-spacer{flex:1}
 .tbtn{height:34px;padding:0 14px;border-radius:8px;font:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;white-space:nowrap}
 .tbtn:hover{opacity:.85}
-.tbtn-blue{background:#1a73e8;color:#fff;box-shadow:0 2px 8px rgba(26,115,232,.35)}
+.tbtn-blue{background:#1a73e8;color:#fff}
 .tbtn-out{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
 .tbtn-green{background:#34a853;color:#fff}
 .tbtn-red{background:#ea4335;color:#fff}
 .back-btn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.7);font-size:13px;font-weight:500;cursor:pointer;padding:6px 10px;border-radius:8px;transition:all .15s}
 .back-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
-
-/* ── DASHBOARD ── */
 .dash-wrap{max-width:1300px;margin:0 auto;padding:28px 24px}
 .dash-hero{background:linear-gradient(135deg,#0f1c2e,#1a3a5c);border-radius:20px;padding:28px 32px;margin-bottom:28px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
 .dash-hero h1{font-size:24px;font-weight:700;margin-bottom:6px}
@@ -40,7 +36,7 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
 .proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
 .proj-card{background:#fff;border-radius:16px;border:1px solid #e0e4ea;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;cursor:pointer;transition:box-shadow .2s,transform .2s}
 .proj-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.12);transform:translateY(-2px)}
-.proj-card-img{width:100%;height:160px;object-fit:cover;display:block;background:#e8eaed}
+.proj-card-img{width:100%;height:160px;object-fit:cover;display:block}
 .proj-card-img-empty{width:100%;height:160px;background:linear-gradient(135deg,#1a3a5c,#0f1c2e);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:rgba(255,255,255,.4)}
 .proj-card-body{padding:16px}
 .proj-card-name{font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:4px}
@@ -56,9 +52,6 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
 .proj-card-date{font-size:11px;color:#9aa0a6}
 .add-proj-card{background:#fff;border-radius:16px;border:2px dashed #d1d5db;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .2s;min-height:280px;color:#9aa0a6}
 .add-proj-card:hover{border-color:#1a73e8;color:#1a73e8;background:#f0f7ff}
-.add-proj-card svg{opacity:.5}
-
-/* ── PROJECT DETAIL ── */
 .detail-wrap{max-width:1300px;margin:0 auto;padding:24px}
 .sec-card{background:#fff;border-radius:16px;border:1px solid #e0e4ea;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;margin-bottom:20px}
 .sec-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #f0f2f5;gap:12px;flex-wrap:wrap}
@@ -100,8 +93,6 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
 .qc-gereed{background:#34a853}
 .qc-uitvoering{background:#1a73e8}
 .quad-empty-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#9aa0a6;font-weight:600;pointer-events:none;text-align:center;padding:8px}
-
-/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:200;backdrop-filter:blur(4px)}
 .modal{background:#fff;border-radius:16px;width:min(580px,100%);max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.22)}
 .modal.wide{width:min(920px,100%)}
@@ -129,12 +120,12 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
 .upload-lbl:hover{background:#e8eaed}
 .foto-empty{padding:14px;text-align:center;color:#9aa0a6;font-size:12px;border:1px dashed #d1d5db;border-radius:8px;margin-bottom:10px;grid-column:1/-1}
 .proj-foto-preview{width:100%;height:160px;object-fit:cover;border-radius:10px;margin-bottom:10px;border:1px solid #e0e4ea}
-.proj-foto-empty{width:100%;height:120px;background:#f4f6f9;border-radius:10px;border:1px dashed #d1d5db;display:flex;align-items:center;justify-content:center;color:#9aa0a6;font-size:13px;margin-bottom:10px}
+.proj-foto-empty{width:100%;height:100px;background:#f4f6f9;border-radius:10px;border:1px dashed #d1d5db;display:flex;align-items:center;justify-content:center;color:#9aa0a6;font-size:13px;margin-bottom:10px}
 .status-pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
 .sp-open{background:#fff3e0;color:#c45e00}
 .sp-uit{background:#e3f2fd;color:#0d47a1}
 .sp-ger{background:#e8f5e9;color:#1b5e20}
-.toast{position:fixed;bottom:20px;right:20px;background:#1a1a2e;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.toast{position:fixed;bottom:20px;right:20px;background:#1a1a2e;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.25);max-width:320px}
 .r-body{background:#fff;padding:16px;border-radius:10px;max-height:60vh;overflow:auto}
 .r-body h2{font-size:18px;margin-bottom:4px}
 .r-meta{font-size:12px;color:#6b7280;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #e0e4ea}
@@ -151,18 +142,15 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="top-logo" onclick="goHome()">
     <div class="top-icon">BH</div>
     <div class="top-name">Bouwherstel Pro</div>
   </div>
   <div class="top-spacer"></div>
-  <!-- Dashboard knoppen -->
   <div id="topDash">
     <button class="tbtn tbtn-blue" onclick="openNewProjModal()">+ Nieuw project</button>
   </div>
-  <!-- Detail knoppen -->
   <div id="topDetail" class="hidden" style="display:flex;gap:8px;align-items:center">
     <div class="back-btn" onclick="goHome()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -174,7 +162,6 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
   </div>
 </div>
 
-<!-- ══ DASHBOARD ══ -->
 <div id="viewDash">
   <div class="dash-wrap">
     <div class="dash-hero">
@@ -194,10 +181,8 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
   </div>
 </div>
 
-<!-- ══ PROJECT DETAIL ══ -->
 <div id="viewDetail" class="hidden">
   <div class="detail-wrap">
-    <!-- Hoofdplattegrond -->
     <div class="sec-card">
       <div class="sec-head">
         <div>
@@ -218,12 +203,11 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
         </div>
       </div>
     </div>
-    <!-- 4 Delen -->
     <div class="sec-card">
       <div class="sec-head">
         <div>
           <h2>Plattegrond in 4 delen</h2>
-          <p>Klik in een deel om een mankament te plaatsen · Klik op marker om dossier te openen</p>
+          <p>Klik in een deel om een mankament te plaatsen · Klik op een marker om het dossier te openen</p>
         </div>
       </div>
       <div class="sec-body">
@@ -233,17 +217,15 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
   </div>
 </div>
 
-<!-- MODAL: NIEUW PROJECT -->
+<!-- MODAL NIEUW PROJECT -->
 <div class="overlay hidden" id="modalProj">
   <div class="modal">
     <div class="mhead"><h3>Nieuw project</h3><button class="mclose" data-close="modalProj">✕</button></div>
     <div class="mbody">
       <div class="field">
         <label class="flabel">Projectfoto</label>
-        <div id="projFotoPreviewWrap">
-          <div class="proj-foto-empty" id="projFotoEmpty">Nog geen foto</div>
-          <img id="projFotoPreview" class="proj-foto-preview hidden" alt="Project foto">
-        </div>
+        <div class="proj-foto-empty hidden" id="projFotoEmpty">Nog geen foto</div>
+        <img id="projFotoPreview" class="proj-foto-preview hidden" alt="">
         <label class="upload-lbl" for="projFotoInput">↑ Foto uploaden</label>
         <input type="file" id="projFotoInput" accept="image/*" class="hidden">
       </div>
@@ -260,7 +242,7 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
   </div>
 </div>
 
-<!-- MODAL: MANKAMENT -->
+<!-- MODAL MANKAMENT -->
 <div class="overlay hidden" id="modalMank">
   <div class="modal">
     <div class="mhead">
@@ -298,7 +280,7 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
   </div>
 </div>
 
-<!-- MODAL: PDF -->
+<!-- MODAL PDF -->
 <div class="overlay hidden" id="modalPdf">
   <div class="modal wide">
     <div class="mhead"><h3>PDF Rapport</h3><button class="mclose" data-close="modalPdf">✕</button></div>
@@ -314,40 +296,48 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;ba
 <div class="toast hidden" id="toast"></div>
 
 <script>
-// ══════════════════════════════════
-//  DATABASE
-// ══════════════════════════════════
-const SK = 'bhpro_v5';
-function loadDB(){ try{ const r=localStorage.getItem(SK); return r?JSON.parse(r):{projects:[]}; }catch(e){ return{projects:[]}; } }
-function saveDB(){ try{ localStorage.setItem(SK,JSON.stringify(DB)); }catch(e){ alert('Opslaan mislukt. Mogelijk te veel foto-data in geheugen.'); } }
-let DB = loadDB();
-let curProjId = null;
-let curMankId = null;
-let curFase = 'start';
-let newProjFoto = '';
+// ══ DATABASE ══
+const SK='bhpro_v5';
+function loadDB(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):{projects:[]};}catch(e){return{projects:[]};}}
+function saveDB(){try{localStorage.setItem(SK,JSON.stringify(DB));}catch(e){toast('⚠️ Opslag vol — verwijder foto\'s om ruimte vrij te maken.');}}
+let DB=loadDB();
+let curProjId=null,curMankId=null,curFase='start',newProjFoto='';
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('hidden'),2800);}
+function getProj(){return DB.projects.find(p=>p.id===curProjId)||null;}
+function getMank(){const p=getProj();return p?p.manks.find(m=>m.id===curMankId)||null:null;}
+function sc(s){return s==='Gereed'?'gereed':s==='In uitvoering'?'uitvoering':'open';}
+const QL=['Links boven','Rechts boven','Links onder','Rechts onder'];
 
-function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
-function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('hidden'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.add('hidden'),2200); }
-function getProj(){ return DB.projects.find(p=>p.id===curProjId)||null; }
-function getMank(){ const p=getProj(); return p?p.manks.find(m=>m.id===curMankId)||null:null; }
-function sc(s){ return s==='Gereed'?'gereed':s==='In uitvoering'?'uitvoering':'open'; }
-const QL = ['Links boven','Rechts boven','Links onder','Rechts onder'];
+// ══ COMPRESSIE ══
+function compressImage(dataURL,maxW,maxH,quality){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      const ratio=Math.min(maxW/w,maxH/h,1);
+      w=Math.round(w*ratio);h=Math.round(h*ratio);
+      const c=document.createElement('canvas');
+      c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(c.toDataURL('image/jpeg',quality));
+    };
+    img.src=dataURL;
+  });
+}
 
-// ══════════════════════════════════
-//  VIEWS
-// ══════════════════════════════════
+// ══ VIEWS ══
 function goHome(){
-  curProjId = null;
+  curProjId=null;
   document.getElementById('viewDash').classList.remove('hidden');
   document.getElementById('viewDetail').classList.add('hidden');
   document.getElementById('topDash').classList.remove('hidden');
   document.getElementById('topDetail').classList.add('hidden');
   renderDashboard();
 }
-
 function openProject(id){
-  curProjId = id;
+  curProjId=id;
   document.getElementById('viewDash').classList.add('hidden');
   document.getElementById('viewDetail').classList.remove('hidden');
   document.getElementById('topDash').classList.add('hidden');
@@ -355,89 +345,69 @@ function openProject(id){
   renderDetail();
 }
 
-// ══════════════════════════════════
-//  DASHBOARD
-// ══════════════════════════════════
+// ══ DASHBOARD ══
 function renderDashboard(){
-  const allManks = DB.projects.reduce((a,p)=>a+p.manks.length,0);
-  const allOpen = DB.projects.reduce((a,p)=>a+p.manks.filter(m=>m.status==='Gecreëerd').length,0);
-  const allGer = DB.projects.reduce((a,p)=>a+p.manks.filter(m=>m.status==='Gereed').length,0);
-  document.getElementById('hsTotal').textContent = DB.projects.length;
-  document.getElementById('hsMank').textContent = allManks;
-  document.getElementById('hsOpen').textContent = allOpen;
-  document.getElementById('hsGer').textContent = allGer;
-
-  const grid = document.getElementById('projGrid');
-  const cards = DB.projects.map(p=>{
+  const allM=DB.projects.reduce((a,p)=>a+p.manks.length,0);
+  const allO=DB.projects.reduce((a,p)=>a+p.manks.filter(m=>m.status==='Gecreëerd').length,0);
+  const allG=DB.projects.reduce((a,p)=>a+p.manks.filter(m=>m.status==='Gereed').length,0);
+  document.getElementById('hsTotal').textContent=DB.projects.length;
+  document.getElementById('hsMank').textContent=allM;
+  document.getElementById('hsOpen').textContent=allO;
+  document.getElementById('hsGer').textContent=allG;
+  const grid=document.getElementById('projGrid');
+  const cards=DB.projects.map(p=>{
     const tot=p.manks.length;
     const open=p.manks.filter(m=>m.status==='Gecreëerd').length;
     const ger=p.manks.filter(m=>m.status==='Gereed').length;
     const date=new Date(p.createdAt).toLocaleDateString('nl-NL',{day:'2-digit',month:'short',year:'numeric'});
-    const imgHtml = p.foto
-      ? `<img class="proj-card-img" src="${p.foto}" alt="${esc(p.name)}">`
-      : `<div class="proj-card-img-empty">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
-          <span style="font-size:11px">Geen foto</span>
-        </div>`;
-    return `<div class="proj-card" onclick="openProject('${p.id}')">
+    const imgHtml=p.foto
+      ?`<img class="proj-card-img" src="${p.foto}" alt="${esc(p.name)}">`
+      :`<div class="proj-card-img-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg><span style="font-size:11px">Geen foto</span></div>`;
+    return`<div class="proj-card" onclick="openProject('${p.id}')">
       ${imgHtml}
       <div class="proj-card-body">
         <div class="proj-card-name">${esc(p.name)}</div>
-        <div class="proj-card-loc">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          ${esc(p.location||'Geen locatie')}
-        </div>
+        <div class="proj-card-loc"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(p.location||'Geen locatie')}</div>
         <div class="proj-card-stats">
           <div class="pstat pstat-tot"><div class="pstat-num">${tot}</div><div class="pstat-label">Totaal</div></div>
           <div class="pstat pstat-open"><div class="pstat-num">${open}</div><div class="pstat-label">Open</div></div>
           <div class="pstat pstat-gereed"><div class="pstat-num">${ger}</div><div class="pstat-label">Gereed</div></div>
         </div>
       </div>
-      <div class="proj-card-footer">
-        <span class="proj-card-date">Aangemaakt: ${date}</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
+      <div class="proj-card-footer"><span class="proj-card-date">Aangemaakt: ${date}</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
     </div>`;
   }).join('');
-
-  const addCard = `<div class="add-proj-card" onclick="openNewProjModal()">
+  const addCard=`<div class="add-proj-card" onclick="openNewProjModal()">
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
     <span style="font-size:13px;font-weight:600">Nieuw project</span>
   </div>`;
-
-  grid.innerHTML = cards + addCard;
+  grid.innerHTML=cards+addCard;
 }
 
-// ══════════════════════════════════
-//  PROJECT DETAIL
-// ══════════════════════════════════
+// ══ DETAIL ══
 function renderDetail(){
-  const p = getProj(); if(!p) return;
-  document.getElementById('detailTitle').textContent = p.name;
-  document.getElementById('detailSub').textContent = (p.location||'') + (p.location?' · ':'') + p.manks.length + ' mankamenten';
+  const p=getProj();if(!p)return;
+  document.getElementById('detailTitle').textContent=p.name;
   const ger=p.manks.filter(m=>m.status==='Gereed').length;
   const open=p.manks.filter(m=>m.status==='Gecreëerd').length;
-  document.getElementById('detailStats').innerHTML =
-    `<span style="margin-right:10px">Totaal: <strong>${p.manks.length}</strong></span>` +
-    `<span style="margin-right:10px;color:#c45e00">Open: <strong>${open}</strong></span>` +
+  document.getElementById('detailSub').textContent=(p.location?p.location+' · ':'')+p.manks.length+' mankamenten';
+  document.getElementById('detailStats').innerHTML=
+    `<span style="margin-right:10px">Totaal: <strong>${p.manks.length}</strong></span>`+
+    `<span style="margin-right:10px;color:#c45e00">Open: <strong>${open}</strong></span>`+
     `<span style="color:#1b5e20">Gereed: <strong>${ger}</strong></span>`;
-  renderMainMap();
-  renderBalloons();
-  renderQuads();
+  renderMainMap();renderBalloons();renderQuads();
 }
-
 function renderMainMap(){
   const p=getProj();
   const img=document.getElementById('mainMapImg');
   const empty=document.getElementById('mainMapEmpty');
-  if(p&&p.map){ img.src=p.map; img.classList.remove('hidden'); empty.classList.add('hidden'); }
-  else{ img.classList.add('hidden'); empty.classList.remove('hidden'); }
+  if(p&&p.map){img.src=p.map;img.classList.remove('hidden');empty.classList.add('hidden');}
+  else{img.classList.add('hidden');empty.classList.remove('hidden');}
 }
-
 function renderBalloons(){
   const layer=document.getElementById('balloonsLayer');
   layer.innerHTML='';
-  const p=getProj(); if(!p||!p.map) return;
+  const p=getProj();if(!p||!p.map)return;
   p.manks.forEach((m,i)=>{
     const btn=document.createElement('button');
     btn.className='balloon';
@@ -450,7 +420,6 @@ function renderBalloons(){
     layer.appendChild(btn);
   });
 }
-
 function renderQuads(){
   const grid=document.getElementById('quadGrid');
   grid.innerHTML='';
@@ -489,63 +458,60 @@ function renderQuads(){
         const my=q<2?qy/2:50+qy/2;
         const mank={id:uid(),quad:q,qx,qy,mx,my,desc:'',status:'Gecreëerd',photos:{start:[],middle:[],end:[]},createdAt:new Date().toISOString()};
         p.manks.push(mank);
-        saveDB(); renderDetail();
-        curMankId=mank.id; curFase='start';
+        saveDB();renderDetail();
+        curMankId=mank.id;curFase='start';
         openMankModal(mank.id);
       });
     }
   }
 }
 
-// ══════════════════════════════════
-//  MANKAMENT MODAL
-// ══════════════════════════════════
+// ══ MANKAMENT MODAL ══
 function openMankModal(id){
   curMankId=id;
-  const p=getProj(); const m=getMank(); if(!m) return;
+  const p=getProj();const m=getMank();if(!m)return;
   const idx=p.manks.findIndex(x=>x.id===id);
   document.getElementById('mMankTitle').textContent=`Mankament ${idx+1} — Deel ${m.quad+1} (${QL[m.quad]})`;
   document.getElementById('inpMankDesc').value=m.desc||'';
   document.getElementById('inpMankStatus').value=m.status||'Gecreëerd';
   curFase='start';
   document.querySelectorAll('.ftab').forEach(t=>t.classList.toggle('on',t.dataset.fase==='start'));
-  updateFaseCounts(); renderFotoGrid();
+  updateFaseCounts();renderFotoGrid();
   document.getElementById('modalMank').classList.remove('hidden');
 }
-
 function updateFaseCounts(){
-  const m=getMank(); if(!m) return;
+  const m=getMank();if(!m)return;
   document.getElementById('fc0').textContent=m.photos.start.length?`(${m.photos.start.length})`:'';
   document.getElementById('fc1').textContent=m.photos.middle.length?`(${m.photos.middle.length})`:'';
   document.getElementById('fc2').textContent=m.photos.end.length?`(${m.photos.end.length})`:'';
 }
-
 function renderFotoGrid(){
-  const m=getMank(); const grid=document.getElementById('fotoGrid');
+  const m=getMank();const grid=document.getElementById('fotoGrid');
   if(!m){grid.innerHTML='';return;}
   const ph=m.photos[curFase];
-  if(!ph.length){grid.innerHTML=`<div class="foto-empty">Geen foto's voor ${curFase}.</div>`;return;}
+  if(!ph.length){grid.innerHTML=`<div class="foto-empty">Geen foto's voor deze fase.</div>`;return;}
   grid.innerHTML=ph.map((src,i)=>`<div class="foto-item"><img src="${src}" alt="foto"><button class="foto-del" onclick="delFoto(${i})">✕</button></div>`).join('');
 }
-
-function delFoto(i){ const m=getMank(); if(!m)return; m.photos[curFase].splice(i,1); saveDB(); updateFaseCounts(); renderFotoGrid(); }
+function delFoto(i){const m=getMank();if(!m)return;m.photos[curFase].splice(i,1);saveDB();updateFaseCounts();renderFotoGrid();}
 
 document.getElementById('faseTabs').addEventListener('click',e=>{
-  const tab=e.target.closest('.ftab'); if(!tab||!tab.dataset.fase)return;
+  const tab=e.target.closest('.ftab');if(!tab||!tab.dataset.fase)return;
   curFase=tab.dataset.fase;
   document.querySelectorAll('.ftab').forEach(t=>t.classList.toggle('on',t.dataset.fase===curFase));
   renderFotoGrid();
 });
 
 document.getElementById('fotoUpload').addEventListener('change',function(){
-  const m=getMank(); if(!m)return;
-  const files=Array.from(this.files); if(!files.length)return;
+  const m=getMank();if(!m)return;
+  const files=Array.from(this.files);if(!files.length)return;
   let done=0;
   files.forEach(file=>{
     const reader=new FileReader();
-    reader.onload=e=>{
-      m.photos[curFase].push(e.target.result); done++;
-      if(done===files.length){ saveDB(); updateFaseCounts(); renderFotoGrid(); toast(files.length+" foto's toegevoegd!"); }
+    reader.onload=async e=>{
+      const compressed=await compressImage(e.target.result,1200,1200,0.72);
+      m.photos[curFase].push(compressed);
+      done++;
+      if(done===files.length){saveDB();updateFaseCounts();renderFotoGrid();toast(files.length+" foto's toegevoegd!");}
     };
     reader.readAsDataURL(file);
   });
@@ -553,26 +519,23 @@ document.getElementById('fotoUpload').addEventListener('change',function(){
 });
 
 document.getElementById('btnSaveMank').onclick=()=>{
-  const m=getMank(); if(!m)return;
+  const m=getMank();if(!m)return;
   m.desc=document.getElementById('inpMankDesc').value.trim();
   m.status=document.getElementById('inpMankStatus').value;
-  saveDB(); renderDetail();
+  saveDB();renderDetail();
   document.getElementById('modalMank').classList.add('hidden');
   toast('Mankament opgeslagen!');
 };
-
 document.getElementById('btnDelMank').onclick=()=>{
   if(!confirm('Mankament verwijderen?'))return;
-  const p=getProj(); if(!p)return;
+  const p=getProj();if(!p)return;
   p.manks=p.manks.filter(m=>m.id!==curMankId);
-  saveDB(); renderDetail();
+  saveDB();renderDetail();
   document.getElementById('modalMank').classList.add('hidden');
   toast('Mankament verwijderd.');
 };
 
-// ══════════════════════════════════
-//  NIEUW PROJECT
-// ══════════════════════════════════
+// ══ NIEUW PROJECT ══
 function openNewProjModal(){
   newProjFoto='';
   document.getElementById('projFotoPreview').classList.add('hidden');
@@ -582,12 +545,11 @@ function openNewProjModal(){
   document.getElementById('inpProjLoc').value='';
   document.getElementById('modalProj').classList.remove('hidden');
 }
-
 document.getElementById('projFotoInput').addEventListener('change',function(){
   if(!this.files[0])return;
   const reader=new FileReader();
-  reader.onload=e=>{
-    newProjFoto=e.target.result;
+  reader.onload=async e=>{
+    newProjFoto=await compressImage(e.target.result,900,600,0.78);
     document.getElementById('projFotoPreview').src=newProjFoto;
     document.getElementById('projFotoPreview').classList.remove('hidden');
     document.getElementById('projFotoEmpty').classList.add('hidden');
@@ -595,7 +557,6 @@ document.getElementById('projFotoInput').addEventListener('change',function(){
   reader.readAsDataURL(this.files[0]);
   this.value='';
 });
-
 document.getElementById('btnCreateProj').onclick=()=>{
   const name=document.getElementById('inpProjName').value.trim();
   const loc=document.getElementById('inpProjLoc').value.trim();
@@ -607,26 +568,24 @@ document.getElementById('btnCreateProj').onclick=()=>{
   renderDashboard();
   toast('Project aangemaakt en opgeslagen!');
 };
+document.getElementById('inpProjName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnCreateProj').click();});
 
-document.getElementById('inpProjName').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('btnCreateProj').click(); });
-
-// ══════════════════════════════════
-//  PLATTEGROND UPLOAD
-// ══════════════════════════════════
+// ══ PLATTEGROND UPLOAD ══
 document.getElementById('mapUpload').addEventListener('change',function(){
-  const p=getProj(); if(!p){alert('Open eerst een project.');this.value='';return;}
+  const p=getProj();if(!p){alert('Open eerst een project.');this.value='';return;}
   if(!this.files[0])return;
   const reader=new FileReader();
-  reader.onload=e=>{ p.map=e.target.result; saveDB(); renderDetail(); toast('Plattegrond geladen!'); };
+  reader.onload=async e=>{
+    p.map=await compressImage(e.target.result,2400,2400,0.78);
+    saveDB();renderDetail();toast('Plattegrond geladen en opgeslagen!');
+  };
   reader.readAsDataURL(this.files[0]);
   this.value='';
 });
 
-// ══════════════════════════════════
-//  PDF
-// ══════════════════════════════════
+// ══ PDF ══
 function buildReport(){
-  const p=getProj(); if(!p)return'';
+  const p=getProj();if(!p)return'';
   const date=new Date().toLocaleDateString('nl-NL',{day:'2-digit',month:'long',year:'numeric'});
   let h=`<h2>${esc(p.name)}</h2><div class="r-meta">Locatie: ${esc(p.location||'–')} &nbsp;·&nbsp; Datum: ${date} &nbsp;·&nbsp; ${p.manks.length} mankamenten</div>`;
   if(!p.manks.length)return h+'<p style="color:#9aa0a6;font-size:13px">Nog geen mankamenten.</p>';
@@ -635,7 +594,7 @@ function buildReport(){
     h+=`<div class="r-ticket"><div class="r-th"><strong>Mankament ${i+1} — Deel ${m.quad+1} (${QL[m.quad]})</strong><span class="status-pill ${sp}">${esc(m.status)}</span></div><div class="r-desc">${esc(m.desc||'Geen omschrijving')}</div>`;
     ['start','middle','end'].forEach(f=>{
       const ph=m.photos[f];
-      h+=`<div class="r-fase-title">${f.charAt(0).toUpperCase()+f.slice(1)} (${ph.length} foto's)</div>`;
+      h+=`<div class="r-fase-title">${f==='start'?'Start':f==='middle'?'Midden':'Einde'} (${ph.length} foto's)</div>`;
       if(ph.length)h+=`<div class="r-fotos">${ph.slice(0,6).map(s=>`<img src="${s}">`).join('')}</div>`;
       else h+=`<div style="font-size:11px;color:#9aa0a6;margin-bottom:4px">Geen foto's</div>`;
     });
@@ -643,15 +602,13 @@ function buildReport(){
   });
   return h;
 }
-
 document.getElementById('btnPdf').onclick=()=>{
-  const p=getProj(); if(!p)return;
+  const p=getProj();if(!p)return;
   document.getElementById('rBody').innerHTML=buildReport();
   document.getElementById('modalPdf').classList.remove('hidden');
 };
-
 document.getElementById('btnDlPdf').onclick=async()=>{
-  const p=getProj(); if(!p)return;
+  const p=getProj();if(!p)return;
   toast('PDF wordt gegenereerd...');
   try{
     const wrap=document.getElementById('rBody');
@@ -661,25 +618,21 @@ document.getElementById('btnDlPdf').onclick=async()=>{
     const pdf=new jsPDF('p','mm','a4');
     const pw=210,ph=297,m=10,iw=pw-m*2,ih=canvas.height*iw/canvas.width;
     let rem=ih,yp=m;
-    pdf.addImage(img,'PNG',m,yp,iw,ih); rem-=(ph-m*2);
+    pdf.addImage(img,'PNG',m,yp,iw,ih);rem-=(ph-m*2);
     while(rem>0){yp=rem-ih+m;pdf.addPage();pdf.addImage(img,'PNG',m,yp,iw,ih);rem-=(ph-m*2);}
-    pdf.save(p.name+'-rapport.pdf'); toast('PDF gedownload!');
-  }catch(e){alert('Fout: '+e.message);}
+    pdf.save(p.name+'-rapport.pdf');toast('PDF gedownload!');
+  }catch(e){alert('PDF fout: '+e.message);}
 };
 
-// ══════════════════════════════════
-//  MODAL HELPERS
-// ══════════════════════════════════
+// ══ MODAL HELPERS ══
 document.addEventListener('click',e=>{
   const cb=e.target.closest('[data-close]');
   if(cb){document.getElementById(cb.dataset.close).classList.add('hidden');return;}
   if(e.target.classList.contains('overlay'))e.target.classList.add('hidden');
 });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); });
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden'));});
 
-// ══════════════════════════════════
-//  INIT
-// ══════════════════════════════════
+// ══ INIT ══
 renderDashboard();
 </script>
 </body>
