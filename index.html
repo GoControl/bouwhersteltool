@@ -3,589 +3,612 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bouwherstel Tool V3</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Bouwherstel Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Manrope',system-ui,sans-serif}
-body{
-  background:radial-gradient(ellipse at 10% 0%,rgba(56,210,255,.18),transparent 30%),
-             radial-gradient(ellipse at 90% 0%,rgba(250,200,60,.12),transparent 25%),
-             linear-gradient(160deg,#071320 0%,#0a1a2c 60%,#06101a 100%);
-  color:#ecf3ff;min-height:100vh;padding:16px;
-}
+html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;font-size:14px}
+body{display:flex;background:#f4f6f9;color:#202124}
 .hidden{display:none!important}
-.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:14px;font-size:15px;font-weight:800;border:none;cursor:pointer;transition:transform .14s,box-shadow .14s;white-space:nowrap;}
-.btn:active{transform:scale(.97)}
-.btn-blue{background:linear-gradient(135deg,#7ef4ff,#28c8f0);color:#04131e;box-shadow:0 8px 24px rgba(40,200,240,.25)}
-.btn-gold{background:linear-gradient(135deg,#ffe680,#f5be30);color:#2b1900;box-shadow:0 8px 24px rgba(245,190,48,.25)}
-.btn-red{background:linear-gradient(135deg,#ff8494,#e83d52);color:#fff;box-shadow:0 8px 24px rgba(232,61,82,.22)}
-.btn-ghost{background:rgba(255,255,255,.06);color:#c8daea;border:1px solid rgba(255,255,255,.10);box-shadow:0 4px 14px rgba(0,0,0,.18)}
-.card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.022));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.09);border-radius:24px;box-shadow:0 24px 64px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.06);padding:20px;}
-.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.09);border-radius:24px;padding:16px 20px;margin-bottom:16px;box-shadow:0 16px 48px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.07);}
-.logo{width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,#7ef4ff,#28c8f0);display:grid;place-items:center;font-weight:800;font-size:20px;color:#04131e;box-shadow:0 10px 28px rgba(40,200,240,.28)}
-.brand-info h1{font-size:24px;line-height:1.1}
-.brand-info p{font-size:13px;color:#7a9ab4;margin-top:3px}
-.brand{display:flex;align-items:center;gap:14px}
-.topbar-actions{display:flex;gap:10px;flex-wrap:wrap}
-.layout{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
-.proj-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px;margin-top:12px;transition:outline .12s;}
-.proj-item.active{outline:2px solid rgba(126,244,255,.3)}
-.proj-item-name{font-size:16px;font-weight:800}
-.proj-item-sub{font-size:13px;color:#7a9ab4;margin:4px 0 10px}
-.proj-btns{display:flex;gap:8px}
-.main-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-.main-header h2{font-size:22px}
-.main-header p{font-size:14px;color:#7a9ab4;margin-top:4px}
-.map-section{margin-bottom:16px}
-.map-section h3{font-size:18px;margin-bottom:8px}
-.map-wrap{position:relative;border-radius:20px;overflow:hidden;background:#0c1824;border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 2px 8px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.28);aspect-ratio:16/9;}
-.map-wrap img{width:100%;height:100%;object-fit:contain;display:block}
-.map-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#4a6a82;font-weight:700;font-size:16px;}
-.map-placeholder svg{opacity:.4}
-.balloons-layer{position:absolute;inset:0;pointer-events:none}
-.balloon-btn{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;}
-.balloon-head{min-width:32px;height:32px;padding:0 9px;background:linear-gradient(180deg,#ffe680,#f5be30);border:2px solid rgba(255,255,255,.35);border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#2b1900;box-shadow:0 8px 20px rgba(245,190,48,.35);transition:transform .14s;}
-.balloon-btn:hover .balloon-head{transform:scale(1.12)}
-.balloon-btn.done .balloon-head{background:linear-gradient(180deg,#a3ffd4,#2ec97a);color:#073018;box-shadow:0 8px 20px rgba(46,201,122,.3)}
-.balloon-tail{width:2px;height:14px;background:linear-gradient(180deg,#f5be30,transparent);margin:0 auto}
-.balloon-btn.done .balloon-tail{background:linear-gradient(180deg,#2ec97a,transparent)}
-.quad-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
-.quad-card h4{font-size:16px;font-weight:800;margin-bottom:10px}
-.quad-map-wrap{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:4/3;background:#0c1824;border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 2px 6px rgba(0,0,0,.28),0 8px 22px rgba(0,0,0,.22);cursor:crosshair;}
-.quad-map-img{position:absolute;width:200%;height:200%;object-fit:cover;pointer-events:none;user-select:none;}
-.q1 .quad-map-img{left:0;top:0}
-.q2 .quad-map-img{left:-100%;top:0}
-.q3 .quad-map-img{left:0;top:-100%}
-.q4 .quad-map-img{left:-100%;top:-100%}
-.quad-click-layer{position:absolute;inset:0;z-index:2;background:transparent}
-.quad-markers-layer{position:absolute;inset:0;z-index:3;pointer-events:none}
-.qmarker{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;background:none;border:none;cursor:pointer;width:28px;height:28px;}
-.qmarker::before,.qmarker::after{content:"";position:absolute;left:12px;top:0;width:4px;height:28px;border-radius:3px;background:linear-gradient(180deg,#ff9aaa,#e83d52);box-shadow:0 0 10px rgba(232,61,82,.4);}
-.qmarker::before{transform:rotate(45deg)}
-.qmarker::after{transform:rotate(-45deg)}
-.qmarker.done::before,.qmarker.done::after{background:linear-gradient(180deg,#a3ffd4,#2ec97a);box-shadow:0 0 10px rgba(46,201,122,.4);}
-.quad-no-map{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:#4a6a82;font-weight:700}
-.points-table{display:grid;gap:10px;margin-top:10px}
-.point-row{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.point-row.selected-row{outline:2px solid rgba(126,244,255,.28)}
-.point-row-num{font-size:22px;font-weight:800;color:#7ef4ff;min-width:28px}
-.point-row-info{flex:1;min-width:0}
-.point-row-info strong{display:block;font-size:15px}
-.point-row-info span{font-size:13px;color:#7a9ab4}
-.pill{display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800}
-.pill-open{background:rgba(245,190,48,.15);color:#ffe273}
-.pill-done{background:rgba(46,201,122,.15);color:#7ff0be}
-.modal-bg{position:fixed;inset:0;background:rgba(3,10,18,.78);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100;backdrop-filter:blur(14px);}
-.modal-box{background:linear-gradient(180deg,rgba(15,28,42,.98),rgba(10,20,32,.98));border:1px solid rgba(255,255,255,.10);border-radius:26px;padding:22px;box-shadow:0 40px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.07);width:100%;max-width:540px;max-height:90vh;overflow-y:auto;}
-.modal-box.wide{max-width:940px}
-.modal-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.modal-top h3{font-size:22px}
-.close-x{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#c8daea;cursor:pointer;font-size:18px}
-.field{margin-bottom:14px}
-.field label{display:block;font-size:13px;font-weight:700;color:#aabdcf;margin-bottom:7px}
-.inp,.txta,.sel{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:14px;color:#ecf3ff;outline:none;font:inherit;}
-.inp,.sel{min-height:46px;padding:0 14px}
-.txta{min-height:88px;padding:12px 14px;resize:vertical}
-.inp:focus,.txta:focus,.sel:focus{border-color:rgba(126,244,255,.36)}
-.phase-tabs{display:flex;gap:8px;margin-bottom:14px}
-.phase-tab{flex:1;min-height:40px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#7a9ab4;font-weight:800;cursor:pointer;font-size:14px;}
-.phase-tab.on{background:linear-gradient(135deg,#7ef4ff,#28c8f0);color:#04131e;border:none}
-.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.photo-thumb{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#0c1824;border:1px solid rgba(255,255,255,.09)}
-.photo-thumb img{width:100%;height:100%;object-fit:cover}
-.photo-del{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.72);color:#fff;border:none;cursor:pointer;font-size:14px;display:grid;place-items:center;}
-.upload-label{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);color:#c8daea;font-weight:700;cursor:pointer;font-size:14px;margin-bottom:12px;transition:background .14s;}
-.upload-label:hover{background:rgba(255,255,255,.10)}
-.phase-count{font-size:12px;font-weight:600;color:#7a9ab4;margin-left:auto}
-.modal-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-.report-body{background:#fff;color:#111;padding:22px;border-radius:16px;max-height:62vh;overflow:auto}
-.report-body h2{font-size:24px;margin-bottom:4px}
-.report-body h3{font-size:18px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px}
-.report-block{margin-bottom:18px;padding:14px;border:1px solid #e0e0e0;border-radius:12px}
-.report-block strong{display:block;margin-bottom:6px}
-.rphoto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
-.rphoto-grid img{width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid #ddd}
-.toast{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#7ef4ff,#28c8f0);color:#04131e;font-weight:800;padding:12px 22px;border-radius:16px;box-shadow:0 14px 36px rgba(40,200,240,.32);z-index:200;font-size:14px;transition:opacity .4s;}
-.empty-state{padding:20px;text-align:center;color:#4a6a82;font-weight:700;border:1px dashed rgba(126,244,255,.18);border-radius:18px;background:rgba(126,244,255,.03)}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.quad-grid{grid-template-columns:1fr}}
+.sidebar{width:260px;min-width:260px;height:100vh;background:#0f1c2e;display:flex;flex-direction:column;overflow:hidden}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(26,115,232,.4)}
+.sb-logo-text{color:#fff;font-size:15px;font-weight:700;line-height:1.2}
+.sb-logo-sub{color:rgba(255,255,255,.4);font-size:11px}
+.sb-section{padding:14px 12px 6px;color:rgba(255,255,255,.3);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
+.sb-projects{flex:1;overflow-y:auto;padding:0 8px}
+.sb-projects::-webkit-scrollbar{width:4px}
+.sb-projects::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+.proj-btn{width:100%;text-align:left;background:none;border:none;color:rgba(255,255,255,.65);cursor:pointer;padding:9px 10px;border-radius:8px;display:flex;align-items:center;gap:10px;transition:background .15s,color .15s;margin-bottom:2px}
+.proj-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+.proj-btn.active{background:rgba(26,115,232,.25);color:#fff}
+.proj-btn-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);flex-shrink:0}
+.proj-btn.active .proj-btn-dot{background:#1a73e8}
+.proj-btn-info{flex:1;min-width:0}
+.proj-btn-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-btn-count{font-size:11px;color:rgba(255,255,255,.35);margin-top:1px}
+.proj-btn.active .proj-btn-count{color:rgba(255,255,255,.55)}
+.sb-bottom{padding:12px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-new-btn{width:100%;min-height:40px;border-radius:10px;background:linear-gradient(135deg,#1a73e8,#1557b0);color:#fff;font-weight:600;font-size:13px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;box-shadow:0 4px 14px rgba(26,115,232,.35)}
+.sb-new-btn:hover{opacity:.9}
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;min-width:0}
+.topbar{height:60px;background:#fff;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.topbar-title{font-size:16px;font-weight:700;color:#202124}
+.topbar-sub{font-size:12px;color:#5f6368;margin-top:1px}
+.tb-btn{min-height:36px;padding:0 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;white-space:nowrap;font-family:inherit}
+.tb-btn:hover{opacity:.85}
+.tb-blue{background:#1a73e8;color:#fff;box-shadow:0 2px 8px rgba(26,115,232,.3)}
+.tb-outline{background:#fff;color:#5f6368;border:1px solid #dadce0}
+.tb-green{background:#34a853;color:#fff;box-shadow:0 2px 8px rgba(52,168,83,.3)}
+.tabs{display:flex;background:#fff;border-bottom:1px solid #e0e0e0;flex-shrink:0;padding:0 20px}
+.tab{padding:12px 18px;font-size:13px;font-weight:600;color:#5f6368;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:inherit}
+.tab.active{color:#1a73e8;border-bottom-color:#1a73e8}
+.tab:hover:not(.active){color:#202124}
+.content{flex:1;overflow:hidden;position:relative}
+.tab-panel{position:absolute;inset:0;overflow:hidden}
+.map-outer{position:absolute;inset:0;overflow:hidden;background:#e8eaed;cursor:grab;user-select:none}
+.map-outer.dragging{cursor:grabbing}
+.map-canvas{position:absolute;transform-origin:0 0}
+.map-canvas img{display:block}
+.map-placeholder-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#9aa0a6}
+.map-placeholder-msg svg{opacity:.4}
+.map-placeholder-msg p{font-size:15px;font-weight:600}
+.map-placeholder-msg span{font-size:13px}
+.markers-layer{position:absolute;inset:0;pointer-events:none}
+.marker-btn{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;background:none;border:none;cursor:pointer;transition:transform .15s}
+.marker-btn:hover{transform:translate(-50%,-50%) scale(1.18)}
+.marker-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;border:3px solid rgba(255,255,255,.85);box-shadow:0 3px 10px rgba(0,0,0,.28)}
+.m-open .marker-circle{background:#f5a623}
+.m-gereed .marker-circle{background:#34a853}
+.m-uitvoering .marker-circle{background:#1a73e8}
+.zoom-controls{position:absolute;bottom:20px;right:20px;display:flex;flex-direction:column;gap:2px;z-index:10}
+.zoom-btn{width:36px;height:36px;border-radius:6px;background:#fff;border:1px solid #dadce0;font-size:18px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.15);color:#202124;transition:background .15s;font-family:inherit}
+.zoom-btn:hover{background:#f8f9fa}
+.list-panel{position:absolute;inset:0;overflow-y:auto;padding:20px}
+.list-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-chip{min-height:34px;padding:0 14px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid #dadce0;background:#fff;color:#5f6368;cursor:pointer;transition:all .15s;font-family:inherit}
+.filter-chip.on{background:#1a73e8;color:#fff;border-color:#1a73e8}
+.ticket-row{background:#fff;border-radius:12px;border:1px solid #e0e0e0;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:box-shadow .15s,border-color .15s;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ticket-row:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);border-color:#bdbdbd}
+.t-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.dot-open{background:#f5a623}
+.dot-gereed{background:#34a853}
+.dot-uitvoering{background:#1a73e8}
+.ticket-body{flex:1;min-width:0}
+.t-num{font-size:11px;color:#9aa0a6;font-weight:500;margin-bottom:2px}
+.t-title{font-size:14px;font-weight:600;color:#202124;margin-bottom:3px}
+.t-desc{font-size:12px;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-meta{font-size:11px;color:#9aa0a6;margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ticket-photos{display:flex;gap:6px;flex-shrink:0}
+.t-thumb{width:52px;height:52px;border-radius:8px;object-fit:cover;border:1px solid #e0e0e0}
+.t-thumb-empty{width:52px;height:52px;border-radius:8px;background:#f4f6f9;border:1px solid #e0e0e0;display:grid;place-items:center;color:#9aa0a6;font-size:10px;font-weight:600;text-align:center;line-height:1.3}
+.s-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.sb-open{background:#fff3e0;color:#e65100}
+.sb-uitvoering{background:#e3f2fd;color:#0d47a1}
+.sb-gereed{background:#e8f5e9;color:#1b5e20}
+.empty-list{padding:60px 20px;text-align:center;color:#9aa0a6}
+.empty-list p{font-size:16px;font-weight:600;margin-bottom:6px}
+.empty-list span{font-size:13px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:200;backdrop-filter:blur(3px)}
+.modal{background:#fff;border-radius:16px;width:min(640px,100%);max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.2)}
+.modal.wide{width:min(900px,100%)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 14px;border-bottom:1px solid #e0e0e0;position:sticky;top:0;background:#fff;z-index:1;border-radius:16px 16px 0 0}
+.modal-header h2{font-size:17px;font-weight:700;color:#202124}
+.modal-close{width:32px;height:32px;border-radius:8px;background:#f4f6f9;border:none;cursor:pointer;font-size:16px;color:#5f6368;display:grid;place-items:center;transition:background .15s}
+.modal-close:hover{background:#e0e0e0}
+.modal-body{padding:18px 20px}
+.modal-footer{padding:14px 20px;border-top:1px solid #e0e0e0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:#fff;z-index:1;border-radius:0 0 16px 16px}
+.field{margin-bottom:16px}
+.field-label{font-size:12px;font-weight:600;color:#5f6368;margin-bottom:6px;display:block}
+.inp,.txta,.sel{width:100%;border:1px solid #dadce0;border-radius:8px;background:#fff;color:#202124;font:inherit;outline:none;transition:border-color .15s}
+.inp,.sel{height:40px;padding:0 12px}
+.txta{min-height:80px;padding:10px 12px;resize:vertical}
+.inp:focus,.txta:focus,.sel:focus{border-color:#1a73e8}
+.fase-tabs{display:flex;border:1px solid #dadce0;border-radius:10px;overflow:hidden;margin-bottom:14px}
+.fase-tab{flex:1;height:38px;background:#f4f6f9;border:none;font:inherit;font-size:12px;font-weight:600;color:#5f6368;cursor:pointer;border-right:1px solid #dadce0;transition:background .15s,color .15s}
+.fase-tab:last-child{border-right:none}
+.fase-tab.on{background:#1a73e8;color:#fff}
+.foto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.foto-item{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:#f4f6f9;border:1px solid #e0e0e0}
+.foto-item img{width:100%;height:100%;object-fit:cover}
+.foto-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;border:none;cursor:pointer;font-size:12px;display:grid;place-items:center}
+.upload-lbl{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:8px;background:#f4f6f9;border:1px solid #dadce0;color:#5f6368;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;margin-bottom:14px}
+.upload-lbl:hover{background:#e8eaed}
+.foto-empty{padding:14px;text-align:center;color:#9aa0a6;font-size:12px;border:1px dashed #dadce0;border-radius:8px;margin-bottom:10px}
+.btn-del{background:#fff3f3;color:#c62828;border:1px solid #ffcdd2;font-family:inherit;font-size:13px;font-weight:600;min-height:36px;padding:0 14px;border-radius:8px;cursor:pointer;transition:background .15s}
+.btn-del:hover{background:#ffebee}
+.report-wrap{background:#fff;border-radius:12px;max-height:64vh;overflow:auto}
+.report-wrap h2{font-size:20px;margin-bottom:4px}
+.r-meta{font-size:13px;color:#5f6368;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e0e0e0}
+.r-ticket{border:1px solid #e0e0e0;border-radius:10px;padding:14px;margin-bottom:14px}
+.r-ticket-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:8px}
+.r-ticket-head strong{font-size:14px}
+.r-desc{font-size:13px;color:#5f6368;margin-bottom:10px}
+.r-fase{margin-top:10px}
+.r-fase-title{font-size:12px;font-weight:600;display:block;margin-bottom:6px;text-transform:capitalize;color:#5f6368}
+.r-fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.r-fotos img{width:100%;height:90px;object-fit:cover;border-radius:8px;border:1px solid #e0e0e0}
+.toast{position:fixed;bottom:20px;right:20px;background:#202124;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="brand">
-    <div class="logo">BH</div>
-    <div class="brand-info">
-      <h1>Bouwherstel Tool</h1>
-      <p>Start · Midden · Einde — alles in één PDF rapport</p>
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">BH</div>
+    <div>
+      <div class="sb-logo-text">Bouwherstel Pro</div>
+      <div class="sb-logo-sub">Inspectie & herstel</div>
     </div>
   </div>
-  <div class="topbar-actions">
-    <button class="btn btn-ghost" id="btnTheme">☀ Thema</button>
-    <button class="btn btn-gold" id="btnPdf">⬇ PDF Rapport</button>
-    <button class="btn btn-blue" id="btnNewProject">+ Nieuw project</button>
+  <div class="sb-section">Projecten</div>
+  <div class="sb-projects" id="sbProjects"></div>
+  <div class="sb-bottom">
+    <button class="sb-new-btn" id="btnNewProject">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nieuw project
+    </button>
   </div>
-</header>
+</nav>
 
-<div class="layout">
-  <aside class="card">
-    <h2>Projecten</h2>
-    <p style="font-size:13px;color:#7a9ab4;margin-top:4px">Open een project en begin direct.</p>
-    <div id="projectList"></div>
-  </aside>
+<div class="main">
+  <div class="topbar">
+    <div style="flex:1;min-width:0">
+      <div class="topbar-title" id="tbTitle">Selecteer een project</div>
+      <div class="topbar-sub" id="tbSub">Kies links een project of maak een nieuw project aan</div>
+    </div>
+    <label class="tb-btn tb-outline" for="mapFileInput" style="cursor:pointer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+      Upload plattegrond
+    </label>
+    <input type="file" id="mapFileInput" accept="image/*" class="hidden">
+    <button class="tb-btn tb-green" id="btnPdf">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      PDF Rapport
+    </button>
+  </div>
 
-  <main>
-    <div id="emptyMain" class="card" style="padding:30px;text-align:center">
-      <div style="font-size:28px;font-weight:800;margin-bottom:10px">Welkom 👷</div>
-      <div style="color:#7a9ab4;max-width:400px;margin:0 auto">Maak een nieuw project aan of open een bestaand project links.</div>
+  <div class="tabs">
+    <button class="tab active" data-tab="kaart">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      Kaart
+    </button>
+    <button class="tab" data-tab="lijst">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Tickets
+    </button>
+  </div>
+
+  <div class="content">
+    <div class="tab-panel" id="panelKaart">
+      <div class="map-outer" id="mapOuter">
+        <div class="map-canvas" id="mapCanvas">
+          <img id="mapImg" class="hidden" alt="Plattegrond">
+          <div class="markers-layer" id="markersLayer"></div>
+        </div>
+        <div class="map-placeholder-msg" id="mapPlaceholder">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          <p>Geen plattegrond geladen</p>
+          <span>Upload een plattegrond via de knop rechtsboven</span>
+        </div>
+      </div>
+      <div class="zoom-controls">
+        <button class="zoom-btn" id="zoomIn">+</button>
+        <button class="zoom-btn" id="zoomOut">−</button>
+        <button class="zoom-btn" id="zoomReset" style="font-size:11px;font-weight:700">⊙</button>
+      </div>
     </div>
 
-    <div id="mainContent" class="hidden">
-      <div class="card" style="margin-bottom:16px">
-        <div class="main-header">
-          <div>
-            <h2 id="mainTitle">Project</h2>
-            <p id="mainSub"></p>
-          </div>
-          <div style="display:flex;gap:10px">
-            <label class="btn btn-blue" for="mapUploadInput" style="cursor:pointer">📷 Upload plattegrond</label>
-            <input type="file" id="mapUploadInput" accept="image/*" class="hidden">
-          </div>
+    <div class="tab-panel hidden" id="panelLijst">
+      <div class="list-panel">
+        <div class="list-filters">
+          <button class="filter-chip on" data-filter="all">Alle tickets</button>
+          <button class="filter-chip" data-filter="Gecreëerd">🟡 Gecreëerd</button>
+          <button class="filter-chip" data-filter="In uitvoering">🔵 In uitvoering</button>
+          <button class="filter-chip" data-filter="Gereed">🟢 Gereed</button>
         </div>
-        <div class="map-section">
-          <h3>Hoofdplattegrond</h3>
-          <p style="font-size:13px;color:#7a9ab4;margin-bottom:10px">Geel = open punt · Groen = compleet (start+midden+einde)</p>
-          <div class="map-wrap" id="mainMapWrap">
-            <div class="map-placeholder" id="mainMapPlaceholder">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-              Nog geen plattegrond — klik op Upload
-            </div>
-            <img id="mainMapImg" class="hidden" alt="Plattegrond">
-            <div class="balloons-layer" id="balloonsLayer"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-bottom:16px">
-        <h3 style="font-size:18px;margin-bottom:4px">4 Delen</h3>
-        <p style="font-size:13px;color:#7a9ab4;margin-bottom:14px">Klik in een deel om een punt te plaatsen. Klik op een rood kruis om het te openen.</p>
-        <div class="quad-grid" id="quadGrid"></div>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size:18px;margin-bottom:4px">Alle punten</h3>
-        <p style="font-size:13px;color:#7a9ab4;margin-bottom:10px">Klik op Open om foto's en opmerkingen te bewerken.</p>
-        <div class="points-table" id="pointsTable"></div>
+        <div id="ticketList"></div>
       </div>
     </div>
-  </main>
+  </div>
 </div>
 
 <!-- MODAL NIEUW PROJECT -->
-<div class="modal-bg hidden" id="modalNewProject">
-  <div class="modal-box">
-    <div class="modal-top">
-      <h3>Nieuw project</h3>
-      <button class="close-x" data-close="modalNewProject">✕</button>
+<div class="modal-overlay hidden" id="modalProject">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Nieuw project</h2>
+      <button class="modal-close" data-close="modalProject">✕</button>
     </div>
-    <div class="field">
-      <label>Projectnaam *</label>
-      <input id="inpProjectName" class="inp" placeholder="Bijv. Woning Utrecht">
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Projectnaam *</label><input id="inpName" class="inp" placeholder="Bijv. Pilot watergang Utrecht"></div>
+      <div class="field"><label class="field-label">Locatie</label><input id="inpLoc" class="inp" placeholder="Bijv. Utrecht"></div>
     </div>
-    <div class="field">
-      <label>Locatie</label>
-      <input id="inpProjectLocation" class="inp" placeholder="Bijv. Utrecht">
-    </div>
-    <div class="modal-row" style="justify-content:flex-end">
-      <button class="btn btn-ghost" data-close="modalNewProject">Annuleren</button>
-      <button class="btn btn-blue" id="btnCreateProject">Aanmaken</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL PUNT -->
-<div class="modal-bg hidden" id="modalPoint">
-  <div class="modal-box">
-    <div class="modal-top">
-      <h3 id="modalPointTitle">Punt</h3>
-      <button class="close-x" data-close="modalPoint">✕</button>
-    </div>
-    <div class="field">
-      <label>Omschrijving</label>
-      <textarea id="inpPointNote" class="txta" placeholder="Bijv. Scheur in wand boven deur..."></textarea>
-    </div>
-    <div class="field">
-      <label>Status</label>
-      <select id="inpPointStatus" class="sel">
-        <option value="open">Open</option>
-        <option value="done">Gereed</option>
-      </select>
-    </div>
-    <div style="font-size:13px;font-weight:700;color:#aabdcf;margin-bottom:8px">Fase</div>
-    <div class="phase-tabs" id="phaseTabs">
-      <button class="phase-tab on" data-phase="start">Start <span class="phase-count" id="cnt-start"></span></button>
-      <button class="phase-tab" data-phase="middle">Midden <span class="phase-count" id="cnt-middle"></span></button>
-      <button class="phase-tab" data-phase="end">Einde <span class="phase-count" id="cnt-end"></span></button>
-    </div>
-    <label class="upload-label" for="inpPhoto">📷 Foto's uploaden voor deze fase</label>
-    <input type="file" id="inpPhoto" accept="image/*" multiple class="hidden">
-    <div class="photo-grid" id="modalPhotoGrid"></div>
-    <div class="modal-row" style="justify-content:space-between">
-      <button class="btn btn-red" id="btnDeletePoint">Verwijder punt</button>
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-ghost" data-close="modalPoint">Sluiten</button>
-        <button class="btn btn-blue" id="btnSavePoint">Opslaan</button>
+    <div class="modal-footer">
+      <div></div>
+      <div style="display:flex;gap:8px">
+        <button class="tb-btn tb-outline" data-close="modalProject">Annuleren</button>
+        <button class="tb-btn tb-blue" id="btnCreate">Aanmaken</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL PDF -->
-<div class="modal-bg hidden" id="modalReport">
-  <div class="modal-box wide">
-    <div class="modal-top">
-      <h3>PDF Rapport</h3>
-      <button class="close-x" data-close="modalReport">✕</button>
+<!-- MODAL TICKET -->
+<div class="modal-overlay hidden" id="modalTicket">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="mTicketTitle">Ticket</h2>
+      <button class="modal-close" data-close="modalTicket">✕</button>
     </div>
-    <div style="margin-bottom:12px;display:flex;justify-content:flex-end">
-      <button class="btn btn-gold" id="btnDownloadPdf">⬇ Download PDF</button>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label">Bijlagen per fase</label>
+        <div class="fase-tabs" id="faseTabs">
+          <button class="fase-tab on" data-fase="start">Start <span id="fCnt0"></span></button>
+          <button class="fase-tab" data-fase="middle">Midden <span id="fCnt1"></span></button>
+          <button class="fase-tab" data-fase="end">Einde <span id="fCnt2"></span></button>
+        </div>
+        <label class="upload-lbl" for="fotoInput">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Foto's uploaden
+        </label>
+        <input type="file" id="fotoInput" accept="image/*" multiple class="hidden">
+        <div class="foto-grid" id="fotoGrid"></div>
+      </div>
+      <div class="field"><label class="field-label">Titel</label><input id="inpTTitle" class="inp" placeholder="Bijv. Waterspuwer afgebroken"></div>
+      <div class="field"><label class="field-label">Omschrijving</label><textarea id="inpTDesc" class="txta" placeholder="Omschrijving van het probleem..."></textarea></div>
+      <div class="field"><label class="field-label">Status</label>
+        <select id="inpTStatus" class="sel">
+          <option value="Gecreëerd">🟡 Gecreëerd</option>
+          <option value="In uitvoering">🔵 In uitvoering</option>
+          <option value="Gereed">🟢 Gereed</option>
+        </select>
+      </div>
     </div>
-    <div class="report-body" id="reportBody"></div>
+    <div class="modal-footer">
+      <button class="btn-del" id="btnDelTicket">Verwijder</button>
+      <div style="display:flex;gap:8px">
+        <button class="tb-btn tb-outline" data-close="modalTicket">Sluiten</button>
+        <button class="tb-btn tb-blue" id="btnSaveTicket">Opslaan</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast hidden" id="toast">Opgeslagen!</div>
+<!-- MODAL RAPPORT -->
+<div class="modal-overlay hidden" id="modalReport">
+  <div class="modal wide">
+    <div class="modal-header">
+      <h2>PDF Rapport</h2>
+      <button class="modal-close" data-close="modalReport">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="tb-btn tb-green" id="btnDlPdf">⬇ Download PDF</button>
+      </div>
+      <div class="report-wrap" id="reportWrap"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
 
 <script>
-const SK='bh_v3';
+const SK='bhpro2';
 let DB={projects:[]};
-function saveDB(){try{localStorage.setItem(SK,JSON.stringify(DB));}catch(e){}}
-function loadDB(){try{const r=localStorage.getItem(SK);if(r)DB=JSON.parse(r);}catch(e){}}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg||'Opgeslagen!';t.classList.remove('hidden');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('hidden'),2200);}
+function save(){try{localStorage.setItem(SK,JSON.stringify(DB));}catch(e){}}
+function load(){try{const r=localStorage.getItem(SK);if(r)DB=JSON.parse(r);}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('hidden'),2200);}
 
-let curProjId=null,curPointId=null,curPhase='start';
+let curProjId=null,curTicketId=null,curFase='start',listFilter='all';
+let scale=1,tx=0,ty=0,isDragging=false,dsx=0,dsy=0,dtx=0,dty=0,imgW=0,imgH=0;
+
 function getProj(){return DB.projects.find(p=>p.id===curProjId)||null;}
-function getPoint(){const p=getProj();return p?p.points.find(x=>x.id===curPointId)||null:null;}
-function pointDone(pt){return pt.photos.start.length>0&&pt.photos.middle.length>0&&pt.photos.end.length>0;}
+function getTicket(){const p=getProj();return p?p.tickets.find(t=>t.id===curTicketId)||null:null;}
+function scls(s){return s==='Gereed'?'m-gereed':s==='In uitvoering'?'m-uitvoering':'m-open';}
+function dcls(s){return s==='Gereed'?'dot-gereed':s==='In uitvoering'?'dot-uitvoering':'dot-open';}
+function bcls(s){return s==='Gereed'?'sb-gereed':s==='In uitvoering'?'sb-uitvoering':'sb-open';}
 
-function renderProjects(){
-  const el=document.getElementById('projectList');
-  if(!DB.projects.length){el.innerHTML='<div class="empty-state" style="margin-top:12px">Nog geen projecten.</div>';return;}
+// SIDEBAR
+function renderSidebar(){
+  const el=document.getElementById('sbProjects');
+  if(!DB.projects.length){el.innerHTML='<div style="padding:12px 10px;font-size:12px;color:rgba(255,255,255,.3)">Nog geen projecten</div>';return;}
   el.innerHTML=DB.projects.map(p=>{
-    const done=p.points.filter(pointDone).length;
-    return `<div class="proj-item${p.id===curProjId?' active':''}">
-      <div class="proj-item-name">${esc(p.name)}</div>
-      <div class="proj-item-sub">${esc(p.location||'Geen locatie')} · ${p.points.length} punt(en) · ${done} compleet</div>
-      <div class="proj-btns">
-        <button class="btn btn-blue" style="font-size:13px;min-height:36px" onclick="openProject('${p.id}')">Open</button>
-        <button class="btn btn-ghost" style="font-size:13px;min-height:36px" onclick="deleteProject('${p.id}')">Verwijder</button>
+    const done=p.tickets.filter(t=>t.status==='Gereed').length;
+    return `<button class="proj-btn${p.id===curProjId?' active':''}" onclick="openProject('${p.id}')">
+      <div class="proj-btn-dot"></div>
+      <div class="proj-btn-info">
+        <div class="proj-btn-name">${esc(p.name)}</div>
+        <div class="proj-btn-count">${p.tickets.length} tickets · ${done} gereed</div>
       </div>
-    </div>`;
+    </button>`;
   }).join('');
 }
 
-function renderWorkspace(){
-  const proj=getProj();
-  document.getElementById('emptyMain').classList.toggle('hidden',!!proj);
-  document.getElementById('mainContent').classList.toggle('hidden',!proj);
-  if(!proj)return;
-  document.getElementById('mainTitle').textContent=proj.name;
-  document.getElementById('mainSub').textContent=(proj.location?proj.location+' · ':'')+proj.points.length+' punt(en)';
-  const img=document.getElementById('mainMapImg');
-  const ph=document.getElementById('mainMapPlaceholder');
-  if(proj.map){img.src=proj.map;img.classList.remove('hidden');ph.classList.add('hidden');}
-  else{img.classList.add('hidden');ph.classList.remove('hidden');}
-  renderBalloons();
-  renderQuads();
-  renderPointsTable();
+// TOPBAR
+function renderTopbar(){
+  const p=getProj();
+  if(!p){document.getElementById('tbTitle').textContent='Selecteer een project';document.getElementById('tbSub').textContent='Kies links een project of maak een nieuw project aan';return;}
+  document.getElementById('tbTitle').textContent=p.name;
+  document.getElementById('tbSub').textContent=(p.location?p.location+' · ':'')+p.tickets.length+' tickets · '+p.tickets.filter(t=>t.status==='Gereed').length+' gereed';
 }
 
-function renderBalloons(){
-  const proj=getProj();
-  const layer=document.getElementById('balloonsLayer');
+// MAP
+function applyT(){document.getElementById('mapCanvas').style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;}
+function renderMap(){
+  const p=getProj();
+  const img=document.getElementById('mapImg');
+  const ph=document.getElementById('mapPlaceholder');
+  if(p&&p.map){img.src=p.map;img.classList.remove('hidden');ph.classList.add('hidden');}
+  else{img.classList.add('hidden');ph.classList.remove('hidden');}
+  renderMarkers();
+}
+function renderMarkers(){
+  const layer=document.getElementById('markersLayer');
   layer.innerHTML='';
-  if(!proj)return;
-  proj.points.forEach((pt,idx)=>{
-    const pos=quadToMain(pt.quad,pt.x,pt.y);
+  const p=getProj();
+  if(!p||!p.map)return;
+  p.tickets.forEach((t,i)=>{
     const btn=document.createElement('button');
-    btn.className='balloon-btn'+(pointDone(pt)?' done':'');
-    btn.style.left=pos.x+'%';
-    btn.style.top=pos.y+'%';
-    btn.innerHTML=`<div class="balloon-head">${idx+1}</div><div class="balloon-tail"></div>`;
-    btn.title=pt.note?esc(pt.note):`Punt ${idx+1}`;
-    btn.onclick=()=>openPointModal(pt.id);
+    btn.className='marker-btn';
+    btn.style.left=t.x+'%';
+    btn.style.top=t.y+'%';
+    btn.innerHTML=`<div class="marker-circle ${scls(t.status)}">${i+1}</div>`;
+    btn.title=t.title||`Ticket ${i+1}`;
+    btn.onclick=e=>{e.stopPropagation();openTicketModal(t.id);};
     layer.appendChild(btn);
   });
 }
-
-function quadToMain(quad,x,y){
-  if(quad===1)return{x:x/2,y:y/2};
-  if(quad===2)return{x:50+x/2,y:y/2};
-  if(quad===3)return{x:x/2,y:50+y/2};
-  return{x:50+x/2,y:50+y/2};
+function resetZoom(){
+  const p=getProj();
+  if(!p||!p.map||!imgW){scale=1;tx=0;ty=0;applyT();return;}
+  const o=document.getElementById('mapOuter');
+  const ns=Math.min(o.clientWidth/imgW,o.clientHeight/imgH,1);
+  scale=ns;tx=(o.clientWidth-imgW*ns)/2;ty=(o.clientHeight-imgH*ns)/2;applyT();
+}
+function doZoom(delta,cx,cy){
+  const o=document.getElementById('mapOuter');
+  const ox=cx!==undefined?cx:o.clientWidth/2;
+  const oy=cy!==undefined?cy:o.clientHeight/2;
+  const ns=Math.max(0.2,Math.min(10,scale*delta));
+  const r=ns/scale;
+  tx=ox-r*(ox-tx);ty=oy-r*(oy-ty);scale=ns;applyT();
 }
 
-function renderQuads(){
-  const proj=getProj();
-  const grid=document.getElementById('quadGrid');
-  grid.innerHTML='';
-  const QUADS=[{num:1,label:'Deel 1 – Links boven'},{num:2,label:'Deel 2 – Rechts boven'},{num:3,label:'Deel 3 – Links onder'},{num:4,label:'Deel 4 – Rechts onder'}];
-  QUADS.forEach(({num,label})=>{
-    const points=proj?proj.points.filter(p=>p.quad===num):[];
-    const card=document.createElement('div');
-    card.className='card';
-    card.innerHTML=`
-      <h4>${esc(label)} <span style="font-size:13px;color:#7a9ab4;font-weight:600">${points.length} punt(en)</span></h4>
-      <div class="quad-map-wrap q${num}" id="qwrap${num}">
-        ${proj&&proj.map?`<img class="quad-map-img" src="${proj.map}" alt="Deel ${num}">`:'<div class="quad-no-map">Upload eerst plattegrond</div>'}
-        <div class="quad-click-layer" id="qclick${num}"></div>
-        <div class="quad-markers-layer" id="qmarkers${num}"></div>
-      </div>`;
-    grid.appendChild(card);
-    const cl=card.querySelector('#qclick'+num);
-    cl.addEventListener('click',function(e){
-      const p2=getProj();
-      if(!p2||!p2.map){alert('Upload eerst de hoofdplattegrond.');return;}
-      const rect=this.getBoundingClientRect();
-      const x=+((e.clientX-rect.left)/rect.width*100).toFixed(1);
-      const y=+((e.clientY-rect.top)/rect.height*100).toFixed(1);
-      const pt={id:uid(),quad:num,x,y,note:'',status:'open',photos:{start:[],middle:[],end:[]}};
-      p2.points.push(pt);
-      saveDB();
-      curPointId=pt.id;
-      curPhase='start';
-      renderWorkspace();
-      renderProjects();
-      openPointModal(pt.id);
-    });
-    const ml=card.querySelector('#qmarkers'+num);
-    points.forEach(pt=>{
-      const m=document.createElement('button');
-      m.className='qmarker'+(pointDone(pt)?' done':'');
-      m.style.left=pt.x+'%';
-      m.style.top=pt.y+'%';
-      m.title=pt.note||'Punt';
-      m.onclick=(e)=>{e.stopPropagation();openPointModal(pt.id);};
-      ml.appendChild(m);
-    });
-  });
-}
+const mapOuter=document.getElementById('mapOuter');
+mapOuter.addEventListener('wheel',e=>{e.preventDefault();const rect=mapOuter.getBoundingClientRect();doZoom(e.deltaY<0?1.12:1/1.12,e.clientX-rect.left,e.clientY-rect.top);},{passive:false});
+mapOuter.addEventListener('mousedown',e=>{if(e.target.closest('.marker-btn'))return;isDragging=true;dsx=e.clientX;dsy=e.clientY;dtx=tx;dty=ty;mapOuter.classList.add('dragging');});
+window.addEventListener('mousemove',e=>{if(!isDragging)return;tx=dtx+(e.clientX-dsx);ty=dty+(e.clientY-dsy);applyT();});
+window.addEventListener('mouseup',()=>{isDragging=false;mapOuter.classList.remove('dragging');});
 
-function renderPointsTable(){
-  const proj=getProj();
-  const table=document.getElementById('pointsTable');
-  if(!proj||!proj.points.length){table.innerHTML='<div class="empty-state">Nog geen punten. Klik in een van de 4 delen om te beginnen.</div>';return;}
-  table.innerHTML=proj.points.map((pt,idx)=>{
-    const done=pointDone(pt);
-    const sel=pt.id===curPointId?' selected-row':'';
-    return `<div class="point-row${sel}">
-      <span class="point-row-num">${idx+1}</span>
-      <div class="point-row-info">
-        <strong>Deel ${pt.quad} · ${esc(pt.note?pt.note.slice(0,45)+(pt.note.length>45?'…':''):'Geen omschrijving')}</strong>
-        <span>Start: ${pt.photos.start.length} · Midden: ${pt.photos.middle.length} · Einde: ${pt.photos.end.length}</span>
+mapOuter.addEventListener('click',e=>{
+  if(isDragging)return;
+  if(e.target.closest('.marker-btn'))return;
+  const p=getProj();if(!p||!p.map)return;
+  const img=document.getElementById('mapImg');
+  const r=img.getBoundingClientRect();
+  if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;
+  const x=+((e.clientX-r.left)/r.width*100).toFixed(2);
+  const y=+((e.clientY-r.top)/r.height*100).toFixed(2);
+  const t={id:uid(),x,y,title:'',desc:'',status:'Gecreëerd',photos:{start:[],middle:[],end:[]},createdAt:new Date().toISOString()};
+  p.tickets.push(t);save();renderMarkers();renderTicketList();renderSidebar();renderTopbar();
+  curTicketId=t.id;curFase='start';openTicketModal(t.id);
+});
+
+document.getElementById('zoomIn').onclick=()=>doZoom(1.2);
+document.getElementById('zoomOut').onclick=()=>doZoom(1/1.2);
+document.getElementById('zoomReset').onclick=resetZoom;
+
+// TABS
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const id=tab.dataset.tab;
+    document.getElementById('panelKaart').classList.toggle('hidden',id!=='kaart');
+    document.getElementById('panelLijst').classList.toggle('hidden',id!=='lijst');
+    if(id==='lijst')renderTicketList();
+  };
+});
+
+// TICKET LIST
+function renderTicketList(){
+  const p=getProj();
+  const el=document.getElementById('ticketList');
+  if(!p){el.innerHTML='<div class="empty-list"><p>Geen project open</p><span>Selecteer een project in de sidebar</span></div>';return;}
+  let tix=p.tickets;
+  if(listFilter!=='all')tix=tix.filter(t=>t.status===listFilter);
+  if(!tix.length){el.innerHTML=p.tickets.length?'<div class="empty-list"><p>Geen tickets met dit filter</p></div>':'<div class="empty-list"><p>Nog geen tickets</p><span>Ga naar de Kaart tab en klik op de plattegrond</span></div>';return;}
+  el.innerHTML=tix.map(t=>{
+    const all=[...t.photos.start,...t.photos.middle,...t.photos.end];
+    const thumbs=all.slice(0,2).map(s=>`<img class="t-thumb" src="${s}" alt="">`).join('');
+    const empty=all.length===0?`<div class="t-thumb-empty">Geen<br>foto's</div>`:'';
+    const date=new Date(t.createdAt).toLocaleDateString('nl-NL',{day:'2-digit',month:'short',year:'numeric'});
+    const idx=p.tickets.findIndex(x=>x.id===t.id);
+    return `<div class="ticket-row" onclick="openTicketModal('${t.id}')">
+      <div class="t-dot ${dcls(t.status)}"></div>
+      <div class="ticket-body">
+        <div class="t-num">Ticket #${idx+1}</div>
+        <div class="t-title">${esc(t.title||'Geen titel')}</div>
+        <div class="t-desc">${esc(t.desc||'Geen omschrijving')}</div>
+        <div class="t-meta">${date} · ${all.length} foto's · <span class="s-badge ${bcls(t.status)}">${esc(t.status)}</span></div>
       </div>
-      <span class="pill ${done?'pill-done':'pill-open'}">${done?'Compleet':'Open'}</span>
-      <button class="btn btn-ghost" style="font-size:13px;min-height:36px" onclick="openPointModal('${pt.id}')">Open</button>
+      <div class="ticket-photos">${thumbs||empty}</div>
     </div>`;
   }).join('');
 }
 
-function openPointModal(pointId){
-  curPointId=pointId;
-  const pt=getPoint();
-  if(!pt)return;
-  const proj=getProj();
-  const idx=proj.points.findIndex(p=>p.id===pointId);
-  document.getElementById('modalPointTitle').textContent=`Punt ${idx+1} – Deel ${pt.quad}`;
-  document.getElementById('inpPointNote').value=pt.note||'';
-  document.getElementById('inpPointStatus').value=pt.status||'open';
-  updatePhaseTabs();
-  renderModalPhotos();
-  showModal('modalPoint');
-}
-
-function updatePhaseTabs(){
-  const pt=getPoint();
-  document.querySelectorAll('.phase-tab').forEach(tab=>{
-    const ph=tab.dataset.phase;
-    tab.classList.toggle('on',ph===curPhase);
-    const c=document.getElementById('cnt-'+ph);
-    if(c&&pt)c.textContent='('+pt.photos[ph].length+')';
-  });
-}
-
-function renderModalPhotos(){
-  const pt=getPoint();
-  const grid=document.getElementById('modalPhotoGrid');
-  if(!pt){grid.innerHTML='';return;}
-  const photos=pt.photos[curPhase];
-  if(!photos.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1;margin-bottom:8px">Geen foto\'s voor deze fase.</div>';return;}
-  grid.innerHTML=photos.map((src,i)=>`<div class="photo-thumb"><img src="${src}" alt="Foto"><button class="photo-del" onclick="deletePhoto(${i})">✕</button></div>`).join('');
-}
-
-function deletePhoto(i){
-  const pt=getPoint();
-  if(!pt)return;
-  pt.photos[curPhase].splice(i,1);
-  saveDB();updatePhaseTabs();renderModalPhotos();
-}
-
-function savePoint(){
-  const pt=getPoint();
-  if(!pt)return;
-  pt.note=document.getElementById('inpPointNote').value.trim();
-  pt.status=document.getElementById('inpPointStatus').value;
-  saveDB();renderWorkspace();renderProjects();toast('Punt opgeslagen!');
-}
-
-function deletePoint(){
-  if(!confirm('Punt verwijderen?'))return;
-  const proj=getProj();
-  if(!proj)return;
-  proj.points=proj.points.filter(p=>p.id!==curPointId);
-  curPointId=null;
-  saveDB();closeModal('modalPoint');renderWorkspace();renderProjects();toast('Punt verwijderd.');
-}
-
-function buildReportHTML(){
-  const proj=getProj();
-  if(!proj)return'<div>Geen project.</div>';
-  const date=new Date().toLocaleDateString('nl-NL');
-  let html=`<h2>${esc(proj.name)}</h2><p>Locatie: ${esc(proj.location||'–')} | Datum: ${date} | Punten: ${proj.points.length}</p><hr style="margin:12px 0;border-color:#e0e0e0">`;
-  if(!proj.points.length)return html+'<p>Geen punten aanwezig.</p>';
-  proj.points.forEach((pt,idx)=>{
-    const done=pointDone(pt);
-    html+=`<div class="report-block"><strong>Punt ${idx+1} – Deel ${pt.quad} <span style="float:right;font-size:12px;color:${done?'#2a9d6a':'#c07000'}">${done?'✓ Compleet':'⏳ Open'}</span></strong><p style="color:#555;font-size:14px;margin-top:4px">${esc(pt.note||'Geen omschrijving')}</p>`;
-    ['start','middle','end'].forEach(phase=>{
-      const ph=pt.photos[phase];
-      html+=`<div style="margin-top:10px"><strong style="font-size:13px;text-transform:capitalize">${phase} (${ph.length} foto's)</strong>`;
-      if(ph.length)html+=`<div class="rphoto-grid">${ph.slice(0,6).map(s=>`<img src="${s}" alt="${phase}">`).join('')}</div>`;
-      else html+=`<div style="font-size:12px;color:#aaa;margin-top:4px">Geen foto's</div>`;
-      html+=`</div>`;
-    });
-    html+=`</div>`;
-  });
-  return html;
-}
-
-function openReport(){
-  const proj=getProj();
-  if(!proj){alert('Open eerst een project.');return;}
-  document.getElementById('reportBody').innerHTML=buildReportHTML();
-  showModal('modalReport');
-}
-
-async function downloadPdf(){
-  const rb=document.getElementById('reportBody');
-  const proj=getProj();
-  if(!proj)return;
-  toast('PDF wordt gemaakt...');
-  try{
-    const canvas=await html2canvas(rb,{scale:2,backgroundColor:'#ffffff',useCORS:true});
-    const imgData=canvas.toDataURL('image/png');
-    const{jsPDF}=window.jspdf;
-    const pdf=new jsPDF('p','mm','a4');
-    const pW=210,pH=297,m=10,iW=pW-m*2;
-    const iH=canvas.height*iW/canvas.width;
-    let rem=iH,yPos=m;
-    pdf.addImage(imgData,'PNG',m,yPos,iW,iH);
-    rem-=(pH-m*2);
-    while(rem>0){yPos=rem-iH+m;pdf.addPage();pdf.addImage(imgData,'PNG',m,yPos,iW,iH);rem-=(pH-m*2);}
-    pdf.save((proj.name||'rapport')+'-bouwherstel.pdf');
-    toast('PDF gedownload!');
-  }catch(err){alert('PDF fout: '+err.message);}
-}
-
-function openProject(id){curProjId=id;curPointId=null;curPhase='start';renderProjects();renderWorkspace();}
-function deleteProject(id){
-  if(!confirm('Project verwijderen?'))return;
-  DB.projects=DB.projects.filter(p=>p.id!==id);
-  if(curProjId===id){curProjId=DB.projects[0]?.id||null;curPointId=null;}
-  saveDB();renderProjects();renderWorkspace();
-}
-function createProject(){
-  const name=document.getElementById('inpProjectName').value.trim();
-  const loc=document.getElementById('inpProjectLocation').value.trim();
-  if(!name){alert('Vul een projectnaam in.');return;}
-  const proj={id:uid(),name,location:loc,map:'',points:[]};
-  DB.projects.unshift(proj);
-  curProjId=proj.id;curPointId=null;curPhase='start';
-  document.getElementById('inpProjectName').value='';
-  document.getElementById('inpProjectLocation').value='';
-  saveDB();closeModal('modalNewProject');renderProjects();renderWorkspace();
-  toast('Project aangemaakt!');
-}
-
-document.getElementById('mapUploadInput').addEventListener('change',function(){
-  const proj=getProj();
-  if(!proj||!this.files[0])return;
-  const reader=new FileReader();
-  reader.onload=e=>{proj.map=e.target.result;saveDB();renderWorkspace();toast('Plattegrond geladen!');};
-  reader.readAsDataURL(this.files[0]);
-  this.value='';
+document.querySelectorAll('.filter-chip').forEach(chip=>{
+  chip.onclick=()=>{
+    document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('on'));
+    chip.classList.add('on');listFilter=chip.dataset.filter;renderTicketList();
+  };
 });
 
-document.getElementById('inpPhoto').addEventListener('change',function(){
-  const pt=getPoint();
-  if(!pt)return;
-  const files=Array.from(this.files);
-  let done=0;
+// TICKET MODAL
+function openTicketModal(id){
+  curTicketId=id;
+  const p=getProj();const t=getTicket();if(!t)return;
+  const idx=p.tickets.findIndex(x=>x.id===id);
+  document.getElementById('mTicketTitle').textContent=`Ticket #${idx+1}`;
+  document.getElementById('inpTTitle').value=t.title||'';
+  document.getElementById('inpTDesc').value=t.desc||'';
+  document.getElementById('inpTStatus').value=t.status||'Gecreëerd';
+  curFase='start';
+  document.querySelectorAll('.fase-tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.fase==='start'));
+  updateCnts();renderFotos();
+  document.getElementById('modalTicket').classList.remove('hidden');
+}
+function updateCnts(){
+  const t=getTicket();if(!t)return;
+  document.getElementById('fCnt0').textContent=t.photos.start.length?`(${t.photos.start.length})`:'';
+  document.getElementById('fCnt1').textContent=t.photos.middle.length?`(${t.photos.middle.length})`:'';
+  document.getElementById('fCnt2').textContent=t.photos.end.length?`(${t.photos.end.length})`:'';
+}
+function renderFotos(){
+  const t=getTicket();const grid=document.getElementById('fotoGrid');
+  if(!t){grid.innerHTML='';return;}
+  const ph=t.photos[curFase];
+  if(!ph.length){grid.innerHTML=`<div class="foto-empty" style="grid-column:1/-1">Geen foto's voor ${curFase}.</div>`;return;}
+  grid.innerHTML=ph.map((src,i)=>`<div class="foto-item"><img src="${src}" alt="foto"><button class="foto-del" onclick="delFoto(${i})">✕</button></div>`).join('');
+}
+function delFoto(i){const t=getTicket();if(!t)return;t.photos[curFase].splice(i,1);save();updateCnts();renderFotos();}
+
+document.getElementById('faseTabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.fase-tab');
+  if(!tab||!tab.dataset.fase)return;
+  curFase=tab.dataset.fase;
+  document.querySelectorAll('.fase-tab').forEach(t=>t.classList.toggle('on',t.dataset.fase===curFase));
+  renderFotos();
+});
+
+document.getElementById('fotoInput').addEventListener('change',function(){
+  const t=getTicket();if(!t)return;
+  const files=Array.from(this.files);let done=0;if(!files.length)return;
   files.forEach(file=>{
     const reader=new FileReader();
-    reader.onload=e=>{
-      pt.photos[curPhase].push(e.target.result);
-      done++;
-      if(done===files.length){
-        saveDB();updatePhaseTabs();renderModalPhotos();
-        renderBalloons();renderQuads();renderPointsTable();
-        toast(files.length+' foto\'s toegevoegd!');
-      }
-    };
+    reader.onload=e=>{t.photos[curFase].push(e.target.result);done++;if(done===files.length){save();updateCnts();renderFotos();renderMarkers();renderTicketList();toast(files.length+" foto's toegevoegd!");}};
     reader.readAsDataURL(file);
   });
   this.value='';
 });
 
-function showModal(id){document.getElementById(id).classList.remove('hidden');}
-function closeModal(id){document.getElementById(id).classList.add('hidden');}
-
-document.addEventListener('click',function(e){
-  const cb=e.target.closest('[data-close]');
-  if(cb){closeModal(cb.dataset.close);return;}
-  if(e.target.classList.contains('modal-bg'))e.target.classList.add('hidden');
-  const pt=e.target.closest('.phase-tab');
-  if(pt&&pt.dataset.phase){curPhase=pt.dataset.phase;updatePhaseTabs();renderModalPhotos();}
-});
-
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape')document.querySelectorAll('.modal-bg').forEach(m=>m.classList.add('hidden'));
-});
-
-document.getElementById('btnNewProject').onclick=()=>showModal('modalNewProject');
-document.getElementById('btnCreateProject').onclick=createProject;
-document.getElementById('btnSavePoint').onclick=savePoint;
-document.getElementById('btnDeletePoint').onclick=deletePoint;
-document.getElementById('btnPdf').onclick=openReport;
-document.getElementById('btnDownloadPdf').onclick=downloadPdf;
-document.getElementById('btnTheme').onclick=function(){
-  const b=document.body;
-  const on=b.style.filter==='invert(1) hue-rotate(180deg)';
-  b.style.filter=on?'':'invert(1) hue-rotate(180deg)';
-  this.textContent=on?'☀ Thema':'🌙 Thema';
+document.getElementById('btnSaveTicket').onclick=()=>{
+  const t=getTicket();if(!t)return;
+  t.title=document.getElementById('inpTTitle').value.trim()||'Naamloos ticket';
+  t.desc=document.getElementById('inpTDesc').value.trim();
+  t.status=document.getElementById('inpTStatus').value;
+  save();renderMarkers();renderTicketList();renderSidebar();renderTopbar();
+  document.getElementById('modalTicket').classList.add('hidden');toast('Ticket opgeslagen!');
 };
-document.getElementById('inpProjectName').addEventListener('keydown',e=>{if(e.key==='Enter')createProject();});
 
-loadDB();
-if(!DB.projects.length){DB.projects.push({id:uid(),name:'Demo project',location:'Lelystad',map:'',points:[]});saveDB();}
+document.getElementById('btnDelTicket').onclick=()=>{
+  if(!confirm('Ticket verwijderen?'))return;
+  const p=getProj();if(!p)return;
+  p.tickets=p.tickets.filter(t=>t.id!==curTicketId);
+  save();renderMarkers();renderTicketList();renderSidebar();renderTopbar();
+  document.getElementById('modalTicket').classList.add('hidden');toast('Ticket verwijderd.');
+};
+
+// PROJECT
+function openProject(id){
+  curProjId=id;curTicketId=null;scale=1;tx=0;ty=0;
+  renderSidebar();renderTopbar();renderMap();renderTicketList();
+  const img=document.getElementById('mapImg');
+  const p=getProj();
+  if(p&&p.map){
+    const doReset=()=>{imgW=img.naturalWidth;imgH=img.naturalHeight;resetZoom();};
+    if(img.complete&&img.naturalWidth)doReset();
+    else img.onload=doReset;
+  }
+}
+function createProject(){
+  const name=document.getElementById('inpName').value.trim();
+  const loc=document.getElementById('inpLoc').value.trim();
+  if(!name){alert('Vul een projectnaam in.');return;}
+  const p={id:uid(),name,location:loc,map:'',tickets:[]};
+  DB.projects.unshift(p);curProjId=p.id;
+  document.getElementById('inpName').value='';document.getElementById('inpLoc').value='';
+  save();document.getElementById('modalProject').classList.add('hidden');
+  renderSidebar();renderTopbar();renderMap();renderTicketList();toast('Project aangemaakt!');
+}
+
+// MAP UPLOAD
+document.getElementById('mapFileInput').addEventListener('change',function(){
+  const p=getProj();if(!p||!this.files[0]){if(!p)alert('Open eerst een project.');this.value='';return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    p.map=e.target.result;save();renderMap();
+    const img=document.getElementById('mapImg');
+    img.onload=()=>{imgW=img.naturalWidth;imgH=img.naturalHeight;resetZoom();};
+    toast('Plattegrond geladen!');
+  };
+  reader.readAsDataURL(this.files[0]);this.value='';
+});
+
+// PDF
+function buildReport(){
+  const p=getProj();if(!p)return'';
+  const date=new Date().toLocaleDateString('nl-NL',{day:'2-digit',month:'long',year:'numeric'});
+  let h=`<h2>${esc(p.name)}</h2><div class="r-meta">Locatie: ${esc(p.location||'–')} &nbsp;·&nbsp; Datum: ${date} &nbsp;·&nbsp; ${p.tickets.length} tickets</div>`;
+  if(!p.tickets.length)return h+'<div style="color:#9aa0a6;font-size:13px;padding:12px 0">Nog geen tickets aanwezig.</div>';
+  p.tickets.forEach((t,i)=>{
+    h+=`<div class="r-ticket"><div class="r-ticket-head"><strong>Ticket #${i+1} — ${esc(t.title||'Naamloos')}</strong><span class="s-badge ${bcls(t.status)}">${esc(t.status)}</span></div><div class="r-desc">${esc(t.desc||'Geen omschrijving')}</div>`;
+    ['start','middle','end'].forEach(f=>{
+      const ph=t.photos[f];
+      h+=`<div class="r-fase"><span class="r-fase-title">${f} (${ph.length} foto's)</span>`;
+      if(ph.length)h+=`<div class="r-fotos">${ph.slice(0,6).map(s=>`<img src="${s}">`).join('')}</div>`;
+      else h+=`<div style="font-size:12px;color:#9aa0a6">Geen foto's</div>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  });
+  return h;
+}
+document.getElementById('btnPdf').onclick=()=>{
+  const p=getProj();if(!p){alert('Open eerst een project.');return;}
+  document.getElementById('reportWrap').innerHTML=buildReport();
+  document.getElementById('modalReport').classList.remove('hidden');
+};
+document.getElementById('btnDlPdf').onclick=async()=>{
+  const p=getProj();if(!p)return;
+  toast('PDF wordt gemaakt...');
+  try{
+    const wrap=document.getElementById('reportWrap');
+    const canvas=await html2canvas(wrap,{scale:2,backgroundColor:'#fff',useCORS:true});
+    const img=canvas.toDataURL('image/png');
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF('p','mm','a4');
+    const pw=210,ph=297,m=10,iw=pw-m*2,ih=canvas.height*iw/canvas.width;
+    let rem=ih,yp=m;
+    pdf.addImage(img,'PNG',m,yp,iw,ih);rem-=(ph-m*2);
+    while(rem>0){yp=rem-ih+m;pdf.addPage();pdf.addImage(img,'PNG',m,yp,iw,ih);rem-=(ph-m*2);}
+    pdf.save(p.name+'-rapport.pdf');toast('PDF gedownload!');
+  }catch(e){alert('Fout: '+e.message);}
+};
+
+// MODAL CLOSE
+document.addEventListener('click',e=>{
+  const cb=e.target.closest('[data-close]');
+  if(cb){document.getElementById(cb.dataset.close).classList.add('hidden');return;}
+  if(e.target.classList.contains('modal-overlay'))e.target.classList.add('hidden');
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.add('hidden'));});
+
+document.getElementById('btnNewProject').onclick=()=>document.getElementById('modalProject').classList.remove('hidden');
+document.getElementById('btnCreate').onclick=createProject;
+document.getElementById('inpName').addEventListener('keydown',e=>{if(e.key==='Enter')createProject();});
+
+// INIT
+load();
+if(!DB.projects.length){DB.projects.push({id:uid(),name:'Pilot watergang Utrecht',location:'Utrecht, NL',map:'',tickets:[]});save();}
 curProjId=DB.projects[0].id;
-renderProjects();
-renderWorkspace();
+renderSidebar();renderTopbar();renderMap();renderTicketList();
 </script>
 </body>
 </html>
