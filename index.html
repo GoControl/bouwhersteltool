@@ -9,287 +9,223 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;font-size:14px}
-body{display:flex;background:#f4f6f9;color:#202124}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;background:#f0f2f5;color:#1a1a2e}
 .hidden{display:none!important}
-.sidebar{width:260px;min-width:260px;height:100vh;background:#0f1c2e;display:flex;flex-direction:column;overflow:hidden}
-.sb-logo{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
-.sb-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(26,115,232,.4)}
-.sb-logo-text{color:#fff;font-size:15px;font-weight:700;line-height:1.2}
-.sb-logo-sub{color:rgba(255,255,255,.4);font-size:11px}
-.sb-section{padding:14px 12px 6px;color:rgba(255,255,255,.3);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
-.sb-projects{flex:1;overflow-y:auto;padding:0 8px}
-.sb-projects::-webkit-scrollbar{width:4px}
-.sb-projects::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
-.proj-btn{width:100%;text-align:left;background:none;border:none;color:rgba(255,255,255,.65);cursor:pointer;padding:9px 10px;border-radius:8px;display:flex;align-items:center;gap:10px;transition:background .15s,color .15s;margin-bottom:2px}
-.proj-btn:hover{background:rgba(255,255,255,.07);color:#fff}
-.proj-btn.active{background:rgba(26,115,232,.25);color:#fff}
-.proj-btn-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);flex-shrink:0}
-.proj-btn.active .proj-btn-dot{background:#1a73e8}
-.proj-btn-info{flex:1;min-width:0}
-.proj-btn-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.proj-btn-count{font-size:11px;color:rgba(255,255,255,.35);margin-top:1px}
-.proj-btn.active .proj-btn-count{color:rgba(255,255,255,.55)}
-.sb-bottom{padding:12px;border-top:1px solid rgba(255,255,255,.07)}
-.sb-new-btn{width:100%;min-height:40px;border-radius:10px;background:linear-gradient(135deg,#1a73e8,#1557b0);color:#fff;font-weight:600;font-size:13px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;box-shadow:0 4px 14px rgba(26,115,232,.35)}
-.sb-new-btn:hover{opacity:.9}
-.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;min-width:0}
-.topbar{height:60px;background:#fff;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.topbar-title{font-size:16px;font-weight:700;color:#202124}
-.topbar-sub{font-size:12px;color:#5f6368;margin-top:1px}
-.tb-btn{min-height:36px;padding:0 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;white-space:nowrap;font-family:inherit}
-.tb-btn:hover{opacity:.85}
-.tb-blue{background:#1a73e8;color:#fff;box-shadow:0 2px 8px rgba(26,115,232,.3)}
-.tb-outline{background:#fff;color:#5f6368;border:1px solid #dadce0}
-.tb-green{background:#34a853;color:#fff;box-shadow:0 2px 8px rgba(52,168,83,.3)}
-.tabs{display:flex;background:#fff;border-bottom:1px solid #e0e0e0;flex-shrink:0;padding:0 20px}
-.tab{padding:12px 18px;font-size:13px;font-weight:600;color:#5f6368;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:inherit}
-.tab.active{color:#1a73e8;border-bottom-color:#1a73e8}
-.tab:hover:not(.active){color:#202124}
-.content{flex:1;overflow:hidden;position:relative}
-.tab-panel{position:absolute;inset:0;overflow:hidden}
-.map-outer{position:absolute;inset:0;overflow:hidden;background:#e8eaed;cursor:grab;user-select:none}
-.map-outer.dragging{cursor:grabbing}
-.map-canvas{position:absolute;transform-origin:0 0}
-.map-canvas img{display:block}
-.map-placeholder-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#9aa0a6}
-.map-placeholder-msg svg{opacity:.4}
-.map-placeholder-msg p{font-size:15px;font-weight:600}
-.map-placeholder-msg span{font-size:13px}
-.markers-layer{position:absolute;inset:0;pointer-events:none}
-.marker-btn{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;background:none;border:none;cursor:pointer;transition:transform .15s}
-.marker-btn:hover{transform:translate(-50%,-50%) scale(1.18)}
-.marker-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;border:3px solid rgba(255,255,255,.85);box-shadow:0 3px 10px rgba(0,0,0,.28)}
-.m-open .marker-circle{background:#f5a623}
-.m-gereed .marker-circle{background:#34a853}
-.m-uitvoering .marker-circle{background:#1a73e8}
-.zoom-controls{position:absolute;bottom:20px;right:20px;display:flex;flex-direction:column;gap:2px;z-index:10}
-.zoom-btn{width:36px;height:36px;border-radius:6px;background:#fff;border:1px solid #dadce0;font-size:18px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.15);color:#202124;transition:background .15s;font-family:inherit}
-.zoom-btn:hover{background:#f8f9fa}
-.list-panel{position:absolute;inset:0;overflow-y:auto;padding:20px}
-.list-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filter-chip{min-height:34px;padding:0 14px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid #dadce0;background:#fff;color:#5f6368;cursor:pointer;transition:all .15s;font-family:inherit}
-.filter-chip.on{background:#1a73e8;color:#fff;border-color:#1a73e8}
-.ticket-row{background:#fff;border-radius:12px;border:1px solid #e0e0e0;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:box-shadow .15s,border-color .15s;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.ticket-row:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);border-color:#bdbdbd}
-.t-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:3px}
-.dot-open{background:#f5a623}
-.dot-gereed{background:#34a853}
-.dot-uitvoering{background:#1a73e8}
-.ticket-body{flex:1;min-width:0}
-.t-num{font-size:11px;color:#9aa0a6;font-weight:500;margin-bottom:2px}
-.t-title{font-size:14px;font-weight:600;color:#202124;margin-bottom:3px}
-.t-desc{font-size:12px;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.t-meta{font-size:11px;color:#9aa0a6;margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.ticket-photos{display:flex;gap:6px;flex-shrink:0}
-.t-thumb{width:52px;height:52px;border-radius:8px;object-fit:cover;border:1px solid #e0e0e0}
-.t-thumb-empty{width:52px;height:52px;border-radius:8px;background:#f4f6f9;border:1px solid #e0e0e0;display:grid;place-items:center;color:#9aa0a6;font-size:10px;font-weight:600;text-align:center;line-height:1.3}
-.s-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600}
-.sb-open{background:#fff3e0;color:#e65100}
-.sb-uitvoering{background:#e3f2fd;color:#0d47a1}
-.sb-gereed{background:#e8f5e9;color:#1b5e20}
-.empty-list{padding:60px 20px;text-align:center;color:#9aa0a6}
-.empty-list p{font-size:16px;font-weight:600;margin-bottom:6px}
-.empty-list span{font-size:13px}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:200;backdrop-filter:blur(3px)}
-.modal{background:#fff;border-radius:16px;width:min(640px,100%);max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.2)}
-.modal.wide{width:min(900px,100%)}
-.modal-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 14px;border-bottom:1px solid #e0e0e0;position:sticky;top:0;background:#fff;z-index:1;border-radius:16px 16px 0 0}
-.modal-header h2{font-size:17px;font-weight:700;color:#202124}
-.modal-close{width:32px;height:32px;border-radius:8px;background:#f4f6f9;border:none;cursor:pointer;font-size:16px;color:#5f6368;display:grid;place-items:center;transition:background .15s}
-.modal-close:hover{background:#e0e0e0}
-.modal-body{padding:18px 20px}
-.modal-footer{padding:14px 20px;border-top:1px solid #e0e0e0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:#fff;z-index:1;border-radius:0 0 16px 16px}
-.field{margin-bottom:16px}
-.field-label{font-size:12px;font-weight:600;color:#5f6368;margin-bottom:6px;display:block}
-.inp,.txta,.sel{width:100%;border:1px solid #dadce0;border-radius:8px;background:#fff;color:#202124;font:inherit;outline:none;transition:border-color .15s}
+.topbar{height:56px;background:#0f1c2e;display:flex;align-items:center;gap:14px;padding:0 20px;box-shadow:0 2px 8px rgba(0,0,0,.25);position:sticky;top:0;z-index:50}
+.top-logo{display:flex;align-items:center;gap:10px}
+.top-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 10px rgba(26,115,232,.4)}
+.top-name{color:#fff;font-weight:700;font-size:15px}
+.top-sep{width:1px;height:24px;background:rgba(255,255,255,.15);margin:0 4px}
+.proj-sel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:8px;height:34px;padding:0 10px;font:inherit;font-size:13px;outline:none;cursor:pointer;min-width:200px}
+.proj-sel option{background:#1a2a3a;color:#fff}
+.top-spacer{flex:1}
+.tbtn{height:34px;padding:0 14px;border-radius:8px;font:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;white-space:nowrap}
+.tbtn:hover{opacity:.85}
+.tbtn-blue{background:#1a73e8;color:#fff;box-shadow:0 2px 8px rgba(26,115,232,.35)}
+.tbtn-out{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2)}
+.tbtn-green{background:#34a853;color:#fff;box-shadow:0 2px 8px rgba(52,168,83,.3)}
+.tbtn-red{background:#ea4335;color:#fff}
+.page{max-width:1400px;margin:0 auto;padding:20px}
+.sec-card{background:#fff;border-radius:16px;border:1px solid #e0e4ea;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;margin-bottom:20px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #f0f2f5;gap:12px;flex-wrap:wrap}
+.sec-head h2{font-size:15px;font-weight:700}
+.sec-head p{font-size:12px;color:#6b7280;margin-top:2px}
+.sec-body{padding:18px}
+.map-wrap{position:relative;border-radius:12px;overflow:hidden;background:#e8eaed;border:1px solid #e0e4ea;aspect-ratio:16/7}
+.map-wrap img{width:100%;height:100%;object-fit:contain;display:block}
+.map-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#9aa0a6;pointer-events:none}
+.map-empty p{font-size:14px;font-weight:600}
+.map-empty span{font-size:12px}
+.balloons{position:absolute;inset:0;pointer-events:none}
+.balloon{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:transform .15s}
+.balloon:hover{transform:translate(-50%,-100%) scale(1.15)}
+.balloon-head{min-width:30px;height:30px;padding:0 8px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;border:2.5px solid rgba(255,255,255,.9);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.bh-open{background:#f5a623}
+.bh-gereed{background:#34a853}
+.bh-uitvoering{background:#1a73e8}
+.balloon-tail{width:2px;height:12px;margin:0 auto}
+.bt-open{background:linear-gradient(180deg,#f5a623,transparent)}
+.bt-gereed{background:linear-gradient(180deg,#34a853,transparent)}
+.bt-uitvoering{background:linear-gradient(180deg,#1a73e8,transparent)}
+.quad-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.quad-card{border-radius:12px;border:1px solid #e0e4ea;overflow:hidden;background:#f8f9fa}
+.quad-label{padding:8px 12px;font-size:12px;font-weight:700;color:#5f6368;background:#fff;border-bottom:1px solid #e0e4ea;display:flex;align-items:center;justify-content:space-between}
+.quad-label span{font-size:11px;font-weight:500;color:#9aa0a6}
+.quad-map{position:relative;aspect-ratio:1/1;background:#e8eaed;cursor:crosshair;overflow:hidden}
+.quad-map img{position:absolute;object-fit:cover;width:200%;height:200%}
+.q0 img{left:0;top:0}
+.q1 img{left:-100%;top:0}
+.q2 img{left:0;top:-100%}
+.q3 img{left:-100%;top:-100%}
+.quad-markers{position:absolute;inset:0;pointer-events:none}
+.quad-click{position:absolute;inset:0;z-index:5;background:transparent}
+.qmarker{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;background:none;border:none;cursor:pointer;z-index:6}
+.qmarker-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;border:2px solid rgba(255,255,255,.9);box-shadow:0 3px 8px rgba(0,0,0,.25);transition:transform .15s}
+.qmarker:hover .qmarker-circle{transform:scale(1.18)}
+.qc-open{background:#f5a623}
+.qc-gereed{background:#34a853}
+.qc-uitvoering{background:#1a73e8}
+.quad-empty-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#9aa0a6;font-weight:600;pointer-events:none}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:200;backdrop-filter:blur(4px)}
+.modal{background:#fff;border-radius:16px;width:min(600px,100%);max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.modal.wide{width:min(920px,100%)}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 20px 14px;border-bottom:1px solid #f0f2f5;position:sticky;top:0;background:#fff;z-index:2;border-radius:16px 16px 0 0}
+.mhead h3{font-size:16px;font-weight:700}
+.mclose{width:30px;height:30px;border-radius:8px;background:#f4f6f9;border:none;cursor:pointer;font-size:15px;color:#5f6368;display:grid;place-items:center}
+.mclose:hover{background:#e0e4ea}
+.mbody{padding:16px 20px}
+.mfoot{padding:12px 20px;border-top:1px solid #f0f2f5;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:#fff;z-index:2;border-radius:0 0 16px 16px}
+.field{margin-bottom:14px}
+.flabel{display:block;font-size:12px;font-weight:600;color:#5f6368;margin-bottom:6px}
+.inp,.txta,.sel{width:100%;border:1px solid #d1d5db;border-radius:8px;font:inherit;outline:none;background:#fff;color:#1a1a2e;transition:border-color .15s}
 .inp,.sel{height:40px;padding:0 12px}
 .txta{min-height:80px;padding:10px 12px;resize:vertical}
 .inp:focus,.txta:focus,.sel:focus{border-color:#1a73e8}
-.fase-tabs{display:flex;border:1px solid #dadce0;border-radius:10px;overflow:hidden;margin-bottom:14px}
-.fase-tab{flex:1;height:38px;background:#f4f6f9;border:none;font:inherit;font-size:12px;font-weight:600;color:#5f6368;cursor:pointer;border-right:1px solid #dadce0;transition:background .15s,color .15s}
-.fase-tab:last-child{border-right:none}
-.fase-tab.on{background:#1a73e8;color:#fff}
+.fase-row{display:flex;border:1px solid #d1d5db;border-radius:10px;overflow:hidden;margin-bottom:12px}
+.ftab{flex:1;height:36px;background:#f8f9fa;border:none;font:inherit;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;border-right:1px solid #d1d5db;transition:all .15s}
+.ftab:last-child{border-right:none}
+.ftab.on{background:#1a73e8;color:#fff}
 .foto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
-.foto-item{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:#f4f6f9;border:1px solid #e0e0e0}
+.foto-item{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:#f4f6f9;border:1px solid #e0e4ea}
 .foto-item img{width:100%;height:100%;object-fit:cover}
-.foto-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;border:none;cursor:pointer;font-size:12px;display:grid;place-items:center}
-.upload-lbl{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:8px;background:#f4f6f9;border:1px solid #dadce0;color:#5f6368;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;margin-bottom:14px}
+.foto-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:12px;display:grid;place-items:center}
+.upload-lbl{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:8px;background:#f4f6f9;border:1px solid #e0e4ea;color:#5f6368;font:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:12px}
 .upload-lbl:hover{background:#e8eaed}
-.foto-empty{padding:14px;text-align:center;color:#9aa0a6;font-size:12px;border:1px dashed #dadce0;border-radius:8px;margin-bottom:10px}
-.btn-del{background:#fff3f3;color:#c62828;border:1px solid #ffcdd2;font-family:inherit;font-size:13px;font-weight:600;min-height:36px;padding:0 14px;border-radius:8px;cursor:pointer;transition:background .15s}
-.btn-del:hover{background:#ffebee}
-.report-wrap{background:#fff;border-radius:12px;max-height:64vh;overflow:auto}
-.report-wrap h2{font-size:20px;margin-bottom:4px}
-.r-meta{font-size:13px;color:#5f6368;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e0e0e0}
-.r-ticket{border:1px solid #e0e0e0;border-radius:10px;padding:14px;margin-bottom:14px}
-.r-ticket-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:8px}
-.r-ticket-head strong{font-size:14px}
-.r-desc{font-size:13px;color:#5f6368;margin-bottom:10px}
-.r-fase{margin-top:10px}
-.r-fase-title{font-size:12px;font-weight:600;display:block;margin-bottom:6px;text-transform:capitalize;color:#5f6368}
-.r-fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.r-fotos img{width:100%;height:90px;object-fit:cover;border-radius:8px;border:1px solid #e0e0e0}
-.toast{position:fixed;bottom:20px;right:20px;background:#202124;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.foto-empty{padding:14px;text-align:center;color:#9aa0a6;font-size:12px;border:1px dashed #d1d5db;border-radius:8px;margin-bottom:10px;grid-column:1/-1}
+.status-pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
+.sp-open{background:#fff3e0;color:#c45e00}
+.sp-uit{background:#e3f2fd;color:#0d47a1}
+.sp-ger{background:#e8f5e9;color:#1b5e20}
+.toast{position:fixed;bottom:20px;right:20px;background:#1a1a2e;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.r-body{background:#fff;padding:16px;border-radius:10px;max-height:60vh;overflow:auto}
+.r-body h2{font-size:18px;margin-bottom:4px}
+.r-meta{font-size:12px;color:#6b7280;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #e0e4ea}
+.r-ticket{border:1px solid #e0e4ea;border-radius:10px;padding:14px;margin-bottom:12px}
+.r-th{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;flex-wrap:wrap}
+.r-th strong{font-size:13px}
+.r-desc{font-size:12px;color:#6b7280;margin-bottom:8px}
+.r-fase-title{font-size:11px;font-weight:700;color:#5f6368;margin:8px 0 5px;text-transform:uppercase;letter-spacing:.5px}
+.r-fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.r-fotos img{width:100%;height:80px;object-fit:cover;border-radius:7px;border:1px solid #e0e4ea}
+@media(max-width:900px){.quad-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 
-<nav class="sidebar">
-  <div class="sb-logo">
-    <div class="sb-logo-icon">BH</div>
-    <div>
-      <div class="sb-logo-text">Bouwherstel Pro</div>
-      <div class="sb-logo-sub">Inspectie & herstel</div>
-    </div>
+<div class="topbar">
+  <div class="top-logo">
+    <div class="top-icon">BH</div>
+    <div class="top-name">Bouwherstel Pro</div>
   </div>
-  <div class="sb-section">Projecten</div>
-  <div class="sb-projects" id="sbProjects"></div>
-  <div class="sb-bottom">
-    <button class="sb-new-btn" id="btnNewProject">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Nieuw project
-    </button>
-  </div>
-</nav>
+  <div class="top-sep"></div>
+  <select class="proj-sel" id="projSel" onchange="switchProject(this.value)"></select>
+  <div class="top-spacer"></div>
+  <button class="tbtn tbtn-out" id="btnNewProj">+ Nieuw project</button>
+  <label class="tbtn tbtn-blue" for="mapUpload" style="cursor:pointer">↑ Upload plattegrond</label>
+  <input type="file" id="mapUpload" accept="image/*" class="hidden">
+  <button class="tbtn tbtn-green" id="btnPdf">↓ PDF Rapport</button>
+</div>
 
-<div class="main">
-  <div class="topbar">
-    <div style="flex:1;min-width:0">
-      <div class="topbar-title" id="tbTitle">Selecteer een project</div>
-      <div class="topbar-sub" id="tbSub">Kies links een project of maak een nieuw project aan</div>
-    </div>
-    <label class="tb-btn tb-outline" for="mapFileInput" style="cursor:pointer">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-      Upload plattegrond
-    </label>
-    <input type="file" id="mapFileInput" accept="image/*" class="hidden">
-    <button class="tb-btn tb-green" id="btnPdf">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-      PDF Rapport
-    </button>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="kaart">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-      Kaart
-    </button>
-    <button class="tab" data-tab="lijst">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      Tickets
-    </button>
-  </div>
-
-  <div class="content">
-    <div class="tab-panel" id="panelKaart">
-      <div class="map-outer" id="mapOuter">
-        <div class="map-canvas" id="mapCanvas">
-          <img id="mapImg" class="hidden" alt="Plattegrond">
-          <div class="markers-layer" id="markersLayer"></div>
-        </div>
-        <div class="map-placeholder-msg" id="mapPlaceholder">
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-          <p>Geen plattegrond geladen</p>
-          <span>Upload een plattegrond via de knop rechtsboven</span>
-        </div>
+<div class="page">
+  <div class="sec-card">
+    <div class="sec-head">
+      <div>
+        <h2>Hoofdplattegrond</h2>
+        <p>Ballonnen tonen de mankamenten — geel = open · groen = gereed · blauw = in uitvoering</p>
       </div>
-      <div class="zoom-controls">
-        <button class="zoom-btn" id="zoomIn">+</button>
-        <button class="zoom-btn" id="zoomOut">−</button>
-        <button class="zoom-btn" id="zoomReset" style="font-size:11px;font-weight:700">⊙</button>
+      <div id="mainMapStats" style="font-size:12px;color:#6b7280"></div>
+    </div>
+    <div class="sec-body">
+      <div class="map-wrap" id="mainMapWrap">
+        <img id="mainMapImg" class="hidden" alt="Plattegrond">
+        <div class="map-empty" id="mainMapEmpty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          <p>Nog geen plattegrond</p>
+          <span>Klik op "Upload plattegrond" rechtsboven</span>
+        </div>
+        <div class="balloons" id="balloonsLayer"></div>
       </div>
     </div>
+  </div>
 
-    <div class="tab-panel hidden" id="panelLijst">
-      <div class="list-panel">
-        <div class="list-filters">
-          <button class="filter-chip on" data-filter="all">Alle tickets</button>
-          <button class="filter-chip" data-filter="Gecreëerd">🟡 Gecreëerd</button>
-          <button class="filter-chip" data-filter="In uitvoering">🔵 In uitvoering</button>
-          <button class="filter-chip" data-filter="Gereed">🟢 Gereed</button>
-        </div>
-        <div id="ticketList"></div>
+  <div class="sec-card">
+    <div class="sec-head">
+      <div>
+        <h2>Plattegrond in 4 delen</h2>
+        <p>Klik in een deel om een mankament te plaatsen · Klik op een marker om het dossier te openen</p>
       </div>
+    </div>
+    <div class="sec-body">
+      <div class="quad-grid" id="quadGrid"></div>
     </div>
   </div>
 </div>
 
 <!-- MODAL NIEUW PROJECT -->
-<div class="modal-overlay hidden" id="modalProject">
+<div class="overlay hidden" id="modalProj">
   <div class="modal">
-    <div class="modal-header">
-      <h2>Nieuw project</h2>
-      <button class="modal-close" data-close="modalProject">✕</button>
+    <div class="mhead"><h3>Nieuw project</h3><button class="mclose" data-close="modalProj">✕</button></div>
+    <div class="mbody">
+      <div class="field"><label class="flabel">Projectnaam *</label><input id="inpProjName" class="inp" placeholder="Bijv. Pilot watergang Utrecht"></div>
+      <div class="field"><label class="flabel">Locatie</label><input id="inpProjLoc" class="inp" placeholder="Bijv. Utrecht"></div>
     </div>
-    <div class="modal-body">
-      <div class="field"><label class="field-label">Projectnaam *</label><input id="inpName" class="inp" placeholder="Bijv. Pilot watergang Utrecht"></div>
-      <div class="field"><label class="field-label">Locatie</label><input id="inpLoc" class="inp" placeholder="Bijv. Utrecht"></div>
-    </div>
-    <div class="modal-footer">
+    <div class="mfoot">
       <div></div>
       <div style="display:flex;gap:8px">
-        <button class="tb-btn tb-outline" data-close="modalProject">Annuleren</button>
-        <button class="tb-btn tb-blue" id="btnCreate">Aanmaken</button>
+        <button class="tbtn tbtn-out" data-close="modalProj">Annuleren</button>
+        <button class="tbtn tbtn-blue" id="btnCreateProj">Aanmaken</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL TICKET -->
-<div class="modal-overlay hidden" id="modalTicket">
+<!-- MODAL MANKAMENT -->
+<div class="overlay hidden" id="modalMank">
   <div class="modal">
-    <div class="modal-header">
-      <h2 id="mTicketTitle">Ticket</h2>
-      <button class="modal-close" data-close="modalTicket">✕</button>
+    <div class="mhead">
+      <h3 id="mMankTitle">Mankament</h3>
+      <button class="mclose" data-close="modalMank">✕</button>
     </div>
-    <div class="modal-body">
+    <div class="mbody">
       <div class="field">
-        <label class="field-label">Bijlagen per fase</label>
-        <div class="fase-tabs" id="faseTabs">
-          <button class="fase-tab on" data-fase="start">Start <span id="fCnt0"></span></button>
-          <button class="fase-tab" data-fase="middle">Midden <span id="fCnt1"></span></button>
-          <button class="fase-tab" data-fase="end">Einde <span id="fCnt2"></span></button>
+        <label class="flabel">Fase — Bijlagen</label>
+        <div class="fase-row" id="faseTabs">
+          <button class="ftab on" data-fase="start">Start <span id="fc0"></span></button>
+          <button class="ftab" data-fase="middle">Midden <span id="fc1"></span></button>
+          <button class="ftab" data-fase="end">Einde <span id="fc2"></span></button>
         </div>
-        <label class="upload-lbl" for="fotoInput">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Foto's uploaden
-        </label>
-        <input type="file" id="fotoInput" accept="image/*" multiple class="hidden">
+        <label class="upload-lbl" for="fotoUpload">↑ Foto's uploaden</label>
+        <input type="file" id="fotoUpload" accept="image/*" multiple class="hidden">
         <div class="foto-grid" id="fotoGrid"></div>
       </div>
-      <div class="field"><label class="field-label">Titel</label><input id="inpTTitle" class="inp" placeholder="Bijv. Waterspuwer afgebroken"></div>
-      <div class="field"><label class="field-label">Omschrijving</label><textarea id="inpTDesc" class="txta" placeholder="Omschrijving van het probleem..."></textarea></div>
-      <div class="field"><label class="field-label">Status</label>
-        <select id="inpTStatus" class="sel">
+      <div class="field"><label class="flabel">Omschrijving</label><textarea id="inpMankDesc" class="txta" placeholder="Beschrijf het mankament..."></textarea></div>
+      <div class="field"><label class="flabel">Status</label>
+        <select id="inpMankStatus" class="sel">
           <option value="Gecreëerd">🟡 Gecreëerd</option>
           <option value="In uitvoering">🔵 In uitvoering</option>
           <option value="Gereed">🟢 Gereed</option>
         </select>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-del" id="btnDelTicket">Verwijder</button>
+    <div class="mfoot">
+      <button class="tbtn tbtn-red" id="btnDelMank">Verwijder</button>
       <div style="display:flex;gap:8px">
-        <button class="tb-btn tb-outline" data-close="modalTicket">Sluiten</button>
-        <button class="tb-btn tb-blue" id="btnSaveTicket">Opslaan</button>
+        <button class="tbtn tbtn-out" data-close="modalMank">Sluiten</button>
+        <button class="tbtn tbtn-blue" id="btnSaveMank">Opslaan</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL RAPPORT -->
-<div class="modal-overlay hidden" id="modalReport">
+<!-- MODAL PDF -->
+<div class="overlay hidden" id="modalPdf">
   <div class="modal wide">
-    <div class="modal-header">
-      <h2>PDF Rapport</h2>
-      <button class="modal-close" data-close="modalReport">✕</button>
-    </div>
-    <div class="modal-body">
+    <div class="mhead"><h3>PDF Rapport</h3><button class="mclose" data-close="modalPdf">✕</button></div>
+    <div class="mbody">
       <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-        <button class="tb-btn tb-green" id="btnDlPdf">⬇ Download PDF</button>
+        <button class="tbtn tbtn-green" id="btnDlPdf">⬇ Download PDF</button>
       </div>
-      <div class="report-wrap" id="reportWrap"></div>
+      <div class="r-body" id="rBody"></div>
     </div>
   </div>
 </div>
@@ -297,289 +233,235 @@ body{display:flex;background:#f4f6f9;color:#202124}
 <div class="toast hidden" id="toast"></div>
 
 <script>
-const SK='bhpro2';
-let DB={projects:[]};
-function save(){try{localStorage.setItem(SK,JSON.stringify(DB));}catch(e){}}
-function load(){try{const r=localStorage.getItem(SK);if(r)DB=JSON.parse(r);}catch(e){}}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+const STORE_KEY='bhpro_v4';
+function loadDB(){try{const r=localStorage.getItem(STORE_KEY);return r?JSON.parse(r):{projects:[]};}catch(e){return{projects:[]};}}
+function saveDB(){try{localStorage.setItem(STORE_KEY,JSON.stringify(DB));}catch(e){}}
+let DB=loadDB();
+let curProjId=null,curMankId=null,curFase='start';
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('hidden'),2200);}
-
-let curProjId=null,curTicketId=null,curFase='start',listFilter='all';
-let scale=1,tx=0,ty=0,isDragging=false,dsx=0,dsy=0,dtx=0,dty=0,imgW=0,imgH=0;
-
 function getProj(){return DB.projects.find(p=>p.id===curProjId)||null;}
-function getTicket(){const p=getProj();return p?p.tickets.find(t=>t.id===curTicketId)||null:null;}
-function scls(s){return s==='Gereed'?'m-gereed':s==='In uitvoering'?'m-uitvoering':'m-open';}
-function dcls(s){return s==='Gereed'?'dot-gereed':s==='In uitvoering'?'dot-uitvoering':'dot-open';}
-function bcls(s){return s==='Gereed'?'sb-gereed':s==='In uitvoering'?'sb-uitvoering':'sb-open';}
+function getMank(){const p=getProj();return p?p.manks.find(m=>m.id===curMankId)||null:null;}
+function sc(s){return s==='Gereed'?'gereed':s==='In uitvoering'?'uitvoering':'open';}
+const QLABELS=['Links boven','Rechts boven','Links onder','Rechts onder'];
 
-// SIDEBAR
-function renderSidebar(){
-  const el=document.getElementById('sbProjects');
-  if(!DB.projects.length){el.innerHTML='<div style="padding:12px 10px;font-size:12px;color:rgba(255,255,255,.3)">Nog geen projecten</div>';return;}
-  el.innerHTML=DB.projects.map(p=>{
-    const done=p.tickets.filter(t=>t.status==='Gereed').length;
-    return `<button class="proj-btn${p.id===curProjId?' active':''}" onclick="openProject('${p.id}')">
-      <div class="proj-btn-dot"></div>
-      <div class="proj-btn-info">
-        <div class="proj-btn-name">${esc(p.name)}</div>
-        <div class="proj-btn-count">${p.tickets.length} tickets · ${done} gereed</div>
-      </div>
-    </button>`;
-  }).join('');
+function renderProjSel(){
+  const sel=document.getElementById('projSel');
+  if(!DB.projects.length){sel.innerHTML='<option value="">— Geen projecten —</option>';curProjId=null;return;}
+  sel.innerHTML=DB.projects.map(p=>`<option value="${p.id}"${p.id===curProjId?' selected':''}>${esc(p.name)}${p.location?' — '+esc(p.location):''}</option>`).join('');
+  if(!curProjId||!DB.projects.find(p=>p.id===curProjId)){curProjId=DB.projects[0].id;sel.value=curProjId;}
 }
 
-// TOPBAR
-function renderTopbar(){
+function switchProject(id){curProjId=id;renderAll();}
+
+function renderAll(){renderProjSel();renderMainMap();renderBalloons();renderQuads();renderStats();}
+
+function renderMainMap(){
   const p=getProj();
-  if(!p){document.getElementById('tbTitle').textContent='Selecteer een project';document.getElementById('tbSub').textContent='Kies links een project of maak een nieuw project aan';return;}
-  document.getElementById('tbTitle').textContent=p.name;
-  document.getElementById('tbSub').textContent=(p.location?p.location+' · ':'')+p.tickets.length+' tickets · '+p.tickets.filter(t=>t.status==='Gereed').length+' gereed';
+  const img=document.getElementById('mainMapImg');
+  const empty=document.getElementById('mainMapEmpty');
+  if(p&&p.map){img.src=p.map;img.classList.remove('hidden');empty.classList.add('hidden');}
+  else{img.classList.add('hidden');empty.classList.remove('hidden');}
 }
 
-// MAP
-function applyT(){document.getElementById('mapCanvas').style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;}
-function renderMap(){
-  const p=getProj();
-  const img=document.getElementById('mapImg');
-  const ph=document.getElementById('mapPlaceholder');
-  if(p&&p.map){img.src=p.map;img.classList.remove('hidden');ph.classList.add('hidden');}
-  else{img.classList.add('hidden');ph.classList.remove('hidden');}
-  renderMarkers();
-}
-function renderMarkers(){
-  const layer=document.getElementById('markersLayer');
+function renderBalloons(){
+  const layer=document.getElementById('balloonsLayer');
   layer.innerHTML='';
   const p=getProj();
   if(!p||!p.map)return;
-  p.tickets.forEach((t,i)=>{
+  p.manks.forEach((m,i)=>{
     const btn=document.createElement('button');
-    btn.className='marker-btn';
-    btn.style.left=t.x+'%';
-    btn.style.top=t.y+'%';
-    btn.innerHTML=`<div class="marker-circle ${scls(t.status)}">${i+1}</div>`;
-    btn.title=t.title||`Ticket ${i+1}`;
-    btn.onclick=e=>{e.stopPropagation();openTicketModal(t.id);};
+    btn.className='balloon';
+    btn.style.left=m.mx+'%';
+    btn.style.top=m.my+'%';
+    const s=sc(m.status);
+    btn.innerHTML=`<div class="balloon-head bh-${s}">${i+1}</div><div class="balloon-tail bt-${s}"></div>`;
+    btn.title=m.desc?m.desc.slice(0,60):`Mankament ${i+1}`;
+    btn.onclick=e=>{e.stopPropagation();openMankModal(m.id);};
     layer.appendChild(btn);
   });
 }
-function resetZoom(){
+
+function renderStats(){
   const p=getProj();
-  if(!p||!p.map||!imgW){scale=1;tx=0;ty=0;applyT();return;}
-  const o=document.getElementById('mapOuter');
-  const ns=Math.min(o.clientWidth/imgW,o.clientHeight/imgH,1);
-  scale=ns;tx=(o.clientWidth-imgW*ns)/2;ty=(o.clientHeight-imgH*ns)/2;applyT();
-}
-function doZoom(delta,cx,cy){
-  const o=document.getElementById('mapOuter');
-  const ox=cx!==undefined?cx:o.clientWidth/2;
-  const oy=cy!==undefined?cy:o.clientHeight/2;
-  const ns=Math.max(0.2,Math.min(10,scale*delta));
-  const r=ns/scale;
-  tx=ox-r*(ox-tx);ty=oy-r*(oy-ty);scale=ns;applyT();
+  if(!p){document.getElementById('mainMapStats').textContent='';return;}
+  const tot=p.manks.length,ger=p.manks.filter(m=>m.status==='Gereed').length,open=p.manks.filter(m=>m.status==='Gecreëerd').length;
+  document.getElementById('mainMapStats').innerHTML=`<span style="margin-right:10px">Totaal: <strong>${tot}</strong></span><span style="margin-right:10px;color:#c45e00">Open: <strong>${open}</strong></span><span style="color:#1b5e20">Gereed: <strong>${ger}</strong></span>`;
 }
 
-const mapOuter=document.getElementById('mapOuter');
-mapOuter.addEventListener('wheel',e=>{e.preventDefault();const rect=mapOuter.getBoundingClientRect();doZoom(e.deltaY<0?1.12:1/1.12,e.clientX-rect.left,e.clientY-rect.top);},{passive:false});
-mapOuter.addEventListener('mousedown',e=>{if(e.target.closest('.marker-btn'))return;isDragging=true;dsx=e.clientX;dsy=e.clientY;dtx=tx;dty=ty;mapOuter.classList.add('dragging');});
-window.addEventListener('mousemove',e=>{if(!isDragging)return;tx=dtx+(e.clientX-dsx);ty=dty+(e.clientY-dsy);applyT();});
-window.addEventListener('mouseup',()=>{isDragging=false;mapOuter.classList.remove('dragging');});
-
-mapOuter.addEventListener('click',e=>{
-  if(isDragging)return;
-  if(e.target.closest('.marker-btn'))return;
-  const p=getProj();if(!p||!p.map)return;
-  const img=document.getElementById('mapImg');
-  const r=img.getBoundingClientRect();
-  if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;
-  const x=+((e.clientX-r.left)/r.width*100).toFixed(2);
-  const y=+((e.clientY-r.top)/r.height*100).toFixed(2);
-  const t={id:uid(),x,y,title:'',desc:'',status:'Gecreëerd',photos:{start:[],middle:[],end:[]},createdAt:new Date().toISOString()};
-  p.tickets.push(t);save();renderMarkers();renderTicketList();renderSidebar();renderTopbar();
-  curTicketId=t.id;curFase='start';openTicketModal(t.id);
-});
-
-document.getElementById('zoomIn').onclick=()=>doZoom(1.2);
-document.getElementById('zoomOut').onclick=()=>doZoom(1/1.2);
-document.getElementById('zoomReset').onclick=resetZoom;
-
-// TABS
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.onclick=()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    const id=tab.dataset.tab;
-    document.getElementById('panelKaart').classList.toggle('hidden',id!=='kaart');
-    document.getElementById('panelLijst').classList.toggle('hidden',id!=='lijst');
-    if(id==='lijst')renderTicketList();
-  };
-});
-
-// TICKET LIST
-function renderTicketList(){
+function renderQuads(){
+  const grid=document.getElementById('quadGrid');
+  grid.innerHTML='';
   const p=getProj();
-  const el=document.getElementById('ticketList');
-  if(!p){el.innerHTML='<div class="empty-list"><p>Geen project open</p><span>Selecteer een project in de sidebar</span></div>';return;}
-  let tix=p.tickets;
-  if(listFilter!=='all')tix=tix.filter(t=>t.status===listFilter);
-  if(!tix.length){el.innerHTML=p.tickets.length?'<div class="empty-list"><p>Geen tickets met dit filter</p></div>':'<div class="empty-list"><p>Nog geen tickets</p><span>Ga naar de Kaart tab en klik op de plattegrond</span></div>';return;}
-  el.innerHTML=tix.map(t=>{
-    const all=[...t.photos.start,...t.photos.middle,...t.photos.end];
-    const thumbs=all.slice(0,2).map(s=>`<img class="t-thumb" src="${s}" alt="">`).join('');
-    const empty=all.length===0?`<div class="t-thumb-empty">Geen<br>foto's</div>`:'';
-    const date=new Date(t.createdAt).toLocaleDateString('nl-NL',{day:'2-digit',month:'short',year:'numeric'});
-    const idx=p.tickets.findIndex(x=>x.id===t.id);
-    return `<div class="ticket-row" onclick="openTicketModal('${t.id}')">
-      <div class="t-dot ${dcls(t.status)}"></div>
-      <div class="ticket-body">
-        <div class="t-num">Ticket #${idx+1}</div>
-        <div class="t-title">${esc(t.title||'Geen titel')}</div>
-        <div class="t-desc">${esc(t.desc||'Geen omschrijving')}</div>
-        <div class="t-meta">${date} · ${all.length} foto's · <span class="s-badge ${bcls(t.status)}">${esc(t.status)}</span></div>
-      </div>
-      <div class="ticket-photos">${thumbs||empty}</div>
-    </div>`;
-  }).join('');
+  for(let q=0;q<4;q++){
+    const manks=p?p.manks.filter(m=>m.quad===q):[];
+    const card=document.createElement('div');
+    card.className='quad-card';
+    card.innerHTML=`
+      <div class="quad-label">Deel ${q+1} — ${QLABELS[q]}<span>${manks.length} punt${manks.length!==1?'en':''}</span></div>
+      <div class="quad-map q${q}" id="qmap${q}">
+        ${p&&p.map?`<img src="${p.map}" alt="Deel ${q+1}">`:' <div class="quad-empty-msg">Upload plattegrond</div>'}
+        <div class="quad-markers" id="qm${q}"></div>
+        <div class="quad-click" id="qc${q}"></div>
+      </div>`;
+    grid.appendChild(card);
+    if(p&&p.map){
+      const ml=card.querySelector(`#qm${q}`);
+      manks.forEach(m=>{
+        const gi=p.manks.findIndex(x=>x.id===m.id);
+        const btn=document.createElement('button');
+        btn.className='qmarker';
+        btn.style.left=m.qx+'%';
+        btn.style.top=m.qy+'%';
+        btn.innerHTML=`<div class="qmarker-circle qc-${sc(m.status)}">${gi+1}</div>`;
+        btn.title=m.desc||`Mankament ${gi+1}`;
+        btn.onclick=e=>{e.stopPropagation();openMankModal(m.id);};
+        ml.appendChild(btn);
+      });
+      const cl=card.querySelector(`#qc${q}`);
+      cl.addEventListener('click',function(e){
+        const rect=this.getBoundingClientRect();
+        const qx=+((e.clientX-rect.left)/rect.width*100).toFixed(2);
+        const qy=+((e.clientY-rect.top)/rect.height*100).toFixed(2);
+        const mx=q%2===0?qx/2:50+qx/2;
+        const my=q<2?qy/2:50+qy/2;
+        const mank={id:uid(),quad:q,qx,qy,mx,my,desc:'',status:'Gecreëerd',photos:{start:[],middle:[],end:[]},createdAt:new Date().toISOString()};
+        p.manks.push(mank);
+        saveDB();renderAll();
+        curMankId=mank.id;curFase='start';
+        openMankModal(mank.id);
+      });
+    }
+  }
 }
 
-document.querySelectorAll('.filter-chip').forEach(chip=>{
-  chip.onclick=()=>{
-    document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('on'));
-    chip.classList.add('on');listFilter=chip.dataset.filter;renderTicketList();
-  };
-});
-
-// TICKET MODAL
-function openTicketModal(id){
-  curTicketId=id;
-  const p=getProj();const t=getTicket();if(!t)return;
-  const idx=p.tickets.findIndex(x=>x.id===id);
-  document.getElementById('mTicketTitle').textContent=`Ticket #${idx+1}`;
-  document.getElementById('inpTTitle').value=t.title||'';
-  document.getElementById('inpTDesc').value=t.desc||'';
-  document.getElementById('inpTStatus').value=t.status||'Gecreëerd';
+function openMankModal(id){
+  curMankId=id;
+  const p=getProj();const m=getMank();if(!m)return;
+  const idx=p.manks.findIndex(x=>x.id===id);
+  document.getElementById('mMankTitle').textContent=`Mankament ${idx+1} — Deel ${m.quad+1} (${QLABELS[m.quad]})`;
+  document.getElementById('inpMankDesc').value=m.desc||'';
+  document.getElementById('inpMankStatus').value=m.status||'Gecreëerd';
   curFase='start';
-  document.querySelectorAll('.fase-tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.fase==='start'));
-  updateCnts();renderFotos();
-  document.getElementById('modalTicket').classList.remove('hidden');
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.toggle('on',t.dataset.fase==='start'));
+  updateFaseCounts();renderFotoGrid();
+  document.getElementById('modalMank').classList.remove('hidden');
 }
-function updateCnts(){
-  const t=getTicket();if(!t)return;
-  document.getElementById('fCnt0').textContent=t.photos.start.length?`(${t.photos.start.length})`:'';
-  document.getElementById('fCnt1').textContent=t.photos.middle.length?`(${t.photos.middle.length})`:'';
-  document.getElementById('fCnt2').textContent=t.photos.end.length?`(${t.photos.end.length})`:'';
+
+function updateFaseCounts(){
+  const m=getMank();if(!m)return;
+  document.getElementById('fc0').textContent=m.photos.start.length?`(${m.photos.start.length})`:'';
+  document.getElementById('fc1').textContent=m.photos.middle.length?`(${m.photos.middle.length})`:'';
+  document.getElementById('fc2').textContent=m.photos.end.length?`(${m.photos.end.length})`:'';
 }
-function renderFotos(){
-  const t=getTicket();const grid=document.getElementById('fotoGrid');
-  if(!t){grid.innerHTML='';return;}
-  const ph=t.photos[curFase];
-  if(!ph.length){grid.innerHTML=`<div class="foto-empty" style="grid-column:1/-1">Geen foto's voor ${curFase}.</div>`;return;}
+
+function renderFotoGrid(){
+  const m=getMank();const grid=document.getElementById('fotoGrid');
+  if(!m){grid.innerHTML='';return;}
+  const ph=m.photos[curFase];
+  if(!ph.length){grid.innerHTML=`<div class="foto-empty">Geen foto's voor ${curFase}.</div>`;return;}
   grid.innerHTML=ph.map((src,i)=>`<div class="foto-item"><img src="${src}" alt="foto"><button class="foto-del" onclick="delFoto(${i})">✕</button></div>`).join('');
 }
-function delFoto(i){const t=getTicket();if(!t)return;t.photos[curFase].splice(i,1);save();updateCnts();renderFotos();}
+
+function delFoto(i){const m=getMank();if(!m)return;m.photos[curFase].splice(i,1);saveDB();updateFaseCounts();renderFotoGrid();}
 
 document.getElementById('faseTabs').addEventListener('click',e=>{
-  const tab=e.target.closest('.fase-tab');
-  if(!tab||!tab.dataset.fase)return;
+  const tab=e.target.closest('.ftab');if(!tab||!tab.dataset.fase)return;
   curFase=tab.dataset.fase;
-  document.querySelectorAll('.fase-tab').forEach(t=>t.classList.toggle('on',t.dataset.fase===curFase));
-  renderFotos();
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.toggle('on',t.dataset.fase===curFase));
+  renderFotoGrid();
 });
 
-document.getElementById('fotoInput').addEventListener('change',function(){
-  const t=getTicket();if(!t)return;
-  const files=Array.from(this.files);let done=0;if(!files.length)return;
+document.getElementById('fotoUpload').addEventListener('change',function(){
+  const m=getMank();if(!m)return;
+  const files=Array.from(this.files);if(!files.length)return;
+  let done=0;
   files.forEach(file=>{
     const reader=new FileReader();
-    reader.onload=e=>{t.photos[curFase].push(e.target.result);done++;if(done===files.length){save();updateCnts();renderFotos();renderMarkers();renderTicketList();toast(files.length+" foto's toegevoegd!");}};
+    reader.onload=e=>{m.photos[curFase].push(e.target.result);done++;if(done===files.length){saveDB();updateFaseCounts();renderFotoGrid();toast(files.length+" foto's toegevoegd!");}};
     reader.readAsDataURL(file);
   });
   this.value='';
 });
 
-document.getElementById('btnSaveTicket').onclick=()=>{
-  const t=getTicket();if(!t)return;
-  t.title=document.getElementById('inpTTitle').value.trim()||'Naamloos ticket';
-  t.desc=document.getElementById('inpTDesc').value.trim();
-  t.status=document.getElementById('inpTStatus').value;
-  save();renderMarkers();renderTicketList();renderSidebar();renderTopbar();
-  document.getElementById('modalTicket').classList.add('hidden');toast('Ticket opgeslagen!');
+document.getElementById('btnSaveMank').onclick=()=>{
+  const m=getMank();if(!m)return;
+  m.desc=document.getElementById('inpMankDesc').value.trim();
+  m.status=document.getElementById('inpMankStatus').value;
+  saveDB();renderAll();
+  document.getElementById('modalMank').classList.add('hidden');
+  toast('Mankament opgeslagen!');
 };
 
-document.getElementById('btnDelTicket').onclick=()=>{
-  if(!confirm('Ticket verwijderen?'))return;
+document.getElementById('btnDelMank').onclick=()=>{
+  if(!confirm('Mankament verwijderen?'))return;
   const p=getProj();if(!p)return;
-  p.tickets=p.tickets.filter(t=>t.id!==curTicketId);
-  save();renderMarkers();renderTicketList();renderSidebar();renderTopbar();
-  document.getElementById('modalTicket').classList.add('hidden');toast('Ticket verwijderd.');
+  p.manks=p.manks.filter(m=>m.id!==curMankId);
+  saveDB();renderAll();
+  document.getElementById('modalMank').classList.add('hidden');
+  toast('Mankament verwijderd.');
 };
 
-// PROJECT
-function openProject(id){
-  curProjId=id;curTicketId=null;scale=1;tx=0;ty=0;
-  renderSidebar();renderTopbar();renderMap();renderTicketList();
-  const img=document.getElementById('mapImg');
-  const p=getProj();
-  if(p&&p.map){
-    const doReset=()=>{imgW=img.naturalWidth;imgH=img.naturalHeight;resetZoom();};
-    if(img.complete&&img.naturalWidth)doReset();
-    else img.onload=doReset;
-  }
-}
-function createProject(){
-  const name=document.getElementById('inpName').value.trim();
-  const loc=document.getElementById('inpLoc').value.trim();
-  if(!name){alert('Vul een projectnaam in.');return;}
-  const p={id:uid(),name,location:loc,map:'',tickets:[]};
-  DB.projects.unshift(p);curProjId=p.id;
-  document.getElementById('inpName').value='';document.getElementById('inpLoc').value='';
-  save();document.getElementById('modalProject').classList.add('hidden');
-  renderSidebar();renderTopbar();renderMap();renderTicketList();toast('Project aangemaakt!');
-}
+document.getElementById('btnNewProj').onclick=()=>document.getElementById('modalProj').classList.remove('hidden');
 
-// MAP UPLOAD
-document.getElementById('mapFileInput').addEventListener('change',function(){
-  const p=getProj();if(!p||!this.files[0]){if(!p)alert('Open eerst een project.');this.value='';return;}
+document.getElementById('btnCreateProj').onclick=()=>{
+  const name=document.getElementById('inpProjName').value.trim();
+  const loc=document.getElementById('inpProjLoc').value.trim();
+  if(!name){alert('Vul een projectnaam in.');return;}
+  const proj={id:uid(),name,location:loc,map:'',manks:[]};
+  DB.projects.unshift(proj);
+  curProjId=proj.id;
+  saveDB();
+  document.getElementById('inpProjName').value='';
+  document.getElementById('inpProjLoc').value='';
+  document.getElementById('modalProj').classList.add('hidden');
+  renderAll();
+  toast('Project aangemaakt en opgeslagen!');
+};
+
+document.getElementById('inpProjName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnCreateProj').click();});
+
+document.getElementById('mapUpload').addEventListener('change',function(){
+  const p=getProj();
+  if(!p){alert('Maak eerst een project aan.');this.value='';return;}
+  if(!this.files[0])return;
   const reader=new FileReader();
-  reader.onload=e=>{
-    p.map=e.target.result;save();renderMap();
-    const img=document.getElementById('mapImg');
-    img.onload=()=>{imgW=img.naturalWidth;imgH=img.naturalHeight;resetZoom();};
-    toast('Plattegrond geladen!');
-  };
-  reader.readAsDataURL(this.files[0]);this.value='';
+  reader.onload=e=>{p.map=e.target.result;saveDB();renderAll();toast('Plattegrond geladen en opgeslagen!');};
+  reader.readAsDataURL(this.files[0]);
+  this.value='';
 });
 
-// PDF
 function buildReport(){
   const p=getProj();if(!p)return'';
   const date=new Date().toLocaleDateString('nl-NL',{day:'2-digit',month:'long',year:'numeric'});
-  let h=`<h2>${esc(p.name)}</h2><div class="r-meta">Locatie: ${esc(p.location||'–')} &nbsp;·&nbsp; Datum: ${date} &nbsp;·&nbsp; ${p.tickets.length} tickets</div>`;
-  if(!p.tickets.length)return h+'<div style="color:#9aa0a6;font-size:13px;padding:12px 0">Nog geen tickets aanwezig.</div>';
-  p.tickets.forEach((t,i)=>{
-    h+=`<div class="r-ticket"><div class="r-ticket-head"><strong>Ticket #${i+1} — ${esc(t.title||'Naamloos')}</strong><span class="s-badge ${bcls(t.status)}">${esc(t.status)}</span></div><div class="r-desc">${esc(t.desc||'Geen omschrijving')}</div>`;
+  let h=`<h2>${esc(p.name)}</h2><div class="r-meta">Locatie: ${esc(p.location||'–')} &nbsp;·&nbsp; Datum: ${date} &nbsp;·&nbsp; ${p.manks.length} mankamenten</div>`;
+  if(!p.manks.length)return h+'<p style="color:#9aa0a6;font-size:13px">Nog geen mankamenten.</p>';
+  p.manks.forEach((m,i)=>{
+    const sp=m.status==='Gereed'?'sp-ger':m.status==='In uitvoering'?'sp-uit':'sp-open';
+    h+=`<div class="r-ticket"><div class="r-th"><strong>Mankament ${i+1} — Deel ${m.quad+1} (${QLABELS[m.quad]})</strong><span class="status-pill ${sp}">${esc(m.status)}</span></div><div class="r-desc">${esc(m.desc||'Geen omschrijving')}</div>`;
     ['start','middle','end'].forEach(f=>{
-      const ph=t.photos[f];
-      h+=`<div class="r-fase"><span class="r-fase-title">${f} (${ph.length} foto's)</span>`;
+      const ph=m.photos[f];
+      h+=`<div class="r-fase-title">${f.charAt(0).toUpperCase()+f.slice(1)} (${ph.length} foto's)</div>`;
       if(ph.length)h+=`<div class="r-fotos">${ph.slice(0,6).map(s=>`<img src="${s}">`).join('')}</div>`;
-      else h+=`<div style="font-size:12px;color:#9aa0a6">Geen foto's</div>`;
-      h+=`</div>`;
+      else h+=`<div style="font-size:11px;color:#9aa0a6;margin-bottom:4px">Geen foto's</div>`;
     });
     h+=`</div>`;
   });
   return h;
 }
+
 document.getElementById('btnPdf').onclick=()=>{
-  const p=getProj();if(!p){alert('Open eerst een project.');return;}
-  document.getElementById('reportWrap').innerHTML=buildReport();
-  document.getElementById('modalReport').classList.remove('hidden');
+  const p=getProj();if(!p){alert('Selecteer eerst een project.');return;}
+  document.getElementById('rBody').innerHTML=buildReport();
+  document.getElementById('modalPdf').classList.remove('hidden');
 };
+
 document.getElementById('btnDlPdf').onclick=async()=>{
   const p=getProj();if(!p)return;
-  toast('PDF wordt gemaakt...');
+  toast('PDF wordt gegenereerd...');
   try{
-    const wrap=document.getElementById('reportWrap');
+    const wrap=document.getElementById('rBody');
     const canvas=await html2canvas(wrap,{scale:2,backgroundColor:'#fff',useCORS:true});
     const img=canvas.toDataURL('image/png');
     const{jsPDF}=window.jspdf;
@@ -592,23 +474,16 @@ document.getElementById('btnDlPdf').onclick=async()=>{
   }catch(e){alert('Fout: '+e.message);}
 };
 
-// MODAL CLOSE
 document.addEventListener('click',e=>{
   const cb=e.target.closest('[data-close]');
   if(cb){document.getElementById(cb.dataset.close).classList.add('hidden');return;}
-  if(e.target.classList.contains('modal-overlay'))e.target.classList.add('hidden');
+  if(e.target.classList.contains('overlay'))e.target.classList.add('hidden');
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.add('hidden'));});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden'));});
 
-document.getElementById('btnNewProject').onclick=()=>document.getElementById('modalProject').classList.remove('hidden');
-document.getElementById('btnCreate').onclick=createProject;
-document.getElementById('inpName').addEventListener('keydown',e=>{if(e.key==='Enter')createProject();});
-
-// INIT
-load();
-if(!DB.projects.length){DB.projects.push({id:uid(),name:'Pilot watergang Utrecht',location:'Utrecht, NL',map:'',tickets:[]});save();}
+if(!DB.projects.length){DB.projects.push({id:uid(),name:'Demo project',location:'Utrecht',map:'',manks:[]});saveDB();}
 curProjId=DB.projects[0].id;
-renderSidebar();renderTopbar();renderMap();renderTicketList();
+renderAll();
 </script>
 </body>
 </html>
